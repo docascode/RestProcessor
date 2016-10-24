@@ -82,17 +82,18 @@
                 }
 
                 Console.WriteLine($"Done splitting swagger file from '{mappingItem.Source}' to '{mappingItem.TargetDir}'");
+            }
 
-                var targetTocPath = Path.Combine(targetApiDir, TocFileName);
-                using (var sw = new StreamWriter(targetTocPath))
+            var targetTocPath = Path.Combine(targetApiDir, TocFileName);
+            using (var sw = new StreamWriter(targetTocPath))
+            {
+                foreach (var toc in tocDict)
                 {
-                    foreach (var toc in tocDict)
+                    sw.WriteLine($"# {toc.Key}");
+                    toc.Value.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.Ordinal));
+                    foreach (var subToc in toc.Value)
                     {
-                        sw.WriteLine($"# {toc.Key}");
-                        foreach (var subToc in toc.Value)
-                        {
-                            sw.WriteLine($"## [{subToc.Title}]({subToc.FilePath})");
-                        }
+                        sw.WriteLine($"## [{subToc.Title}]({subToc.FilePath})");
                     }
                 }
             }
