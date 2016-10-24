@@ -1,0 +1,19 @@
+###############
+#    folder   #
+###############
+**/bin/
+**/obj/
+packages/
+.vs/
+
+###############
+#  temp file  #
+###############
+*.log
+*.tmp
+*.vsprops
+*.suo
+*.user
+*.exe
+*.pdb
+*.sln.docstates

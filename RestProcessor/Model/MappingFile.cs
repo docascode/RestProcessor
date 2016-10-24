@@ -1,0 +1,17 @@
+﻿namespace RestProcessor
+{
+    using System;
+    using System.Collections.Generic;
+
+    using Newtonsoft.Json;
+
+    [Serializable]
+    public class MappingFile
+    {
+        [JsonProperty("target_api_root_dir")]
+        public string TargetApiRootDir { get; set; }
+
+        [JsonProperty("mapping")]
+        public List<MappingItem> MappingItems { get; set; }
+    }
+}
