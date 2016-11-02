@@ -5,10 +5,10 @@
     using Newtonsoft.Json;
 
     [Serializable]
-    public class MappingItem
+    public class ReferenceItem
     {
-        [JsonProperty("source")]
-        public string Source { get; set; }
+        [JsonProperty("source_swagger")]
+        public string SourceSwagger { get; set; }
 
         [JsonProperty("target_dir")]
         public string TargetDir { get; set; }

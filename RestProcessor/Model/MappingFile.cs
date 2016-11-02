@@ -12,6 +12,6 @@
         public string TargetApiRootDir { get; set; }
 
         [JsonProperty("mapping")]
-        public List<MappingItem> MappingItems { get; set; }
+        public Mapping Mapping { get; set; }
     }
 }

@@ -3,7 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Text;
+    using System.Text.RegularExpressions;
 
     using Newtonsoft.Json;
 
@@ -11,6 +13,7 @@
     {
         private static readonly JsonSerializer JsonSerializer = new JsonSerializer();
         private const string TocFileName = "toc.md";
+        public static readonly Regex TocRegex = new Regex(@"^(?<headerLevel>#+)(( |\t)*)\[(?<tocTitle>.+)\]\((?<tocLink>(?!http[s]?://).*?)\)( |\t)*#*( |\t)*(\n|$)", RegexOptions.Compiled);
 
         public static void Process(string sourceRootDir, string targetRootDir, string mappingFilePath)
         {
@@ -47,13 +50,17 @@
                 Console.WriteLine($"Done cleaning previous existing {targetApiDir}");
             }
             Directory.CreateDirectory(targetApiDir);
+            if (!targetApiDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                targetApiDir = targetApiDir + Path.DirectorySeparatorChar;
+            }
 
             var tocDict = new Dictionary<string, List<SubToc>>();
-            foreach (var mappingItem in mappingFile.MappingItems)
+            foreach (var mappingItem in mappingFile.Mapping.ReferenceItems)
             {
                 // Split rest files
                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, mappingItem.TargetDir));
-                var sourceFile = Path.Combine(sourceRootDir, mappingItem.Source);
+                var sourceFile = Path.Combine(sourceRootDir, mappingItem.SourceSwagger);
                 var restFileInfo = RestSplitter.Process(targetDir, sourceFile);
 
                 // Write top TOC
@@ -81,15 +88,40 @@
                     subTocList.Add(new SubToc(subTocTitle, filePath));
                 }
 
-                Console.WriteLine($"Done splitting swagger file from '{mappingItem.Source}' to '{mappingItem.TargetDir}'");
+                Console.WriteLine($"Done splitting swagger file from '{mappingItem.SourceSwagger}' to '{mappingItem.TargetDir}'");
             }
+
+            // Extract dictionary for documentation toc and index
+            var docDict = mappingFile.Mapping.DocumentationItems.Where(docItem => !string.IsNullOrEmpty(docItem.TocTitle)).ToDictionary(docItem => docItem.TocTitle);
 
             var targetTocPath = Path.Combine(targetApiDir, TocFileName);
             using (var sw = new StreamWriter(targetTocPath))
             {
                 foreach (var toc in tocDict)
                 {
-                    sw.WriteLine($"# {toc.Key}");
+                    List<string> tocLines = null;
+                    DocumentationItem docItem;
+                    if (docDict.TryGetValue(toc.Key, out docItem) && !string.IsNullOrEmpty(docItem.SourceToc))
+                    {
+                        tocLines = GenerateDocTocItems(targetRootDir, docItem.SourceToc, targetApiDir).ToList();
+                    }
+
+                    // 1. Top toc
+                    sw.WriteLine(!string.IsNullOrEmpty(docItem?.SourceIndex)
+                        ? $"# [{toc.Key}]({GenerateIndexHRef(targetRootDir, docItem.SourceIndex, targetApiDir)})"
+                        : $"# {toc.Key}");
+
+                    // 2. Conceptual toc
+                    if (tocLines != null)
+                    {
+                        foreach (var tocLine in tocLines)
+                        {
+                            // Insert one heading before to make it sub toc
+                            sw.WriteLine($"#{tocLine}");
+                        }
+                    }
+
+                    // 3. REST toc
                     toc.Value.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.Ordinal));
                     foreach (var subToc in toc.Value)
                     {
@@ -110,6 +142,51 @@
                 Title = title;
                 FilePath = filePath;
             }
+        }
+
+        private static IEnumerable<string> GenerateDocTocItems(string targetRootDir, string tocRelativePath, string targetApiDir)
+        {
+            var tocPath = Path.Combine(targetRootDir, tocRelativePath);
+            if (!File.Exists(tocPath))
+            {
+                throw new FileNotFoundException($"Toc file '{tocRelativePath}' not exists.");
+            }
+            var tocRelativeDirectoryToApi = GetRelativePath(Path.GetDirectoryName(tocPath), targetApiDir);
+
+            foreach (var tocLine in File.ReadLines(tocPath))
+            {
+                var match = TocRegex.Match(tocLine);
+                if (match.Success)
+                {
+                    var tocLink = match.Groups["tocLink"].Value;
+                    var tocTitle = match.Groups["tocTitle"].Value;
+                    var headerLevel = match.Groups["headerLevel"].Value.Length;
+                    var tocLinkRelativePath = tocRelativeDirectoryToApi + "/" +tocLink;
+                    yield return $"{new string('#', headerLevel)} [{tocTitle}]({tocLinkRelativePath})";
+                }
+                else
+                {
+                    yield return tocLine;
+                }
+            }
+        }
+
+        private static string GenerateIndexHRef(string targetRootDir, string indexRelativePath, string targetApiDir)
+        {
+            var indexPath = Path.Combine(targetRootDir, indexRelativePath);
+            if (!File.Exists(indexPath))
+            {
+                throw new FileNotFoundException($"Index file '{indexPath}' not exists.");
+            }
+            return GetRelativePath(indexPath, targetApiDir);
+        }
+
+        private static string GetRelativePath(string path, string basePath)
+        {
+            var pathUri = new Uri(path);
+            var basePathUri = new Uri(basePath);
+            var relativePathToBaseUri = basePathUri.MakeRelativeUri(pathUri);
+            return relativePathToBaseUri.OriginalString.Length == 0 ? Path.GetFileName(path) : relativePathToBaseUri.OriginalString;
         }
 
         private static string ExtractPascalName(string name)
