@@ -61,7 +61,7 @@
                 // Split rest files
                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, mappingItem.TargetDir));
                 var sourceFile = Path.Combine(sourceRootDir, mappingItem.SourceSwagger);
-                var restFileInfo = RestSplitter.Process(targetDir, sourceFile);
+                var restFileInfo = RestSplitter.Process(targetDir, sourceFile, mappingItem.OperationGroupMapping);
 
                 // Write top TOC
                 var tocTitle = string.IsNullOrEmpty(mappingItem.TocTitle)
@@ -85,6 +85,11 @@
                     var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
                     var subTocTitle = ExtractPascalName(fileNameWithoutExt);
                     var filePath = FileUtility.NormalizePath(Path.Combine(mappingItem.TargetDir, fileName));
+                    if (subTocList.Any(toc => toc.Title == subTocTitle))
+                    {
+                        throw new InvalidOperationException($"Sub toc {subTocTitle} under {tocTitle} has been added into toc.md, please add operation group name mapping to avoid conflicting");
+                    }
+
                     subTocList.Add(new SubToc(subTocTitle, filePath));
                 }
 

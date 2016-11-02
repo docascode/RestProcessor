@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -19,7 +18,7 @@
             public string TocTitle { get; set; }
         }
 
-        public static RestFileInfo Process(string targetDir, string filePath)
+        public static RestFileInfo Process(string targetDir, string filePath, OperationGroupMapping operationGroupMapping)
         {
             var restFileInfo = new RestFileInfo();
             if (!Directory.Exists(targetDir))
@@ -53,9 +52,18 @@
                         throw new InvalidOperationException($"Operation group '{operationGroup}' could not be found in for {FileUtility.GetDirectoryName(targetDir)}");
                     }
 
+                    // Get file name from operation group mapping
+                    var fileName = operationGroup;
+                    string newOperationGourpName;
+                    if (operationGroupMapping != null && operationGroupMapping.TryGetValue(operationGroup, out newOperationGourpName))
+                    {
+                        fileName = newOperationGourpName;
+                        rootJObj["x-internal-operation-group-name"] = newOperationGourpName;
+                    }
+
                     // Reset paths to filtered paths
                     rootJObj["paths"] = filteredPaths;
-                    restFileInfo.FileNames.Add(Serialze(targetDir, operationGroup, rootJObj));
+                    restFileInfo.FileNames.Add(Serialze(targetDir, fileName, rootJObj));
                 }
             }
             return restFileInfo;

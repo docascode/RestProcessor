@@ -54,6 +54,7 @@
     <Compile Include="Model\DocumentationItem.cs" />
     <Compile Include="Model\Mapping.cs" />
     <Compile Include="Model\MappingFile.cs" />
+    <Compile Include="Model\OperationGroupMapping.cs" />
     <Compile Include="Model\ReferenceItem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

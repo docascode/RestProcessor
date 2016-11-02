@@ -7,6 +7,9 @@
     [Serializable]
     public class ReferenceItem
     {
+        [JsonProperty("operation_group_mapping")]
+        public OperationGroupMapping OperationGroupMapping { get; set; }
+
         [JsonProperty("source_swagger")]
         public string SourceSwagger { get; set; }
 
