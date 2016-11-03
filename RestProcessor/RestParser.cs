@@ -38,6 +38,7 @@
             }
 
             ProcessCore(sourceRootDir, targetRootDir, mapping);
+            Console.WriteLine("Done processing all swagger files");
         }
 
         private static void ProcessCore(string sourceRootDir, string targetRootDir, MappingFile mappingFile)
@@ -63,7 +64,7 @@
                 var sourceFile = Path.Combine(sourceRootDir, mappingItem.SourceSwagger);
                 var restFileInfo = RestSplitter.Process(targetDir, sourceFile, mappingItem.OperationGroupMapping);
 
-                // Write top TOC
+                // Extract top TOC title
                 var tocTitle = string.IsNullOrEmpty(mappingItem.TocTitle)
                     ? ExtractPascalName(restFileInfo.TocTitle)
                     : mappingItem.TocTitle;
@@ -79,7 +80,7 @@
                 // Sort sub TOC
                 restFileInfo.FileNames.Sort();
 
-                // Write sub TOC
+                // Generate sub TOC
                 foreach (var fileName in restFileInfo.FileNames)
                 {
                     var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
@@ -97,8 +98,22 @@
             }
 
             // Extract dictionary for documentation toc and index
-            var docDict = mappingFile.Mapping.DocumentationItems.Where(docItem => !string.IsNullOrEmpty(docItem.TocTitle)).ToDictionary(docItem => docItem.TocTitle);
+            Console.WriteLine("Start to extract documentation toc and index");
+            var docDict = new Dictionary<string, DocumentationItem>();
+            foreach (var docItem in mappingFile.Mapping.DocumentationItems)
+            {
+                if (string.IsNullOrEmpty(docItem.TocTitle))
+                {
+                    throw new InvalidOperationException($"For {nameof(DocumentationItem)}, toc_title should not by null or empty, source_index is {docItem.SourceIndex}, source_toc is {docItem.SourceToc}.");
+                }
+                if (docDict.ContainsKey(docItem.TocTitle))
+                {
+                    throw new InvalidOperationException($"For {nameof(DocumentationItem)}, toc_title should be unique, duplicate toc_title {docItem.TocTitle} occured.");
+                }
+                docDict.Add(docItem.TocTitle, docItem);
+            }
 
+            Console.WriteLine("Start to generate toc.md");
             var targetTocPath = Path.Combine(targetApiDir, TocFileName);
             using (var sw = new StreamWriter(targetTocPath))
             {
