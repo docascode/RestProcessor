@@ -61,6 +61,7 @@
     <Compile Include="RestParser.cs" />
     <Compile Include="RestSplitter.cs" />
     <Compile Include="TagsUtility.cs" />
+    <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

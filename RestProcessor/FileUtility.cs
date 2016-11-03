@@ -38,5 +38,22 @@
             }
             return path.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
+
+        public static string GetRelativePath(string path, string basePath)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new ArgumentException($"{nameof(path)} should not be null or empty");
+            }
+            if (string.IsNullOrEmpty(basePath))
+            {
+                throw new ArgumentException($"{nameof(basePath)} should not be null or empty");
+            }
+
+            var pathUri = new Uri(path);
+            var basePathUri = new Uri(basePath);
+            var relativePathToBaseUri = basePathUri.MakeRelativeUri(pathUri);
+            return relativePathToBaseUri.OriginalString.Length == 0 ? Path.GetFileName(path) : relativePathToBaseUri.OriginalString;
+        }
     }
 }

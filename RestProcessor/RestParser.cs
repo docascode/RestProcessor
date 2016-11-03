@@ -66,7 +66,7 @@
 
                 // Extract top TOC title
                 var tocTitle = string.IsNullOrEmpty(mappingItem.TocTitle)
-                    ? ExtractPascalName(restFileInfo.TocTitle)
+                    ? Utility.ExtractPascalName(restFileInfo.TocTitle)
                     : mappingItem.TocTitle;
 
                 // Update toc dictionary
@@ -84,11 +84,11 @@
                 foreach (var fileName in restFileInfo.FileNames)
                 {
                     var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
-                    var subTocTitle = ExtractPascalName(fileNameWithoutExt);
+                    var subTocTitle = Utility.ExtractPascalName(fileNameWithoutExt);
                     var filePath = FileUtility.NormalizePath(Path.Combine(mappingItem.TargetDir, fileName));
                     if (subTocList.Any(toc => toc.Title == subTocTitle))
                     {
-                        throw new InvalidOperationException($"Sub toc {subTocTitle} under {tocTitle} has been added into toc.md, please add operation group name mapping to avoid conflicting");
+                        throw new InvalidOperationException($"Sub toc '{subTocTitle}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping to avoid conflicting");
                     }
 
                     subTocList.Add(new SubToc(subTocTitle, filePath));
@@ -104,11 +104,15 @@
             {
                 if (string.IsNullOrEmpty(docItem.TocTitle))
                 {
-                    throw new InvalidOperationException($"For {nameof(DocumentationItem)}, toc_title should not by null or empty, source_index is {docItem.SourceIndex}, source_toc is {docItem.SourceToc}.");
+                    throw new InvalidOperationException($"For {nameof(DocumentationItem)}, toc_title should not by null or empty, source_index is '{docItem.SourceIndex}', source_toc is '{docItem.SourceToc}'.");
                 }
                 if (docDict.ContainsKey(docItem.TocTitle))
                 {
-                    throw new InvalidOperationException($"For {nameof(DocumentationItem)}, toc_title should be unique, duplicate toc_title {docItem.TocTitle} occured.");
+                    throw new InvalidOperationException($"For {nameof(DocumentationItem)}, toc_title should be unique, duplicate toc_title '{docItem.TocTitle}' occurred.");
+                }
+                if (!tocDict.ContainsKey(docItem.TocTitle))
+                {
+                    throw new InvalidOperationException($"For {nameof(DocumentationItem)}, toc_title '{docItem.TocTitle}' doesn't exist in {nameof(ReferenceItem)}");
                 }
                 docDict.Add(docItem.TocTitle, docItem);
             }
@@ -171,7 +175,12 @@
             {
                 throw new FileNotFoundException($"Toc file '{tocRelativePath}' not exists.");
             }
-            var tocRelativeDirectoryToApi = GetRelativePath(Path.GetDirectoryName(tocPath), targetApiDir);
+            var fileName = Path.GetFileName(tocPath);
+            if (!fileName.Equals(TocFileName, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException($"Currently only '{TocFileName}' is supported as conceptual toc, please update the toc path '{tocRelativePath}'.");
+            }
+            var tocRelativeDirectoryToApi = FileUtility.GetRelativePath(Path.GetDirectoryName(tocPath), targetApiDir);
 
             foreach (var tocLine in File.ReadLines(tocPath))
             {
@@ -198,108 +207,7 @@
             {
                 throw new FileNotFoundException($"Index file '{indexPath}' not exists.");
             }
-            return GetRelativePath(indexPath, targetApiDir);
-        }
-
-        private static string GetRelativePath(string path, string basePath)
-        {
-            var pathUri = new Uri(path);
-            var basePathUri = new Uri(basePath);
-            var relativePathToBaseUri = basePathUri.MakeRelativeUri(pathUri);
-            return relativePathToBaseUri.OriginalString.Length == 0 ? Path.GetFileName(path) : relativePathToBaseUri.OriginalString;
-        }
-
-        private static string ExtractPascalName(string name)
-        {
-            var list = new HashSet<string> { "BI", "IP", "ML", "MAM", "VM", "VMs" };
-            if (name.Contains(" "))
-            {
-                return name;
-            }
-
-            var result = new StringBuilder();
-            for (var i = 0; i < name.Length; i++)
-            {
-                // Exclude index = 0
-                var c = name[i];
-                if (i != 0 &&
-                    char.IsUpper(c))
-                {
-                    var closestUpperCaseWord = GetClosestUpperCaseWord(name, i);
-                    if (closestUpperCaseWord.Length > 0)
-                    {
-                        if (list.Contains(closestUpperCaseWord))
-                        {
-                            result.Append(" ");
-                            result.Append(closestUpperCaseWord);
-                            i = i + closestUpperCaseWord.Length - 1;
-                            continue;
-                        }
-
-                        var closestCamelCaseWord = GetClosestCamelCaseWord(name, i);
-                        if (list.Contains(closestCamelCaseWord))
-                        {
-                            result.Append(" ");
-                            result.Append(closestCamelCaseWord);
-                            i = i + closestCamelCaseWord.Length - 1;
-                            continue;
-                        }
-                    }
-                    result.Append(" ");
-                }
-                result.Append(c);
-            }
-
-            return result.ToString();
-        }
-
-        private static string GetClosestUpperCaseWord(string word, int index)
-        {
-            var result = new StringBuilder();
-            for (var i = index; i < word.Length; i++)
-            {
-                var character = word[i];
-                if (char.IsUpper(character))
-                {
-                    result.Append(character);
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            if (result.Length == 0)
-            {
-                return string.Empty;
-            }
-
-            // Remove the last character, which is unlikely the continues upper case word.
-            return result.ToString(0, result.Length - 1);
-        }
-
-        private static string GetClosestCamelCaseWord(string word, int index)
-        {
-            var result = new StringBuilder();
-            var meetLowerCase = false;
-            for (var i = index; i < word.Length; i++)
-            {
-                var character = word[i];
-                if (char.IsUpper(character))
-                {
-                    if (meetLowerCase)
-                    {
-                        return result.ToString();
-                    }
-                }
-                else
-                {
-                    meetLowerCase = true;
-                }
-                result.Append(character);
-            }
-
-            return result.ToString();
+            return FileUtility.GetRelativePath(indexPath, targetApiDir);
         }
     }
 }
