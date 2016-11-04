@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text;
     using System.Text.RegularExpressions;
 
     using Newtonsoft.Json;
@@ -56,7 +55,7 @@
                 targetApiDir = targetApiDir + Path.DirectorySeparatorChar;
             }
 
-            var tocDict = new Dictionary<string, List<SubToc>>();
+            var tocDict = new Dictionary<string, List<SwaggerToc>>();
             foreach (var mappingItem in mappingFile.Mapping.ReferenceItems)
             {
                 // Split rest files
@@ -70,10 +69,10 @@
                     : mappingItem.TocTitle;
 
                 // Update toc dictionary
-                List<SubToc> subTocList;
+                List<SwaggerToc> subTocList;
                 if (!tocDict.TryGetValue(tocTitle, out subTocList))
                 {
-                    subTocList = new List<SubToc>();
+                    subTocList = new List<SwaggerToc>();
                     tocDict.Add(tocTitle, subTocList);
                 }
 
@@ -91,7 +90,7 @@
                         throw new InvalidOperationException($"Sub toc '{subTocTitle}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping to avoid conflicting");
                     }
 
-                    subTocList.Add(new SubToc(subTocTitle, filePath));
+                    subTocList.Add(new SwaggerToc(subTocTitle, filePath));
                 }
 
                 Console.WriteLine($"Done splitting swagger file from '{mappingItem.SourceSwagger}' to '{mappingItem.TargetDir}'");
@@ -110,10 +109,6 @@
                 {
                     throw new InvalidOperationException($"For {nameof(DocumentationItem)}, toc_title should be unique, duplicate toc_title '{docItem.TocTitle}' occurred.");
                 }
-                if (!tocDict.ContainsKey(docItem.TocTitle))
-                {
-                    throw new InvalidOperationException($"For {nameof(DocumentationItem)}, toc_title '{docItem.TocTitle}' doesn't exist in {nameof(ReferenceItem)}");
-                }
                 docDict.Add(docItem.TocTitle, docItem);
             }
 
@@ -121,21 +116,22 @@
             var targetTocPath = Path.Combine(targetApiDir, TocFileName);
             using (var sw = new StreamWriter(targetTocPath))
             {
-                foreach (var toc in tocDict)
+                // Follow the sequence of documentation items
+                foreach (var docItem in docDict)
                 {
-                    List<string> tocLines = null;
-                    DocumentationItem docItem;
-                    if (docDict.TryGetValue(toc.Key, out docItem) && !string.IsNullOrEmpty(docItem.SourceToc))
-                    {
-                        tocLines = GenerateDocTocItems(targetRootDir, docItem.SourceToc, targetApiDir).ToList();
-                    }
-
                     // 1. Top toc
-                    sw.WriteLine(!string.IsNullOrEmpty(docItem?.SourceIndex)
-                        ? $"# [{toc.Key}]({GenerateIndexHRef(targetRootDir, docItem.SourceIndex, targetApiDir)})"
-                        : $"# {toc.Key}");
+                    Console.WriteLine($"Created top conceptual toc item '{docItem.Key}'");
+                    sw.WriteLine(!string.IsNullOrEmpty(docItem.Value.SourceIndex)
+                        ? $"# [{docItem.Key}]({GenerateIndexHRef(targetRootDir, docItem.Value.SourceIndex, targetApiDir)})"
+                        : $"# {docItem.Key}");
 
                     // 2. Conceptual toc
+                    List<string> tocLines = null;
+                    if (!string.IsNullOrEmpty(docItem.Value.SourceToc))
+                    {
+                        tocLines = GenerateDocTocItems(targetRootDir, docItem.Value.SourceToc, targetApiDir).Where(i => !string.IsNullOrEmpty(i)).ToList();
+                    }
+
                     if (tocLines != null)
                     {
                         foreach (var tocLine in tocLines)
@@ -143,25 +139,46 @@
                             // Insert one heading before to make it sub toc
                             sw.WriteLine($"#{tocLine}");
                         }
+                        Console.WriteLine($"-- Created sub referenced toc items under conceptual toc item '{docItem.Key}'");
                     }
 
                     // 3. REST toc
-                    toc.Value.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.Ordinal));
-                    foreach (var subToc in toc.Value)
+                    List<SwaggerToc> swaggerToc;
+                    if (tocDict.TryGetValue(docItem.Key, out swaggerToc))
+                    {
+                        swaggerToc.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.Ordinal));
+                        foreach (var subToc in swaggerToc)
+                        {
+                            sw.WriteLine($"## [{subToc.Title}]({subToc.FilePath})");
+                        }
+                    }
+                }
+
+                // Write the toc of remaining REST
+                foreach (var tocItem in tocDict.Where(i => !docDict.ContainsKey(i.Key)))
+                {
+                    // 1. Top toc
+                    sw.WriteLine($"# {tocItem.Key}");
+
+                    // 2. REST toc
+                    tocItem.Value.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.Ordinal));
+                    foreach (var subToc in tocItem.Value)
                     {
                         sw.WriteLine($"## [{subToc.Title}]({subToc.FilePath})");
                     }
+
+                    Console.WriteLine($"Created top referenced toc item '{tocItem.Key}' which has no conceptual pages");
                 }
             }
         }
 
-        private class SubToc
+        private class SwaggerToc
         {
             public string Title { get; }
 
             public string FilePath { get; }
 
-            public SubToc(string title, string filePath)
+            public SwaggerToc(string title, string filePath)
             {
                 Title = title;
                 FilePath = filePath;
