@@ -208,6 +208,11 @@
                     var tocTitle = match.Groups["tocTitle"].Value;
                     var headerLevel = match.Groups["headerLevel"].Value.Length;
                     var tocLinkRelativePath = tocRelativeDirectoryToApi + "/" +tocLink;
+                    var linkPath = Path.Combine(targetApiDir, tocLinkRelativePath);
+                    if (!File.Exists(linkPath))
+                    {
+                        throw new FileNotFoundException($"Link '{tocLinkRelativePath}' not exist in '{TocFileName}' of '{targetApiDir}'");
+                    }
                     yield return $"{new string('#', headerLevel)} [{tocTitle}]({tocLinkRelativePath})";
                 }
                 else

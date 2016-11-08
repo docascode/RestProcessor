@@ -7,7 +7,7 @@
     {
         public static string ExtractPascalName(string name)
         {
-            var list = new HashSet<string> { "BI", "IP", "ML", "MAM", "VM", "VMs" };
+            var list = new HashSet<string> { "BI", "IP", "ML", "MAM", "OS", "VM", "VMs" };
             if (name.Contains(" "))
             {
                 return name;
