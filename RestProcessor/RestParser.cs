@@ -211,7 +211,7 @@
                     var linkPath = Path.Combine(targetApiDir, tocLinkRelativePath);
                     if (!File.Exists(linkPath))
                     {
-                        throw new FileNotFoundException($"Link '{tocLinkRelativePath}' not exist in '{TocFileName}' of '{targetApiDir}'");
+                        throw new FileNotFoundException($"Link '{tocLinkRelativePath}' not exist in '{tocRelativePath}', when merging into '{TocFileName}' of '{targetApiDir}'");
                     }
                     yield return $"{new string('#', headerLevel)} [{tocTitle}]({tocLinkRelativePath})";
                 }

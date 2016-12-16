@@ -36,6 +36,10 @@
                 var root = JToken.ReadFrom(reader);
                 var rootJObj = (JObject)root;
 
+                // Resolve $ref with json file instead of definition reference in the same swagger
+                var refResolver = new RefResolver(rootJObj, filePath);
+                refResolver.Resolve();
+
                 restFileInfo.TocTitle = GetInfoTitle(rootJObj);
 
                 var pathsJObj = (JObject)rootJObj["paths"];
