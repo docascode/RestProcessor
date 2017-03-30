@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Linq;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -76,16 +77,39 @@
                         if (jValue != null && jValue.Type == JTokenType.String)
                         {
                             var stringValue = (string)jValue;
-                            if (stringValue.EndsWith(".json"))
+                            if(stringValue.Contains(".json"))
                             {
-                                var fullPath = Path.Combine(_swaggerDir, stringValue);
-                                using (var streamReader = File.OpenText(fullPath))
-                                using (var reader = new JsonTextReader(streamReader))
+                                if (stringValue.EndsWith(".json"))
                                 {
-                                    var root = JToken.ReadFrom(reader);
-                                    var fileName = Path.GetFileNameWithoutExtension(fullPath);
-                                    var definitionName = AddDefinitions(fileName, root);
-                                    jObject[pair.Key] = JToken.FromObject($"#/{DefinitionKey}/{definitionName}");
+                                    // External file reference
+                                    var fullPath = Path.Combine(_swaggerDir, stringValue);
+                                    using (var streamReader = File.OpenText(fullPath))
+                                    using (var reader = new JsonTextReader(streamReader))
+                                    {
+                                        var root = JToken.ReadFrom(reader);
+                                        var fileName = Path.GetFileNameWithoutExtension(fullPath);
+                                        var definitionName = AddDefinitions(fileName, root);
+                                        jObject[pair.Key] = JToken.FromObject($"#/{DefinitionKey}/{definitionName}");
+                                        Console.WriteLine($"Resolved $ref in '{jObject.Path}' for external path '{stringValue}'.");
+                                    }
+                                }
+                                else if (stringValue.Contains("#"))
+                                {
+                                    // External embedded reference
+                                    var values = stringValue.Split('#');
+                                    if (values.Length != 2)
+                                    {
+                                        throw new InvalidOperationException($"After reference value '{stringValue}' is split by '#', length should be 2 instead of {values.Length}.");
+                                    }
+                                    var fullPath = Path.Combine(_swaggerDir, values[0]);
+                                    using (var streamReader = File.OpenText(fullPath))
+                                    using (var reader = new JsonTextReader(streamReader))
+                                    {
+                                        var root = JToken.ReadFrom(reader);
+                                        var key = values[1].Split('/').First();
+
+                                        Console.WriteLine($"Resolved $ref in '{jObject.Path}' for external path '{stringValue}'.");
+                                    }
                                 }
                             }
                         }
@@ -99,16 +123,16 @@
             }
         }
 
-        private string AddDefinitions(string fileName, JToken root)
+        private string AddDefinitions(string key, JToken root)
         {
             JToken jToken;
-            if (_definitionsJObject.TryGetValue(fileName, out jToken))
+            if (_definitionsJObject.TryGetValue(key, out jToken))
             {
-                var randomFileName = fileName + _random.Next(int.MinValue, int.MaxValue);
-                return AddDefinitions(randomFileName, root);
+                var randomKey = key + _random.Next(int.MinValue, int.MaxValue);
+                return AddDefinitions(randomKey, root);
             }
-            _definitionsJObject[fileName] = root;
-            return fileName;
+            _definitionsJObject[key] = root;
+            return key;
         }
     }
 }
