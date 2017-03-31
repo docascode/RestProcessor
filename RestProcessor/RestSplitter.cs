@@ -46,7 +46,7 @@
                 var operationGroups = GetOperationGroups(pathsJObj);
                 if (operationGroups.Count == 0)
                 {
-                    throw new InvalidOperationException("Operation groups should not be null or empty.");
+                    throw new InvalidOperationException($"Operation groups should not be null or empty for file {filePath}.");
                 }
                 foreach (var operationGroup in operationGroups)
                 {

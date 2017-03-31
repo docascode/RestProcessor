@@ -87,7 +87,7 @@
                     var filePath = FileUtility.NormalizePath(Path.Combine(mappingItem.TargetDir, fileName));
                     if (subTocList.Any(toc => toc.Title == subTocTitle))
                     {
-                        throw new InvalidOperationException($"Sub toc '{subTocTitle}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping to avoid conflicting");
+                        throw new InvalidOperationException($"Sub toc '{fileNameWithoutExt}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{mappingItem.SourceSwagger}' to avoid conflicting");
                     }
 
                     subTocList.Add(new SwaggerToc(subTocTitle, filePath));
