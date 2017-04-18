@@ -1,6 +1,9 @@
 before_build:
   - nuget restore
 
+configuration:
+  - Release
+
 build:
   project: RestProcessor.sln
 
