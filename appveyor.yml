@@ -8,6 +8,6 @@ build:
   project: RestProcessor.sln
 
 artifacts:
-  - path: RestProcessor\bin\Release
+  - path: RestProcessor
     name: RestProcessorArtifacts
     type: zip
