@@ -13,4 +13,4 @@ artifacts:
     type: zip
 
 on_success:
-  - echo $artifacts[0].url
+  - echo %artifact%[0].url
