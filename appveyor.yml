@@ -2,6 +2,6 @@ before_build:
   - nuget restore
   
 artifacts:
-  - path: RestProcessor\bin\Release\RestProcessor.exe
+  - path: '*.exe'
     name: RestProcessorArtifacts
     type: zip
