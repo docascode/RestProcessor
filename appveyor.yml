@@ -11,3 +11,8 @@ artifacts:
   - path: RestProcessor
     name: RestProcessorArtifacts
     type: zip
+
+on_success:
+  - foreach ($artifactName in $artifacts.keys) {
+        echo $artifacts[$artifactName].url
+    }
