@@ -1,6 +1,9 @@
 before_build:
   - nuget restore
-  
+
+build:
+  - msbuild /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
 artifacts:
   - path: '**.exe'
     name: RestProcessorArtifacts
