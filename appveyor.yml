@@ -1,4 +1,7 @@
 
+before_build:
+  - nuget restore
+  
 artifacts:
   - path: RestProcessor\bin\%CONFIGURATION%\RestProcessor.exe
     name: RestProcessorArtifacts
