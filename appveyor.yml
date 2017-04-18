@@ -13,6 +13,4 @@ artifacts:
     type: zip
 
 on_success:
-  - foreach ($artifactName in $artifacts.keys) {
-        echo $artifacts[$artifactName].url
-    }
+  - echo $artifacts[0].url
