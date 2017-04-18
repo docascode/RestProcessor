@@ -1,1 +1,5 @@
 
+artifacts:
+  - path: RestProcessor\bin\%CONFIGURATION%\RestProcessor.exe
+    name: RestProcessorArtifacts
+    type: zip
