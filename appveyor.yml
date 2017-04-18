@@ -8,9 +8,6 @@ build:
   project: RestProcessor.sln
 
 artifacts:
-  - path: RestProcessor
+  - path: RestProcessor\bin\$(configuration)
     name: RestProcessorArtifacts
     type: zip
-
-on_success:
-  - echo %artifact%[0].url
