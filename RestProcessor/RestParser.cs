@@ -151,10 +151,17 @@
                         if (tocLines != null)
                         {
                             sw.WriteLine("## Reference");
+                            foreach (var subToc in swaggerToc)
+                            {
+                                sw.WriteLine($"### [{subToc.Title}]({subToc.FilePath})");
+                            }
                         }
-                        foreach (var subToc in swaggerToc)
+                        else
                         {
-                            sw.WriteLine($"### [{subToc.Title}]({subToc.FilePath})");
+                            foreach (var subToc in swaggerToc)
+                            {
+                                sw.WriteLine($"## [{subToc.Title}]({subToc.FilePath})");
+                            }
                         }
                     }
                 }
