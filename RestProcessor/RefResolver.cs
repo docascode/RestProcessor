@@ -11,7 +11,6 @@
         private const string DefinitionKey = "definitions";
         private readonly string _swaggerDir;
         private readonly JObject _root;
-        private readonly Random _random = new Random();
         private readonly JObject _definitionsJObject;
 
         public RefResolver(JObject root, string swaggerPath)
@@ -84,7 +83,8 @@
                                 {
                                     var root = JToken.ReadFrom(reader);
                                     var fileName = Path.GetFileNameWithoutExtension(fullPath);
-                                    var definitionName = AddDefinitions(fileName, root);
+                                    const int counter = 0;
+                                    var definitionName = AddDefinitions(fileName, root, counter);
                                     jObject[pair.Key] = JToken.FromObject($"#/{DefinitionKey}/{definitionName}");
                                 }
                             }
@@ -99,13 +99,14 @@
             }
         }
 
-        private string AddDefinitions(string fileName, JToken root)
+        private string AddDefinitions(string fileName, JToken root, int counter)
         {
             JToken jToken;
             if (_definitionsJObject.TryGetValue(fileName, out jToken))
             {
-                var randomFileName = fileName + _random.Next(int.MinValue, int.MaxValue);
-                return AddDefinitions(randomFileName, root);
+                counter++;
+                var randomFileName = $"{fileName}-{counter}";
+                return AddDefinitions(randomFileName, root, counter);
             }
             _definitionsJObject[fileName] = root;
             return fileName;
