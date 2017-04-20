@@ -148,7 +148,10 @@
                     {
                         swaggerToc.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.Ordinal));
                         // Only reference TOC with conceptual TOC should insert 'Reference' text
-                        sw.WriteLine("## Reference");
+                        if (tocLines != null)
+                        {
+                            sw.WriteLine("## Reference");
+                        }
                         foreach (var subToc in swaggerToc)
                         {
                             sw.WriteLine($"### [{subToc.Title}]({subToc.FilePath})");
