@@ -132,7 +132,7 @@
                         tocLines = GenerateDocTocItems(targetRootDir, docItem.Value.SourceToc, targetApiDir).Where(i => !string.IsNullOrEmpty(i)).ToList();
                     }
 
-                    if (tocLines != null)
+                    if (tocLines != null && tocLines.Count > 0)
                     {
                         foreach (var tocLine in tocLines)
                         {
@@ -148,7 +148,7 @@
                     {
                         swaggerToc.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.Ordinal));
                         // Only reference TOC with conceptual TOC should insert 'Reference' text
-                        if (tocLines != null)
+                        if (tocLines != null && tocLines.Count > 0)
                         {
                             sw.WriteLine("## Reference");
                             foreach (var subToc in swaggerToc)
