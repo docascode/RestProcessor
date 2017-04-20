@@ -147,6 +147,7 @@
                     if (tocDict.TryGetValue(docItem.Key, out swaggerToc))
                     {
                         swaggerToc.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.Ordinal));
+                        // Only reference TOC with conceptual TOC should insert 'Reference' text
                         sw.WriteLine("## Reference");
                         foreach (var subToc in swaggerToc)
                         {
@@ -163,10 +164,9 @@
 
                     // 2. REST toc
                     tocItem.Value.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.Ordinal));
-                    sw.WriteLine("## Reference");
                     foreach (var subToc in tocItem.Value)
                     {
-                        sw.WriteLine($"### [{subToc.Title}]({subToc.FilePath})");
+                        sw.WriteLine($"## [{subToc.Title}]({subToc.FilePath})");
                     }
 
                     Console.WriteLine($"Created top referenced toc item '{tocItem.Key}' which has no conceptual pages");
