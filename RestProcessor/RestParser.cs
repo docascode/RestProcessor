@@ -55,6 +55,8 @@
                 targetApiDir = targetApiDir + Path.DirectorySeparatorChar;
             }
 
+            // Mapping for group name and full toc title name
+            var groupTocsMapping = new Dictionary<string, List<string>>();
             var tocDict = new Dictionary<string, List<SwaggerToc>>();
             foreach (var mappingItem in mappingFile.Mapping.ReferenceItems)
             {
@@ -110,57 +112,88 @@
                     throw new InvalidOperationException($"For {nameof(DocumentationItem)}, toc_title should be unique, duplicate toc_title '{docItem.TocTitle}' occurred.");
                 }
                 docDict.Add(docItem.TocTitle, docItem);
+
+                // Add info to groupTocsMapping
+                var groupServiceMapping = GroupServiceMapping.FromTocTitle(docItem.TocTitle);
+                var groupKey = groupServiceMapping.Group ?? string.Empty;
+                List<string> tocs;
+                if (!groupTocsMapping.TryGetValue(groupKey, out tocs))
+                {
+                    tocs = new List<string>();
+                    groupTocsMapping.Add(groupKey, tocs);
+                }
+                // Follow the sequence of documentation items
+                tocs.Add(docItem.TocTitle);
             }
 
             Console.WriteLine("Start to generate toc.md");
             var targetTocPath = Path.Combine(targetApiDir, TocFileName);
             using (var sw = new StreamWriter(targetTocPath))
             {
-                // Follow the sequence of documentation items
-                foreach (var docItem in docDict)
+                foreach (var group in groupTocsMapping)
                 {
-                    // 1. Top toc
-                    Console.WriteLine($"Created top conceptual toc item '{docItem.Key}'");
-                    sw.WriteLine(!string.IsNullOrEmpty(docItem.Value.SourceIndex)
-                        ? $"# [{docItem.Key}]({GenerateIndexHRef(targetRootDir, docItem.Value.SourceIndex, targetApiDir)})"
-                        : $"# {docItem.Key}");
-
-                    // 2. Conceptual toc
-                    List<string> tocLines = null;
-                    if (!string.IsNullOrEmpty(docItem.Value.SourceToc))
+                    var groupName = group.Key;
+                    var subTocPrefix = string.Empty;
+                    if (!string.IsNullOrEmpty(groupName))
                     {
-                        tocLines = GenerateDocTocItems(targetRootDir, docItem.Value.SourceToc, targetApiDir).Where(i => !string.IsNullOrEmpty(i)).ToList();
+                        Console.WriteLine($"Created top grouped toc item '{groupName}'");
+                        sw.WriteLine($"# {groupName}");
+                        subTocPrefix = "#";
                     }
 
-                    if (tocLines != null && tocLines.Count > 0)
+                    var fullTocTitles = group.Value;
+                    foreach (var fullTocTitle in fullTocTitles)
                     {
-                        foreach (var tocLine in tocLines)
+                        DocumentationItem docItem;
+                        if (!docDict.TryGetValue(fullTocTitle, out docItem))
                         {
-                            // Insert one heading before to make it sub toc
-                            sw.WriteLine($"#{tocLine}");
+                            throw new InvalidOperationException($"Toc title `{fullTocTitle}` should exist in documentation node of mapping.json.");
                         }
-                        Console.WriteLine($"-- Created sub referenced toc items under conceptual toc item '{docItem.Key}'");
-                    }
+                        var groupServiceMapping = GroupServiceMapping.FromTocTitle(fullTocTitle);
 
-                    // 3. REST toc
-                    List<SwaggerToc> swaggerToc;
-                    if (tocDict.TryGetValue(docItem.Key, out swaggerToc))
-                    {
-                        swaggerToc.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.Ordinal));
-                        // Only reference TOC with conceptual TOC should insert 'Reference' text
+                        // 1. Top toc
+                        Console.WriteLine($"Created conceptual toc item '{groupServiceMapping.Service}'");
+                        sw.WriteLine(!string.IsNullOrEmpty(docItem.SourceIndex)
+                            ? $"{subTocPrefix}# [{groupServiceMapping.Service}]({GenerateIndexHRef(targetRootDir, docItem.SourceIndex, targetApiDir)})"
+                            : $"{subTocPrefix}# {groupServiceMapping.Service}");
+
+                        // 2. Conceptual toc
+                        List<string> tocLines = null;
+                        if (!string.IsNullOrEmpty(docItem.SourceToc))
+                        {
+                            tocLines = GenerateDocTocItems(targetRootDir, docItem.SourceToc, targetApiDir).Where(i => !string.IsNullOrEmpty(i)).ToList();
+                        }
+
                         if (tocLines != null && tocLines.Count > 0)
                         {
-                            sw.WriteLine("## Reference");
-                            foreach (var subToc in swaggerToc)
+                            foreach (var tocLine in tocLines)
                             {
-                                sw.WriteLine($"### [{subToc.Title}]({subToc.FilePath})");
+                                // Insert one heading before to make it sub toc
+                                sw.WriteLine($"{subTocPrefix}#{tocLine}");
                             }
+                            Console.WriteLine($"-- Created sub referenced toc items under conceptual toc item '{groupServiceMapping.Service}'");
                         }
-                        else
+
+                        // 3. REST toc
+                        List<SwaggerToc> swaggerToc;
+                        if (tocDict.TryGetValue(fullTocTitle, out swaggerToc))
                         {
-                            foreach (var subToc in swaggerToc)
+                            swaggerToc.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.Ordinal));
+                            // Only reference TOC with conceptual TOC should insert 'Reference' text
+                            if (tocLines != null && tocLines.Count > 0)
                             {
-                                sw.WriteLine($"## [{subToc.Title}]({subToc.FilePath})");
+                                sw.WriteLine($"{subTocPrefix}## Reference");
+                                foreach (var subToc in swaggerToc)
+                                {
+                                    sw.WriteLine($"{subTocPrefix}### [{subToc.Title}]({subToc.FilePath})");
+                                }
+                            }
+                            else
+                            {
+                                foreach (var subToc in swaggerToc)
+                                {
+                                    sw.WriteLine($"{subTocPrefix}## [{subToc.Title}]({subToc.FilePath})");
+                                }
                             }
                         }
                     }

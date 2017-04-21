@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileUtility.cs" />
+    <Compile Include="GroupServiceMapping\GroupServiceMapping.cs" />
     <Compile Include="Model\DocumentationItem.cs" />
     <Compile Include="Model\Mapping.cs" />
     <Compile Include="Model\MappingFile.cs" />
