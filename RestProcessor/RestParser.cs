@@ -56,7 +56,7 @@
             }
 
             // Mapping for group name and full toc title name
-            var groupTocsMapping = new Dictionary<string, List<string>>();
+            var groupTocsMapping = new SortedDictionary<string, List<string>>();
             var tocDict = new Dictionary<string, List<SwaggerToc>>();
             foreach (var mappingItem in mappingFile.Mapping.ReferenceItems)
             {
