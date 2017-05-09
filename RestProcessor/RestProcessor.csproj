@@ -52,11 +52,17 @@
   <ItemGroup>
     <Compile Include="FileUtility.cs" />
     <Compile Include="GroupServiceMapping\GroupServiceMapping.cs" />
-    <Compile Include="Model\DocumentationItem.cs" />
-    <Compile Include="Model\Mapping.cs" />
-    <Compile Include="Model\MappingFile.cs" />
-    <Compile Include="Model\OperationGroupMapping.cs" />
-    <Compile Include="Model\ReferenceItem.cs" />
+    <Compile Include="Model\Obsolete\DocumentationItem.cs" />
+    <Compile Include="Model\Obsolete\Mapping.cs" />
+    <Compile Include="Model\Obsolete\MappingFile.cs" />
+    <Compile Include="Model\Obsolete\OperationGroupMapping.cs" />
+    <Compile Include="Model\Obsolete\ReferenceItem.cs" />
+    <Compile Include="Model\Organazation\OrgInfo.cs" />
+    <Compile Include="Model\Organazation\OrgsMapping.cs" />
+    <Compile Include="Model\Organazation\OrgsMappingFile.cs" />
+    <Compile Include="Model\Organazation\ServiceInfo.cs" />
+    <Compile Include="Model\Organazation\SwaggerInfo.cs" />
+    <Compile Include="Processor\MappingFileProcessor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RefResolver.cs" />
