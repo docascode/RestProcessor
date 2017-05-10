@@ -1,10 +1,24 @@
 ﻿namespace RestProcessor
 {
     using System.Collections.Generic;
+    using System.IO;
     using System.Text;
+
+    using Newtonsoft.Json;
 
     public static class Utility
     {
+        private static readonly JsonSerializer JsonSerializer = new JsonSerializer();
+
+        public static T ReadFromFile<T>(string mappingFilePath)
+        {
+            using (var streamReader = File.OpenText(mappingFilePath))
+            using (var reader = new JsonTextReader(streamReader))
+            {
+                return JsonSerializer.Deserialize<T>(reader);
+            }
+        }
+
         public static string ExtractPascalName(string name)
         {
             var list = new HashSet<string> { "BI", "IP", "ML", "MAM", "OS", "VM", "VMs", "APIM" };
