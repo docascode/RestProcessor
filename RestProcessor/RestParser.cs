@@ -24,10 +24,12 @@
             if (mapping.Mapping != null)
             {
                 // Obsolete mapping file
+                Console.WriteLine("parsing old format mapping.json.");
                 (new MappingProcessor()).Process(sourceRootDir, targetRootDir, mapping);
             }
             else
             {
+                Console.WriteLine("parsing new format mapping.json.");
                 var orgsMappingFile = Utility.ReadFromFile<OrgsMappingFile>(mappingFilePath);
                 (new OrgsMappingProcessor()).Process(sourceRootDir, targetRootDir, orgsMappingFile);
             }
