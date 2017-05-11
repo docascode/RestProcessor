@@ -102,22 +102,23 @@
                         var subRefTocPrefix = string.Empty;
                         if (tocLines != null && tocLines.Count > 0)
                         {
+                            subRefTocPrefix = IncreaseSharpCharacter(subRefTocPrefix);
                             writer.WriteLine($"{subTocPrefix}#{subRefTocPrefix} Reference");
-                            IncreaseSharpCharacter(subRefTocPrefix);
                         }
 
                         foreach (var pair in subTocDict)
                         {
+                            var subGroupTocPrefix = subRefTocPrefix;
                             if (!string.IsNullOrEmpty(pair.Key))
                             {
-                                writer.WriteLine($"{subTocPrefix}##{subRefTocPrefix} {pair.Key}");
-                                IncreaseSharpCharacter(subRefTocPrefix);
+                                subGroupTocPrefix = IncreaseSharpCharacter(subRefTocPrefix);
+                                writer.WriteLine($"{subTocPrefix}#{subGroupTocPrefix} {pair.Key}");
                             }
                             var subTocList = pair.Value;
                             subTocList.Sort((x, y) => string.CompareOrdinal(x.Title, y.Title));
                             foreach (var subToc in subTocList)
                             {
-                                writer.WriteLine($"{subTocPrefix}###{subRefTocPrefix} [{subToc.Title}]({subToc.FilePath})");
+                                writer.WriteLine($"{subTocPrefix}##{subGroupTocPrefix} [{subToc.Title}]({subToc.FilePath})");
                             }
                         }
                     }
