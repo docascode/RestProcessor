@@ -66,7 +66,7 @@
                         }
 
                         // 3. REST toc
-                        var subTocList = new List<SwaggerToc>();
+                        var subTocDict = new SortedDictionary<string, List<SwaggerToc>>();
                         foreach (var swagger in service.SwaggerInfo)
                         {
                             var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, service.UrlGroup));
@@ -74,11 +74,21 @@
                             var restFileInfo = RestSplitter.Process(targetDir, sourceFile, swagger.OperationGroupMapping);
                             var tocTitle = Utility.ExtractPascalName(restFileInfo.TocTitle);
 
+                            var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;
+                            List<SwaggerToc> subTocList;
+                            if (!subTocDict.TryGetValue(subGroupName, out subTocList))
+                            {
+                                subTocList = new List<SwaggerToc>();
+                                subTocDict.Add(subGroupName, subTocList);
+                            }
+
                             foreach (var fileName in restFileInfo.FileNames)
                             {
                                 var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
                                 var subTocTitle = Utility.ExtractPascalName(fileNameWithoutExt);
                                 var filePath = FileUtility.NormalizePath(Path.Combine(service.UrlGroup, fileName));
+
+
                                 if (subTocList.Any(toc => toc.Title == subTocTitle))
                                 {
                                     throw new InvalidOperationException($"Sub toc '{fileNameWithoutExt}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{swagger.Source}' to avoid conflicting");
@@ -89,23 +99,27 @@
                             Console.WriteLine($"Done splitting swagger file from '{swagger.Source}' to '{service.UrlGroup}'");
                         }
 
-                        subTocList.Sort((x, y) => string.CompareOrdinal(x.Title, y.Title));
+                        var subRefTocPrefix = string.Empty;
                         if (tocLines != null && tocLines.Count > 0)
                         {
-                            writer.WriteLine($"{subTocPrefix}## Reference");
-                            foreach (var subToc in subTocList)
-                            {
-                                writer.WriteLine($"{subTocPrefix}### [{subToc.Title}]({subToc.FilePath})");
-                            }
-                        }
-                        else
-                        {
-                            foreach (var subToc in subTocList)
-                            {
-                                writer.WriteLine($"{subTocPrefix}## [{subToc.Title}]({subToc.FilePath})");
-                            }
+                            writer.WriteLine($"{subTocPrefix}#{subRefTocPrefix} Reference");
+                            IncreaseSharpCharacter(subRefTocPrefix);
                         }
 
+                        foreach (var pair in subTocDict)
+                        {
+                            if (!string.IsNullOrEmpty(pair.Key))
+                            {
+                                writer.WriteLine($"{subTocPrefix}##{subRefTocPrefix} {pair.Key}");
+                                IncreaseSharpCharacter(subRefTocPrefix);
+                            }
+                            var subTocList = pair.Value;
+                            subTocList.Sort((x, y) => string.CompareOrdinal(x.Title, y.Title));
+                            foreach (var subToc in subTocList)
+                            {
+                                writer.WriteLine($"{subTocPrefix}###{subRefTocPrefix} [{subToc.Title}]({subToc.FilePath})");
+                            }
+                        }
                     }
                 }
             }

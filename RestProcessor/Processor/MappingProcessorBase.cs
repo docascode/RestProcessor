@@ -75,6 +75,11 @@
             return FileUtility.GetRelativePath(indexPath, targetApiDir);
         }
 
+        protected static string IncreaseSharpCharacter(string str)
+        {
+            return str + "#";
+        }
+
         protected class SwaggerToc
         {
             public string Title { get; }
