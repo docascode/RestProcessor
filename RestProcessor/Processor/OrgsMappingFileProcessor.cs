@@ -156,8 +156,6 @@
 
             using (var writer = new StreamWriter(targetIndexPath))
             {
-                // TODO: yaml header
-
                 var summaryFile = Path.Combine(targetRootDir, orgsMappingFile.ApisPageOptions.SummaryFile);
                 if (File.Exists(summaryFile))
                 {
