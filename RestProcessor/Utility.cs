@@ -1,14 +1,67 @@
 ﻿namespace RestProcessor
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
+    using System.Text.RegularExpressions;
 
     using Newtonsoft.Json;
 
     public static class Utility
     {
         private static readonly JsonSerializer JsonSerializer = new JsonSerializer();
+        private static readonly Regex YamlHeaderRegex = new Regex(@"^\-{3}(?:\s*?)\n([\s\S]+?)(?:\s*?)\n\-{3}(?:\s*?)(?:\n|$)", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromSeconds(10));
+        private static readonly YamlDotNet.Serialization.Deserializer deserializer = new YamlDotNet.Serialization.Deserializer();
+
+        public static object GetYamlHeaderByMeta(string filePath, string metaName)
+        {
+            var yamlHeader = GetYamlHeader(filePath);
+            object result;
+            if (yamlHeader != null && yamlHeader.TryGetValue(metaName, out result))
+            {
+                return result;
+            }
+            return null;
+        }
+
+        public static Dictionary<string, object> GetYamlHeader(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"File path {filePath} not exists when parsing yaml header.");
+            }
+
+            var markdown = File.ReadAllText(filePath);
+
+            var match = YamlHeaderRegex.Match(markdown);
+            if (match.Length == 0)
+            {
+                return null;
+            }
+
+            // ---
+            // a: b
+            // ---
+            var value = match.Groups[1].Value;
+            try
+            {
+                using (StringReader reader = new StringReader(value))
+                {
+                    var result = deserializer.Deserialize<Dictionary<string, object>>(reader);
+                    if (result == null)
+                    {
+                        return null;
+                    }
+                    return result;
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine();
+                return null;
+            }
+        }
 
         public static T ReadFromFile<T>(string mappingFilePath)
         {
