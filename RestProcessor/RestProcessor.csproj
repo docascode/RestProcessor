@@ -54,7 +54,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants.cs" />
     <Compile Include="FileUtility.cs" />
     <Compile Include="GroupServiceMapping\GroupServiceMapping.cs" />
     <Compile Include="Model\Obsolete\DocumentationItem.cs" />
@@ -62,6 +61,7 @@
     <Compile Include="Model\Obsolete\MappingFile.cs" />
     <Compile Include="Model\Obsolete\OperationGroupMapping.cs" />
     <Compile Include="Model\Obsolete\ReferenceItem.cs" />
+    <Compile Include="Model\Organazation\ApisPageOptions.cs" />
     <Compile Include="Model\Organazation\OrgInfo.cs" />
     <Compile Include="Model\Organazation\OrgsMappingFile.cs" />
     <Compile Include="Model\Organazation\ServiceInfo.cs" />
