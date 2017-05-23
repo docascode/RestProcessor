@@ -10,7 +10,10 @@
 
     public static class Utility
     {
-        private static readonly JsonSerializer JsonSerializer = new JsonSerializer();
+        private static readonly JsonSerializer JsonSerializer = new JsonSerializer
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        };
         private static readonly Regex YamlHeaderRegex = new Regex(@"^\-{3}(?:\s*?)\n([\s\S]+?)(?:\s*?)\n\-{3}(?:\s*?)(?:\n|$)", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromSeconds(10));
         private static readonly YamlDotNet.Serialization.Deserializer deserializer = new YamlDotNet.Serialization.Deserializer();
 
@@ -60,6 +63,15 @@
             {
                 Console.WriteLine();
                 return null;
+            }
+        }
+
+        public static void Serialize(string path, object obj)
+        {
+            using (var stream = File.Create(path))
+            using (var writer = new StreamWriter(stream))
+            {
+                JsonSerializer.Serialize(writer, obj);
             }
         }
 
