@@ -81,58 +81,61 @@
 
                         // 3. REST toc
                         var subTocDict = new SortedDictionary<string, List<SwaggerToc>>();
-                        foreach (var swagger in service.SwaggerInfo)
+                        if (service.SwaggerInfo != null)
                         {
-                            var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, service.UrlGroup));
-                            var sourceFile = Path.Combine(sourceRootDir, swagger.Source);
-                            var restFileInfo = RestSplitter.Process(targetDir, sourceFile, swagger.OperationGroupMapping);
-                            var tocTitle = Utility.ExtractPascalName(restFileInfo.TocTitle);
-
-                            var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;
-                            List<SwaggerToc> subTocList;
-                            if (!subTocDict.TryGetValue(subGroupName, out subTocList))
+                            foreach (var swagger in service.SwaggerInfo)
                             {
-                                subTocList = new List<SwaggerToc>();
-                                subTocDict.Add(subGroupName, subTocList);
-                            }
+                                var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, service.UrlGroup));
+                                var sourceFile = Path.Combine(sourceRootDir, swagger.Source);
+                                var restFileInfo = RestSplitter.Process(targetDir, sourceFile, swagger.OperationGroupMapping);
+                                var tocTitle = Utility.ExtractPascalName(restFileInfo.TocTitle);
 
-                            foreach (var fileName in restFileInfo.FileNames)
-                            {
-                                var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
-                                var subTocTitle = Utility.ExtractPascalName(fileNameWithoutExt);
-                                var filePath = FileUtility.NormalizePath(Path.Combine(service.UrlGroup, fileName));
-
-
-                                if (subTocList.Any(toc => toc.Title == subTocTitle))
+                                var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;
+                                List<SwaggerToc> subTocList;
+                                if (!subTocDict.TryGetValue(subGroupName, out subTocList))
                                 {
-                                    throw new InvalidOperationException($"Sub toc '{fileNameWithoutExt}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{swagger.Source}' to avoid conflicting");
+                                    subTocList = new List<SwaggerToc>();
+                                    subTocDict.Add(subGroupName, subTocList);
                                 }
 
-                                subTocList.Add(new SwaggerToc(subTocTitle, filePath));
-                            }
-                            Console.WriteLine($"Done splitting swagger file from '{swagger.Source}' to '{service.UrlGroup}'");
-                        }
+                                foreach (var fileName in restFileInfo.FileNames)
+                                {
+                                    var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
+                                    var subTocTitle = Utility.ExtractPascalName(fileNameWithoutExt);
+                                    var filePath = FileUtility.NormalizePath(Path.Combine(service.UrlGroup, fileName));
 
-                        var subRefTocPrefix = string.Empty;
-                        if (tocLines != null && tocLines.Count > 0)
-                        {
-                            subRefTocPrefix = IncreaseSharpCharacter(subRefTocPrefix);
-                            writer.WriteLine($"{subTocPrefix}#{subRefTocPrefix} Reference");
-                        }
 
-                        foreach (var pair in subTocDict)
-                        {
-                            var subGroupTocPrefix = subRefTocPrefix;
-                            if (!string.IsNullOrEmpty(pair.Key))
-                            {
-                                subGroupTocPrefix = IncreaseSharpCharacter(subRefTocPrefix);
-                                writer.WriteLine($"{subTocPrefix}#{subGroupTocPrefix} {pair.Key}");
+                                    if (subTocList.Any(toc => toc.Title == subTocTitle))
+                                    {
+                                        throw new InvalidOperationException($"Sub toc '{fileNameWithoutExt}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{swagger.Source}' to avoid conflicting");
+                                    }
+
+                                    subTocList.Add(new SwaggerToc(subTocTitle, filePath));
+                                }
+                                Console.WriteLine($"Done splitting swagger file from '{swagger.Source}' to '{service.UrlGroup}'");
                             }
-                            var subTocList = pair.Value;
-                            subTocList.Sort((x, y) => string.CompareOrdinal(x.Title, y.Title));
-                            foreach (var subToc in subTocList)
+
+                            var subRefTocPrefix = string.Empty;
+                            if (tocLines != null && tocLines.Count > 0)
                             {
-                                writer.WriteLine($"{subTocPrefix}##{subGroupTocPrefix} [{subToc.Title}]({subToc.FilePath})");
+                                subRefTocPrefix = IncreaseSharpCharacter(subRefTocPrefix);
+                                writer.WriteLine($"{subTocPrefix}#{subRefTocPrefix} Reference");
+                            }
+
+                            foreach (var pair in subTocDict)
+                            {
+                                var subGroupTocPrefix = subRefTocPrefix;
+                                if (!string.IsNullOrEmpty(pair.Key))
+                                {
+                                    subGroupTocPrefix = IncreaseSharpCharacter(subRefTocPrefix);
+                                    writer.WriteLine($"{subTocPrefix}#{subGroupTocPrefix} {pair.Key}");
+                                }
+                                var subTocList = pair.Value;
+                                subTocList.Sort((x, y) => string.CompareOrdinal(x.Title, y.Title));
+                                foreach (var subToc in subTocList)
+                                {
+                                    writer.WriteLine($"{subTocPrefix}##{subGroupTocPrefix} [{subToc.Title}]({subToc.FilePath})");
+                                }
                             }
                         }
                     }
