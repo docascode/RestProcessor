@@ -9,6 +9,7 @@
     public class Program
     {
         private static readonly string ConceptualFolder = "docs-ref-conceptual";
+        private static readonly string IndexFolder = "docs-ref-index";
 
         public static void Main(string[] args)
         {
@@ -55,7 +56,7 @@
                     TocTitle = noneService.TocTitle,
                     UrlGroup = GetUrlGroupFromIndex(noneService.SourceIndex),
                     IndexFile = noneService.SourceIndex,
-                    TocFile = noneService.TocTitle,
+                    TocFile = noneService.SourceToc,
                 });
             }
 
@@ -68,8 +69,8 @@
                 ApisPageOptions = new ApisPageOptions
                 {
                     EnableAutoGenerate = false,
-                    TargetFile = string.Empty,
-                    SummaryFile = string.Empty,
+                    TargetFile = $"{IndexFolder}/index.md",
+                    SummaryFile = $"{IndexFolder}/apis-page-summary.md",
                     ServiceDescriptionMetadata = "service_description"
                 },
                 OrgInfos = new List<OrgInfo> { new OrgInfo
