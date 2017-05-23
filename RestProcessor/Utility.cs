@@ -14,8 +14,10 @@
         {
             NullValueHandling = NullValueHandling.Ignore
         };
-        private static readonly Regex YamlHeaderRegex = new Regex(@"^\-{3}(?:\s*?)\n([\s\S]+?)(?:\s*?)\n\-{3}(?:\s*?)(?:\n|$)", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromSeconds(10));
-        private static readonly YamlDotNet.Serialization.Deserializer deserializer = new YamlDotNet.Serialization.Deserializer();
+
+        public static readonly Regex YamlHeaderRegex = new Regex(@"^\-{3}(?:\s*?)\n([\s\S]+?)(?:\s*?)\n\-{3}(?:\s*?)(?:\n|$)", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromSeconds(10));
+        public static readonly YamlDotNet.Serialization.Deserializer YamlDeserializer = new YamlDotNet.Serialization.Deserializer();
+        public static readonly YamlDotNet.Serialization.Serializer YamlSerializer = new YamlDotNet.Serialization.Serializer();
 
         public static object GetYamlHeaderByMeta(string filePath, string metaName)
         {
@@ -51,7 +53,7 @@
             {
                 using (StringReader reader = new StringReader(value))
                 {
-                    var result = deserializer.Deserialize<Dictionary<string, object>>(reader);
+                    var result = YamlDeserializer.Deserialize<Dictionary<string, object>>(reader);
                     if (result == null)
                     {
                         return null;
