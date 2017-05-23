@@ -61,7 +61,7 @@
             }
 
             // sort services
-            services.Sort((a, b) => a.UrlGroup.CompareTo(b.UrlGroup));
+            services.Sort((a, b) => a.TocTitle.CompareTo(b.TocTitle));
 
             return new OrgsMappingFile
             {
