@@ -63,23 +63,7 @@
                             ? $"{subTocPrefix}# [{service.TocTitle}]({GenerateIndexHRef(targetRootDir, service.IndexFile, targetApiDir)})"
                             : $"{subTocPrefix}# {service.TocTitle}");
 
-                        // 2. Conceptual toc
-                        List<string> tocLines = null;
-                        if (!string.IsNullOrEmpty(service.TocFile))
-                        {
-                            tocLines = GenerateDocTocItems(targetRootDir, service.TocFile, targetApiDir).Where(i => !string.IsNullOrEmpty(i)).ToList();
-                            if (tocLines.Any())
-                            {
-                                foreach (var tocLine in tocLines)
-                                {
-                                    // Insert one heading before to make it sub toc
-                                    writer.WriteLine($"{subTocPrefix}#{tocLine}");
-                                }
-                                Console.WriteLine($"-- Created sub referenced toc items under conceptual toc item '{service.TocTitle}'");
-                            }
-                        }
-
-                        // 3. REST toc
+                        // 2. Parse and split REST swaggers
                         var subTocDict = new SortedDictionary<string, List<SwaggerToc>>();
                         if (service.SwaggerInfo != null)
                         {
@@ -114,7 +98,27 @@
                                 }
                                 Console.WriteLine($"Done splitting swagger file from '{swagger.Source}' to '{service.UrlGroup}'");
                             }
+                        }
 
+                        // 3. Conceptual toc
+                        List<string> tocLines = null;
+                        if (!string.IsNullOrEmpty(service.TocFile))
+                        {
+                            tocLines = GenerateDocTocItems(targetRootDir, service.TocFile, targetApiDir).Where(i => !string.IsNullOrEmpty(i)).ToList();
+                            if (tocLines.Any())
+                            {
+                                foreach (var tocLine in tocLines)
+                                {
+                                    // Insert one heading before to make it sub toc
+                                    writer.WriteLine($"{subTocPrefix}#{tocLine}");
+                                }
+                                Console.WriteLine($"-- Created sub referenced toc items under conceptual toc item '{service.TocTitle}'");
+                            }
+                        }
+
+                        // 4. Write REST toc
+                        if (service.SwaggerInfo != null)
+                        {
                             var subRefTocPrefix = string.Empty;
                             if (tocLines != null && tocLines.Count > 0)
                             {
