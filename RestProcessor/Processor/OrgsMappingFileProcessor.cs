@@ -199,7 +199,7 @@
                                 throw new InvalidOperationException($"Index file {service.IndexFile} of service {service.TocTitle} should exists.");
                             }
                             var summary = Utility.GetYamlHeaderByMeta(Path.Combine(targetRootDir, service.IndexFile), orgsMappingFile.ApisPageOptions.ServiceDescriptionMetadata);
-                            writer.WriteLine($"| [{service.TocTitle}]({service.IndexFile}) | {summary ?? string.Empty} |");
+                            writer.WriteLine($"| [{service.TocTitle}](~/{service.IndexFile}) | {summary ?? string.Empty} |");
                         }
                         writer.WriteLine();
                     }
