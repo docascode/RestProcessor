@@ -54,6 +54,9 @@
                         writer.WriteLine($"# [{orgInfo.DefaultTocTitle}]({GenerateIndexHRef(targetRootDir, orgInfo.OrgIndex, targetApiDir)})");
                     }
 
+                    // Sort by service name
+                    orgInfo.Services.Sort((a, b) => a.TocTitle.CompareTo(b.TocTitle));
+
                     // Write service info
                     foreach (var service in orgInfo.Services)
                     {
