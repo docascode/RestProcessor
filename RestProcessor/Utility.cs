@@ -88,7 +88,7 @@
 
         public static string ExtractPascalName(string name)
         {
-            var list = new HashSet<string> { "BI", "IP", "ML", "MAM", "OS", "VM", "VMs", "APIM" };
+            var list = new HashSet<string> { "BI", "IP", "ML", "MAM", "OS", "VM", "VMs", "APIM", "vCenter" };
             if (name.Contains(" "))
             {
                 return name;
