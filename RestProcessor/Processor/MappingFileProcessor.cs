@@ -20,6 +20,10 @@
                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, mappingItem.TargetDir));
                 var sourceFile = Path.Combine(sourceRootDir, mappingItem.SourceSwagger);
                 var restFileInfo = RestSplitter.Process(targetDir, sourceFile, mappingItem.OperationGroupMapping);
+                if (restFileInfo == null)
+                {
+                    continue;
+                }
 
                 // Extract top TOC title
                 var tocTitle = string.IsNullOrEmpty(mappingItem.TocTitle)

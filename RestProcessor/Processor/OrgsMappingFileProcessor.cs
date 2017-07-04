@@ -75,6 +75,10 @@
                                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, service.UrlGroup));
                                 var sourceFile = Path.Combine(sourceRootDir, swagger.Source);
                                 var restFileInfo = RestSplitter.Process(targetDir, sourceFile, swagger.OperationGroupMapping);
+                                if (restFileInfo == null)
+                                {
+                                    continue;
+                                }
                                 var tocTitle = Utility.ExtractPascalName(restFileInfo.TocTitle);
 
                                 var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;
