@@ -75,7 +75,7 @@
                                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, service.UrlGroup));
                                 var sourceFile = Path.Combine(sourceRootDir, swagger.Source);
                                 var restFileInfo = RestSplitter.Process(targetDir, sourceFile, swagger.OperationGroupMapping);
-                                var tocTitle = Utility.ExtractPascalName(restFileInfo.TocTitle);
+                                var tocTitle = Utility.ExtractPascalNameByRegex(restFileInfo.TocTitle);
 
                                 var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;
                                 List<SwaggerToc> subTocList;
@@ -85,11 +85,11 @@
                                     subTocDict.Add(subGroupName, subTocList);
                                 }
 
-                                foreach (var fileName in restFileInfo.FileNames)
+                                foreach (var fileNameInfo in restFileInfo.FileNameInfos)
                                 {
-                                    var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
-                                    var subTocTitle = Utility.ExtractPascalName(fileNameWithoutExt);
-                                    var filePath = FileUtility.NormalizePath(Path.Combine(service.UrlGroup, fileName));
+                                    var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileNameInfo.Name);
+                                    var subTocTitle = fileNameInfo.IsCustomized ? fileNameWithoutExt : Utility.ExtractPascalNameByRegex(fileNameWithoutExt);
+                                    var filePath = FileUtility.NormalizePath(Path.Combine(service.UrlGroup, fileNameInfo.Name));
 
 
                                     if (subTocList.Any(toc => toc.Title == subTocTitle))
