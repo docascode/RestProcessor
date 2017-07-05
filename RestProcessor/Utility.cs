@@ -18,6 +18,8 @@
         public static readonly Regex YamlHeaderRegex = new Regex(@"^\-{3}(?:\s*?)\n([\s\S]+?)(?:\s*?)\n\-{3}(?:\s*?)(?:\n|$)", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromSeconds(10));
         public static readonly YamlDotNet.Serialization.Deserializer YamlDeserializer = new YamlDotNet.Serialization.Deserializer();
         public static readonly YamlDotNet.Serialization.Serializer YamlSerializer = new YamlDotNet.Serialization.Serializer();
+        public static readonly string Pattern = @"(?:{0}|[A-Z](?:[a-z]*?)(?={0}|[A-Z]|$)|(?:[a-z]+?)(?={0}|[A-Z]|$)|[A-Z]+?(?={0}|[A-Z][a-z]|$))";
+        public static readonly HashSet<string> Keyword = new HashSet<string> { "BI", "IP", "ML", "MAM", "OS", "VM", "VMs", "APIM", "vCenter" };
 
         public static object GetYamlHeaderByMeta(string filePath, string metaName)
         {
@@ -53,12 +55,7 @@
             {
                 using (StringReader reader = new StringReader(value))
                 {
-                    var result = YamlDeserializer.Deserialize<Dictionary<string, object>>(reader);
-                    if (result == null)
-                    {
-                        return null;
-                    }
-                    return result;
+                    return YamlDeserializer.Deserialize<Dictionary<string, object>>(reader);
                 }
             }
             catch (Exception)
@@ -86,9 +83,25 @@
             }
         }
 
+        public static string ExtractPascalNameByRegex(string name)
+        {
+            var result = new List<string>();
+            var p = string.Format(Pattern, string.Join("|", Keyword));
+            while (name.Length > 0)
+            {
+                var m = Regex.Match(name, p);
+                if (!m.Success)
+                {
+                    return name;
+                }
+                result.Add(m.Value);
+                name = name.Substring(m.Length);
+            }
+            return string.Join(" ", result);
+        }
+
         public static string ExtractPascalName(string name)
         {
-            var list = new HashSet<string> { "BI", "IP", "ML", "MAM", "OS", "VM", "VMs", "APIM", "vCenter" };
             if (name.Contains(" "))
             {
                 return name;
@@ -105,7 +118,7 @@
                     var closestUpperCaseWord = GetClosestUpperCaseWord(name, i);
                     if (closestUpperCaseWord.Length > 0)
                     {
-                        if (list.Contains(closestUpperCaseWord))
+                        if (Keyword.Contains(closestUpperCaseWord))
                         {
                             result.Append(" ");
                             result.Append(closestUpperCaseWord);
@@ -114,7 +127,7 @@
                         }
 
                         var closestCamelCaseWord = GetClosestCamelCaseWord(name, i);
-                        if (list.Contains(closestCamelCaseWord))
+                        if (Keyword.Contains(closestCamelCaseWord))
                         {
                             result.Append(" ");
                             result.Append(closestCamelCaseWord);

@@ -27,7 +27,7 @@
 
                 // Extract top TOC title
                 var tocTitle = string.IsNullOrEmpty(mappingItem.TocTitle)
-                    ? Utility.ExtractPascalName(restFileInfo.TocTitle)
+                    ? Utility.ExtractPascalNameByRegex(restFileInfo.TocTitle)
                     : mappingItem.TocTitle;
 
                 // Update toc dictionary
@@ -39,14 +39,14 @@
                 }
 
                 // Sort sub TOC
-                restFileInfo.FileNames.Sort();
+                restFileInfo.FileNameInfos.Sort((a, b) => string.CompareOrdinal(a.Name, b.Name));
 
                 // Generate sub TOC
-                foreach (var fileName in restFileInfo.FileNames)
+                foreach (var fileNameInfo in restFileInfo.FileNameInfos)
                 {
-                    var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
-                    var subTocTitle = Utility.ExtractPascalName(fileNameWithoutExt);
-                    var filePath = FileUtility.NormalizePath(Path.Combine(mappingItem.TargetDir, fileName));
+                    var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileNameInfo.Name);
+                    var subTocTitle = fileNameInfo.IsCustomized ? fileNameWithoutExt : Utility.ExtractPascalNameByRegex(fileNameWithoutExt);
+                    var filePath = FileUtility.NormalizePath(Path.Combine(mappingItem.TargetDir, fileNameInfo.Name));
                     if (subTocList.Any(toc => toc.Title == subTocTitle))
                     {
                         throw new InvalidOperationException($"Sub toc '{fileNameWithoutExt}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{mappingItem.SourceSwagger}' to avoid conflicting");
