@@ -19,7 +19,7 @@
         public static readonly YamlDotNet.Serialization.Deserializer YamlDeserializer = new YamlDotNet.Serialization.Deserializer();
         public static readonly YamlDotNet.Serialization.Serializer YamlSerializer = new YamlDotNet.Serialization.Serializer();
         public static readonly string Pattern = @"(?:{0}|[A-Z](?:[a-z]*?)(?={0}|[A-Z]|$)|(?:[a-z]+?)(?={0}|[A-Z]|$)|[A-Z]+?(?={0}|[A-Z][a-z]|$))";
-        public static readonly HashSet<string> Keyword = new HashSet<string> { "BI", "IP", "ML", "MAM", "OS", "VM", "VMs", "APIM", "vCenter" };
+        public static readonly HashSet<string> Keyword = new HashSet<string> { "BI", "IP", "ML", "MAM", "OS", "VM", "VMs", "APIM", "vCenters" };
 
         public static object GetYamlHeaderByMeta(string filePath, string metaName)
         {
