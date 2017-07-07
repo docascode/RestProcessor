@@ -20,9 +20,9 @@
 
         public class FileNameInfo
         {
-            public string Name { get; set; }
+            public string FileName { get; set; }
 
-            public bool IsCustomized { get; set; }
+            public string TocName { get; set; }
         }
 
         public static RestFileInfo Process(string targetDir, string filePath, OperationGroupMapping operationGroupMapping)
@@ -71,13 +71,19 @@
                     if (operationGroupMapping != null && operationGroupMapping.TryGetValue(operationGroup, out newOperationGourpName))
                     {
                         fileName = newOperationGourpName;
-                        fileNameInfo.IsCustomized = true;
+                        fileNameInfo.TocName = newOperationGourpName;
                         rootJObj["x-internal-operation-group-name"] = newOperationGourpName;
+                    }
+                    else
+                    {
+                        var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
+                        fileNameInfo.TocName = Utility.ExtractPascalNameByRegex(fileNameWithoutExt);
                     }
 
                     // Reset paths to filtered paths
+                    rootJObj["x-internal-sub-toc-name"] = fileNameInfo.TocName;
                     rootJObj["paths"] = filteredPaths;
-                    fileNameInfo.Name = Serialze(targetDir, fileName, rootJObj);
+                    fileNameInfo.FileName = Serialze(targetDir, fileName, rootJObj);
                     restFileInfo.FileNameInfos.Add(fileNameInfo);
                 }
             }

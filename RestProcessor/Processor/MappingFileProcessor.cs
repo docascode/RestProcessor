@@ -39,17 +39,16 @@
                 }
 
                 // Sort sub TOC
-                restFileInfo.FileNameInfos.Sort((a, b) => string.CompareOrdinal(a.Name, b.Name));
+                restFileInfo.FileNameInfos.Sort((a, b) => string.CompareOrdinal(a.FileName, b.FileName));
 
                 // Generate sub TOC
                 foreach (var fileNameInfo in restFileInfo.FileNameInfos)
                 {
-                    var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileNameInfo.Name);
-                    var subTocTitle = fileNameInfo.IsCustomized ? fileNameWithoutExt : Utility.ExtractPascalNameByRegex(fileNameWithoutExt);
-                    var filePath = FileUtility.NormalizePath(Path.Combine(mappingItem.TargetDir, fileNameInfo.Name));
+                    var subTocTitle = fileNameInfo.TocName;
+                    var filePath = FileUtility.NormalizePath(Path.Combine(mappingItem.TargetDir, fileNameInfo.FileName));
                     if (subTocList.Any(toc => toc.Title == subTocTitle))
                     {
-                        throw new InvalidOperationException($"Sub toc '{fileNameWithoutExt}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{mappingItem.SourceSwagger}' to avoid conflicting");
+                        throw new InvalidOperationException($"Sub toc '{subTocTitle}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{mappingItem.SourceSwagger}' to avoid conflicting");
                     }
 
                     subTocList.Add(new SwaggerToc(subTocTitle, filePath));
