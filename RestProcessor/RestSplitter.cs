@@ -81,8 +81,8 @@
                     }
 
                     // Reset paths to filtered paths
-                    rootJObj["x-internal-sub-toc-name"] = fileNameInfo.TocName;
                     rootJObj["paths"] = filteredPaths;
+                    rootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
                     fileNameInfo.FileName = Serialze(targetDir, fileName, rootJObj);
                     restFileInfo.FileNameInfos.Add(fileNameInfo);
                 }
