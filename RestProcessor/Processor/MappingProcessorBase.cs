@@ -86,10 +86,13 @@
 
             public string FilePath { get; }
 
-            public SwaggerToc(string title, string filePath)
+            public List<SwaggerToc> ChildrenToc { get; }
+
+            public SwaggerToc(string title, string filePath, List<SwaggerToc> childrenToc = null)
             {
                 Title = title;
                 FilePath = filePath;
+                ChildrenToc = childrenToc;
             }
         }
     }

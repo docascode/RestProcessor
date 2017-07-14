@@ -22,10 +22,12 @@
         {
             public string FileName { get; set; }
 
+            public List<FileNameInfo> ChildrenFileNameInfo { get; set; }
+
             public string TocName { get; set; }
         }
 
-        public static RestFileInfo Process(string targetDir, string filePath, OperationGroupMapping operationGroupMapping)
+        public static RestFileInfo Process(string targetDir, string filePath, OperationGroupMapping operationGroupMapping, bool isOperationLevel = false)
         {
             var restFileInfo = new RestFileInfo();
             if (!Directory.Exists(targetDir))
@@ -83,11 +85,58 @@
                     // Reset paths to filtered paths
                     rootJObj["paths"] = filteredPaths;
                     rootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
+
+                    if (isOperationLevel)
+                    {
+                        // Split operation group to operation
+                        fileNameInfo.ChildrenFileNameInfo = new List<FileNameInfo>(GenerateOperations(rootJObj, targetDir));
+
+                        // Sort
+                        fileNameInfo.ChildrenFileNameInfo.Sort((a, b) => string.CompareOrdinal(a.TocName, b.TocName));
+
+                        // Clear up original paths in operation group
+                        // TODO: add members
+                        rootJObj["paths"] = new JObject();
+                    }
+
                     fileNameInfo.FileName = Serialze(targetDir, fileName, rootJObj);
                     restFileInfo.FileNameInfos.Add(fileNameInfo);
                 }
             }
             return restFileInfo;
+        }
+
+        private static IEnumerable<FileNameInfo> GenerateOperations(JObject jObject, string targetDir)
+        {
+            foreach (var path in (JObject)jObject["paths"])
+            {
+                foreach (var item in (JObject)path.Value)
+                {
+                    // Skip for parameters
+                    if (item.Key.Equals("parameters"))
+                    {
+                        continue;
+                    }
+
+                    // TODO: operation group name
+                    var operationObj = (JObject)item.Value;
+                    var nounVerb = GetOperationGroupPerOperation(operationObj);
+                    var operationTocName = Utility.ExtractPascalNameByRegex(nounVerb.Item2);
+                    operationObj["x-internal-toc-name"] = operationTocName;
+
+                    jObject["paths"][path.Key] = new JObject
+                    {
+                        { item.Key, operationObj }
+                    };
+                    var operationFileName = Serialze(Path.Combine(targetDir, nounVerb.Item1), nounVerb.Item2, jObject);
+
+                    yield return new FileNameInfo
+                    {
+                        TocName = operationTocName,
+                        FileName = Path.Combine(nounVerb.Item1, operationFileName)
+                    };
+                }
+            }
         }
 
         private static string GetInfoTitle(JObject root)
@@ -109,6 +158,10 @@
         private static string Serialze(string targetDir, string name, JObject root)
         {
             var fileName = $"{name}.json";
+            if (!Directory.Exists(targetDir))
+            {
+                Directory.CreateDirectory(targetDir);
+            }
             using (var sw = new StreamWriter(Path.Combine(targetDir, fileName)))
             using (var writer = new JsonTextWriter(sw))
             {
@@ -130,7 +183,7 @@
                     {
                         continue;
                     }
-                    var opGroup = GetOperationGroupPerOperation((JObject)item.Value);
+                    var opGroup = GetOperationGroupPerOperation((JObject)item.Value).Item1;
                     if (expectedOpGroup == opGroup)
                     {
                         if (filteredPaths[pathUrl] == null)
@@ -163,14 +216,14 @@
                     {
                         continue;
                     }
-                    var operationGroupPerOperation = GetOperationGroupPerOperation((JObject)item.Value);
+                    var operationGroupPerOperation = GetOperationGroupPerOperation((JObject)item.Value).Item1;
                     operationGroups.Add(operationGroupPerOperation);
                 }
             }
             return operationGroups;
         }
 
-        private static string GetOperationGroupPerOperation(JObject operation)
+        private static Tuple<string, string> GetOperationGroupPerOperation(JObject operation)
         {
             JToken value;
             if (operation.TryGetValue("operationId", out value) && value != null)
@@ -180,9 +233,16 @@
             throw new InvalidOperationException($"operationId is not defined in {operation}");
         }
 
-        private static string GetOperationGroupFromOperationId(string operationId)
+        private static Tuple<string, string> GetOperationGroupFromOperationId(string operationId)
         {
-            return operationId.Split('_')[0];
+            var result = operationId.Split('_');
+            if (result.Length != 2)
+            {
+                //throw new InvalidOperationException($"Invalid operation id: {operationId}, it should be Noun_Verb format.");
+                // TODO: remove
+                return Tuple.Create(result[0], result[0]);
+            }
+            return Tuple.Create(result[0], result[1]);
         }
     }
 }

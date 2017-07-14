@@ -16,5 +16,8 @@
 
         [JsonProperty("organizations")]
         public List<OrgInfo> OrgInfos { get; set; }
+
+        [JsonProperty("isOperationLevel")]
+        public bool IsOperationLevel { get; set; }
     }
 }
