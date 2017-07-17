@@ -95,10 +95,30 @@
                         fileNameInfo.ChildrenFileNameInfo.Sort((a, b) => string.CompareOrdinal(a.TocName, b.TocName));
 
                         // Clear up original paths in operation group
-                        // TODO: add members
                         rootJObj["paths"] = new JObject();
+
+                        // Add split members into operation group
+                        var splitMembers = new JArray();
+                        foreach (var childInfo in fileNameInfo.ChildrenFileNameInfo)
+                        {
+                            var relativePath = FileUtility.NormalizePath(childInfo.FileName);
+                            var dotIndex = relativePath.LastIndexOf('.');
+                            var relativePathWithoutExt = relativePath;
+                            if (dotIndex > 0)
+                            {
+                                // Remove ".json"
+                                relativePathWithoutExt = relativePath.Remove(dotIndex);
+                            }
+                            splitMembers.Add(new JObject
+                            {
+                                { "displayName", childInfo.TocName },
+                                { "relativePath", relativePathWithoutExt },
+                            });
+                        }
+                        rootJObj["x-internal-split-members"] = splitMembers;
                     }
 
+                    rootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
                     fileNameInfo.FileName = Serialze(targetDir, fileName, rootJObj);
                     restFileInfo.FileNameInfos.Add(fileNameInfo);
                 }
@@ -133,7 +153,10 @@
                             }
                         }
                     };
+
+                    rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
                     var operationFileName = Serialze(Path.Combine(targetDir, operationGroup), operationName, rootJObj);
+                    rootJObj["x-internal-split-type"] = null;
 
                     yield return new FileNameInfo
                     {
@@ -251,6 +274,13 @@
                 throw new InvalidOperationException($"Invalid operation id: {operationId}, it should be Noun_Verb format.");
             }
             return Tuple.Create(result[0], result[1]);
+        }
+
+        private enum SplitType
+        {
+            None,
+            Operation,
+            OperationGroup,
         }
     }
 }
