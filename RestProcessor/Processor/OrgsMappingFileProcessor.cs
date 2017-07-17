@@ -104,7 +104,7 @@
                                     {
                                         foreach (var nameInfo in fileNameInfo.ChildrenFileNameInfo)
                                         {
-                                            childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(nameInfo.FileName)));
+                                            childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, nameInfo.FileName))));
                                         }
                                     }
 

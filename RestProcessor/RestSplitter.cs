@@ -89,7 +89,7 @@
                     if (isOperationLevel)
                     {
                         // Split operation group to operation
-                        fileNameInfo.ChildrenFileNameInfo = new List<FileNameInfo>(GenerateOperations(rootJObj, (JObject)rootJObj["paths"], targetDir));
+                        fileNameInfo.ChildrenFileNameInfo = new List<FileNameInfo>(GenerateOperations(rootJObj, (JObject)rootJObj["paths"], targetDir, fileName));
 
                         // Sort
                         fileNameInfo.ChildrenFileNameInfo.Sort((a, b) => string.CompareOrdinal(a.TocName, b.TocName));
@@ -106,7 +106,7 @@
             return restFileInfo;
         }
 
-        private static IEnumerable<FileNameInfo> GenerateOperations(JObject rootJObj, JObject paths, string targetDir)
+        private static IEnumerable<FileNameInfo> GenerateOperations(JObject rootJObj, JObject paths, string targetDir, string operationGroup)
         {
             foreach (var path in paths)
             {
@@ -118,10 +118,9 @@
                         continue;
                     }
 
-                    // TODO: operation group name
                     var operationObj = (JObject)item.Value;
-                    var nounVerb = GetOperationGroupPerOperation(operationObj);
-                    var operationTocName = Utility.ExtractPascalNameByRegex(nounVerb.Item2);
+                    var operationName = GetOperationGroupPerOperation(operationObj).Item2;
+                    var operationTocName = Utility.ExtractPascalNameByRegex(operationName);
                     operationObj["x-internal-toc-name"] = operationTocName;
 
                     // Reuse the root object, to reuse the other properties
@@ -130,16 +129,16 @@
                         {
                             path.Key, new JObject
                             {
-                                {item.Key, operationObj}
+                                { item.Key, operationObj }
                             }
                         }
                     };
-                    var operationFileName = Serialze(Path.Combine(targetDir, nounVerb.Item1), nounVerb.Item2, rootJObj);
+                    var operationFileName = Serialze(Path.Combine(targetDir, operationGroup), operationName, rootJObj);
 
                     yield return new FileNameInfo
                     {
                         TocName = operationTocName,
-                        FileName = Path.Combine(nounVerb.Item1, operationFileName)
+                        FileName = Path.Combine(operationGroup, operationFileName)
                     };
                 }
             }
