@@ -89,7 +89,7 @@
                     if (isOperationLevel)
                     {
                         // Split operation group to operation
-                        fileNameInfo.ChildrenFileNameInfo = new List<FileNameInfo>(GenerateOperations(rootJObj, targetDir));
+                        fileNameInfo.ChildrenFileNameInfo = new List<FileNameInfo>(GenerateOperations(rootJObj, (JObject)rootJObj["paths"], targetDir));
 
                         // Sort
                         fileNameInfo.ChildrenFileNameInfo.Sort((a, b) => string.CompareOrdinal(a.TocName, b.TocName));
@@ -106,9 +106,9 @@
             return restFileInfo;
         }
 
-        private static IEnumerable<FileNameInfo> GenerateOperations(JObject jObject, string targetDir)
+        private static IEnumerable<FileNameInfo> GenerateOperations(JObject rootJObj, JObject paths, string targetDir)
         {
-            foreach (var path in (JObject)jObject["paths"])
+            foreach (var path in paths)
             {
                 foreach (var item in (JObject)path.Value)
                 {
@@ -124,11 +124,17 @@
                     var operationTocName = Utility.ExtractPascalNameByRegex(nounVerb.Item2);
                     operationObj["x-internal-toc-name"] = operationTocName;
 
-                    jObject["paths"][path.Key] = new JObject
+                    // Reuse the root object, to reuse the other properties
+                    rootJObj["paths"] = new JObject
                     {
-                        { item.Key, operationObj }
+                        {
+                            path.Key, new JObject
+                            {
+                                {item.Key, operationObj}
+                            }
+                        }
                     };
-                    var operationFileName = Serialze(Path.Combine(targetDir, nounVerb.Item1), nounVerb.Item2, jObject);
+                    var operationFileName = Serialze(Path.Combine(targetDir, nounVerb.Item1), nounVerb.Item2, rootJObj);
 
                     yield return new FileNameInfo
                     {
@@ -238,9 +244,12 @@
             var result = operationId.Split('_');
             if (result.Length != 2)
             {
-                //throw new InvalidOperationException($"Invalid operation id: {operationId}, it should be Noun_Verb format.");
-                // TODO: remove
+                // When the operation id doesn't contain '_', treat the whole operation id as Noun and Verb at the same time
                 return Tuple.Create(result[0], result[0]);
+            }
+            if (result.Length > 2)
+            {
+                throw new InvalidOperationException($"Invalid operation id: {operationId}, it should be Noun_Verb format.");
             }
             return Tuple.Create(result[0], result[1]);
         }
