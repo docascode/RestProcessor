@@ -86,7 +86,8 @@
                     rootJObj["paths"] = filteredPaths;
                     rootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
 
-                    if (isOperationLevel)
+                    // Only split when the children count larger than 1
+                    if (isOperationLevel && ((JObject)rootJObj["paths"]).Count > 1)
                     {
                         // Split operation group to operation
                         fileNameInfo.ChildrenFileNameInfo = new List<FileNameInfo>(GenerateOperations(rootJObj, (JObject)rootJObj["paths"], targetDir, fileName));
@@ -116,9 +117,16 @@
                             });
                         }
                         rootJObj["x-internal-split-members"] = splitMembers;
+                        rootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
+
+                        // Clear definitions for root object
+                        JToken definitionsValue;
+                        if (rootJObj.TryGetValue("definitions", out definitionsValue))
+                        {
+                            rootJObj["definitions"] = null;
+                        }
                     }
 
-                    rootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
                     fileNameInfo.FileName = Serialze(targetDir, fileName, rootJObj);
                     restFileInfo.FileNameInfos.Add(fileNameInfo);
                 }
