@@ -118,13 +118,6 @@
                         }
                         rootJObj["x-internal-split-members"] = splitMembers;
                         rootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
-
-                        // Clear definitions for root object
-                        JToken definitionsValue;
-                        if (rootJObj.TryGetValue("definitions", out definitionsValue))
-                        {
-                            rootJObj["definitions"] = null;
-                        }
                     }
 
                     fileNameInfo.FileName = Serialze(targetDir, fileName, rootJObj);
