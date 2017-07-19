@@ -73,8 +73,9 @@
                             foreach (var swagger in service.SwaggerInfo)
                             {
                                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, service.UrlGroup));
-                                var sourceFile = Path.Combine(sourceRootDir, swagger.Source);
+                                var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
                                 var restFileInfo = RestSplitter.Process(targetDir, sourceFile, swagger.OperationGroupMapping);
+
                                 if (restFileInfo == null)
                                 {
                                     continue;
