@@ -33,7 +33,7 @@
                         throw new InvalidOperationException($"Target file of apis page options should not be null or empty.");
                     }
                     var targetIndexPath = Path.Combine(targetRootDir, orgsMappingFile.ApisPageOptions.TargetFile);
-                    writer.WriteLine($"# [Getting started with REST]({FileUtility.GetRelativePath(targetIndexPath, targetApiDir)})");
+                    writer.WriteLine($"# [{orgsMappingFile.ApisPageOptions.TocTitle}]({FileUtility.GetRelativePath(targetIndexPath, targetApiDir)})");
                 }
 
                 // Write organization info
