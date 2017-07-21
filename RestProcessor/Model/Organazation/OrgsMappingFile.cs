@@ -19,5 +19,8 @@
 
         [JsonProperty("is_operation_level")]
         public bool IsOperationLevel { get; set; }
+
+        [JsonProperty("is_grouped_by_tag")]
+        public bool IsGroupdedByTag { get; set; }
     }
 }

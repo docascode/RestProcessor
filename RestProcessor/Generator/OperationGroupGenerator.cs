@@ -8,8 +8,9 @@
 
     public class OperationGroupGenerator
     {
-        public static IEnumerable<RestSplitter.FileNameInfo> Generate(JObject pathsJObj, JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, bool isOperationLevel)
+        public static IEnumerable<RestSplitter.FileNameInfo> Generate(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, bool isOperationLevel)
         {
+            var pathsJObj = (JObject)rootJObj["paths"];
             var operationGroups = GetOperationGroups(pathsJObj);
             if (operationGroups.Count == 0)
             {

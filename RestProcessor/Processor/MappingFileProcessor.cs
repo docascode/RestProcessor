@@ -19,7 +19,7 @@
                 // Split rest files
                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, mappingItem.TargetDir));
                 var sourceFile = Path.Combine(sourceRootDir, mappingItem.SourceSwagger);
-                var restFileInfo = RestSplitter.Process(targetDir, sourceFile, mappingItem.OperationGroupMapping);
+                var restFileInfo = RestSplitter.Process(targetDir, sourceFile, mappingItem.OperationGroupMapping, false, false);
                 if (restFileInfo == null)
                 {
                     continue;

@@ -26,7 +26,7 @@
             public string TocName { get; set; }
         }
 
-        public static RestFileInfo Process(string targetDir, string filePath, OperationGroupMapping operationGroupMapping, bool isOperationLevel = false)
+        public static RestFileInfo Process(string targetDir, string filePath, OperationGroupMapping operationGroupMapping, bool isOperationLevel, bool isGroupedByTag)
         {
             var restFileInfo = new RestFileInfo();
             if (!Directory.Exists(targetDir))
@@ -48,11 +48,15 @@
                 var refResolver = new RefResolver(rootJObj, filePath);
                 refResolver.Resolve();
 
-                var pathsJObj = (JObject)rootJObj["paths"];
+                var fileNameInfos = isGroupedByTag ?
+                    TagsGenerator.Generate(rootJObj, targetDir, filePath, operationGroupMapping, isOperationLevel).ToList() :
+                    OperationGroupGenerator.Generate(rootJObj, targetDir, filePath, operationGroupMapping, isOperationLevel).ToList();
 
-                var fileNameInfos = OperationGroupGenerator.Generate(pathsJObj, rootJObj, targetDir, filePath, operationGroupMapping, isOperationLevel);
+                if (fileNameInfos.Any())
+                {
+                    restFileInfo.FileNameInfos = fileNameInfos;
+                }
 
-                restFileInfo.FileNameInfos = fileNameInfos.ToList();
                 restFileInfo.TocTitle = GetInfoTitle(rootJObj);
             }
             return restFileInfo;
