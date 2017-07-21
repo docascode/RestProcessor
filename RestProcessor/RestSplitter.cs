@@ -22,10 +22,12 @@
         {
             public string FileName { get; set; }
 
+            public List<FileNameInfo> ChildrenFileNameInfo { get; set; }
+
             public string TocName { get; set; }
         }
 
-        public static RestFileInfo Process(string targetDir, string filePath, OperationGroupMapping operationGroupMapping)
+        public static RestFileInfo Process(string targetDir, string filePath, OperationGroupMapping operationGroupMapping, bool isOperationLevel = false)
         {
             var restFileInfo = new RestFileInfo();
             if (!Directory.Exists(targetDir))
@@ -83,11 +85,87 @@
                     // Reset paths to filtered paths
                     rootJObj["paths"] = filteredPaths;
                     rootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
+
+                    // Only split when the children count larger than 1
+                    if (isOperationLevel && ((JObject)rootJObj["paths"]).Count > 1)
+                    {
+                        // Split operation group to operation
+                        fileNameInfo.ChildrenFileNameInfo = new List<FileNameInfo>(GenerateOperations(rootJObj, (JObject)rootJObj["paths"], targetDir, fileName));
+
+                        // Sort
+                        fileNameInfo.ChildrenFileNameInfo.Sort((a, b) => string.CompareOrdinal(a.TocName, b.TocName));
+
+                        // Clear up original paths in operation group
+                        rootJObj["paths"] = new JObject();
+
+                        // Add split members into operation group
+                        var splitMembers = new JArray();
+                        foreach (var childInfo in fileNameInfo.ChildrenFileNameInfo)
+                        {
+                            var relativePath = FileUtility.NormalizePath(childInfo.FileName);
+                            var dotIndex = relativePath.LastIndexOf('.');
+                            var relativePathWithoutExt = relativePath;
+                            if (dotIndex > 0)
+                            {
+                                // Remove ".json"
+                                relativePathWithoutExt = relativePath.Remove(dotIndex);
+                            }
+                            splitMembers.Add(new JObject
+                            {
+                                { "displayName", childInfo.TocName },
+                                { "relativePath", relativePathWithoutExt },
+                            });
+                        }
+                        rootJObj["x-internal-split-members"] = splitMembers;
+                        rootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
+                    }
+
                     fileNameInfo.FileName = Serialze(targetDir, fileName, rootJObj);
                     restFileInfo.FileNameInfos.Add(fileNameInfo);
                 }
             }
             return restFileInfo;
+        }
+
+        private static IEnumerable<FileNameInfo> GenerateOperations(JObject rootJObj, JObject paths, string targetDir, string operationGroup)
+        {
+            foreach (var path in paths)
+            {
+                foreach (var item in (JObject)path.Value)
+                {
+                    // Skip for parameters
+                    if (item.Key.Equals("parameters"))
+                    {
+                        continue;
+                    }
+
+                    var operationObj = (JObject)item.Value;
+                    var operationName = GetOperationGroupPerOperation(operationObj).Item2;
+                    var operationTocName = Utility.ExtractPascalNameByRegex(operationName);
+                    operationObj["x-internal-toc-name"] = operationTocName;
+
+                    // Reuse the root object, to reuse the other properties
+                    rootJObj["paths"] = new JObject
+                    {
+                        {
+                            path.Key, new JObject
+                            {
+                                { item.Key, operationObj }
+                            }
+                        }
+                    };
+
+                    rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
+                    var operationFileName = Serialze(Path.Combine(targetDir, operationGroup), operationName, rootJObj);
+                    rootJObj["x-internal-split-type"] = null;
+
+                    yield return new FileNameInfo
+                    {
+                        TocName = operationTocName,
+                        FileName = Path.Combine(operationGroup, operationFileName)
+                    };
+                }
+            }
         }
 
         private static string GetInfoTitle(JObject root)
@@ -109,6 +187,10 @@
         private static string Serialze(string targetDir, string name, JObject root)
         {
             var fileName = $"{name}.json";
+            if (!Directory.Exists(targetDir))
+            {
+                Directory.CreateDirectory(targetDir);
+            }
             using (var sw = new StreamWriter(Path.Combine(targetDir, fileName)))
             using (var writer = new JsonTextWriter(sw))
             {
@@ -130,7 +212,7 @@
                     {
                         continue;
                     }
-                    var opGroup = GetOperationGroupPerOperation((JObject)item.Value);
+                    var opGroup = GetOperationGroupPerOperation((JObject)item.Value).Item1;
                     if (expectedOpGroup == opGroup)
                     {
                         if (filteredPaths[pathUrl] == null)
@@ -163,14 +245,14 @@
                     {
                         continue;
                     }
-                    var operationGroupPerOperation = GetOperationGroupPerOperation((JObject)item.Value);
+                    var operationGroupPerOperation = GetOperationGroupPerOperation((JObject)item.Value).Item1;
                     operationGroups.Add(operationGroupPerOperation);
                 }
             }
             return operationGroups;
         }
 
-        private static string GetOperationGroupPerOperation(JObject operation)
+        private static Tuple<string, string> GetOperationGroupPerOperation(JObject operation)
         {
             JToken value;
             if (operation.TryGetValue("operationId", out value) && value != null)
@@ -180,9 +262,26 @@
             throw new InvalidOperationException($"operationId is not defined in {operation}");
         }
 
-        private static string GetOperationGroupFromOperationId(string operationId)
+        private static Tuple<string, string> GetOperationGroupFromOperationId(string operationId)
         {
-            return operationId.Split('_')[0];
+            var result = operationId.Split('_');
+            if (result.Length != 2)
+            {
+                // When the operation id doesn't contain '_', treat the whole operation id as Noun and Verb at the same time
+                return Tuple.Create(result[0], result[0]);
+            }
+            if (result.Length > 2)
+            {
+                throw new InvalidOperationException($"Invalid operation id: {operationId}, it should be Noun_Verb format.");
+            }
+            return Tuple.Create(result[0], result[1]);
+        }
+
+        private enum SplitType
+        {
+            None,
+            Operation,
+            OperationGroup,
         }
     }
 }

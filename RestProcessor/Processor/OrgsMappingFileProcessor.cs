@@ -30,7 +30,7 @@
                 {
                     if (string.IsNullOrEmpty(orgsMappingFile.ApisPageOptions.TargetFile))
                     {
-                        throw new InvalidOperationException($"Target file of apis page options should not be null or empty.");
+                        throw new InvalidOperationException("Target file of apis page options should not be null or empty.");
                     }
                     var targetIndexPath = Path.Combine(targetRootDir, orgsMappingFile.ApisPageOptions.TargetFile);
                     writer.WriteLine($"# [{orgsMappingFile.ApisPageOptions.TocTitle}]({FileUtility.GetRelativePath(targetIndexPath, targetApiDir)})");
@@ -49,7 +49,7 @@
                             : $"# {orgInfo.OrgName}");
                         subTocPrefix = "#";
                     }
-                    else if(!(orgsMappingFile.ApisPageOptions?.EnableAutoGenerate == true) && !string.IsNullOrEmpty(orgInfo.DefaultTocTitle) && !string.IsNullOrEmpty(orgInfo.OrgIndex))
+                    else if(orgsMappingFile.ApisPageOptions?.EnableAutoGenerate != true && !string.IsNullOrEmpty(orgInfo.DefaultTocTitle) && !string.IsNullOrEmpty(orgInfo.OrgIndex))
                     {
                         writer.WriteLine($"# [{orgInfo.DefaultTocTitle}]({GenerateIndexHRef(targetRootDir, orgInfo.OrgIndex, targetApiDir)})");
                     }
@@ -74,7 +74,8 @@
                             {
                                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, service.UrlGroup));
                                 var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
-                                var restFileInfo = RestSplitter.Process(targetDir, sourceFile, swagger.OperationGroupMapping);
+
+                                var restFileInfo = RestSplitter.Process(targetDir, sourceFile, swagger.OperationGroupMapping, orgsMappingFile.IsOperationLevel);
 
                                 if (restFileInfo == null)
                                 {
@@ -100,7 +101,16 @@
                                         throw new InvalidOperationException($"Sub toc '{subTocTitle}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{swagger.Source}' to avoid conflicting");
                                     }
 
-                                    subTocList.Add(new SwaggerToc(subTocTitle, filePath));
+                                    var childrenToc = new List<SwaggerToc>();
+                                    if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
+                                    {
+                                        foreach (var nameInfo in fileNameInfo.ChildrenFileNameInfo)
+                                        {
+                                            childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, nameInfo.FileName))));
+                                        }
+                                    }
+
+                                    subTocList.Add(new SwaggerToc(subTocTitle, filePath, childrenToc));
                                 }
                                 Console.WriteLine($"Done splitting swagger file from '{swagger.Source}' to '{service.UrlGroup}'");
                             }
@@ -145,6 +155,13 @@
                                 foreach (var subToc in subTocList)
                                 {
                                     writer.WriteLine($"{subTocPrefix}##{subGroupTocPrefix} [{subToc.Title}]({subToc.FilePath})");
+                                    if (subToc.ChildrenToc.Count > 0)
+                                    {
+                                        foreach (var child in subToc.ChildrenToc)
+                                        {
+                                            writer.WriteLine($"{subTocPrefix}###{subGroupTocPrefix} [{child.Title}]({child.FilePath})");
+                                        }
+                                    }
                                 }
                             }
                         }
