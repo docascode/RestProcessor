@@ -5,9 +5,9 @@
 
     using Newtonsoft.Json.Linq;
 
-    public static class TagsUtility
+    public static class TagsGenerator
     {
-        private static JObject FindPathsByTag(JObject paths, string tag)
+        public static JObject FindPathsByTag(JObject paths, string tag)
         {
             var filteredPaths = new JObject();
             foreach (var path in paths)
@@ -21,7 +21,10 @@
                         continue;
                     }
                     var tags = GetTagsPerOperation((JObject)item.Value);
-                    if (tags.Contains(tag))
+
+                    // Only add into operations when the first tag of this operation equals expected.
+                    var firstTag = tags.FirstOrDefault();
+                    if (firstTag != null && firstTag == tag)
                     {
                         if (filteredPaths[pathUrl] == null)
                         {
@@ -41,7 +44,7 @@
             return filteredPaths;
         }
 
-        private static HashSet<string> GetTags(JObject paths)
+        public static HashSet<string> GetTags(JObject paths)
         {
             var tags = new HashSet<string>();
             foreach (var path in paths.Values())
@@ -60,7 +63,7 @@
             return tags;
         }
 
-        private static IEnumerable<string> GetTagsPerOperation(JObject operation)
+        public static IEnumerable<string> GetTagsPerOperation(JObject operation)
         {
             JToken value;
             if (operation.TryGetValue("tags", out value) && value != null)

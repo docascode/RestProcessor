@@ -7,12 +7,14 @@
     using System.Text.RegularExpressions;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     public static class Utility
     {
         private static readonly JsonSerializer JsonSerializer = new JsonSerializer
         {
-            NullValueHandling = NullValueHandling.Ignore
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.Indented
         };
 
         public static readonly Regex YamlHeaderRegex = new Regex(@"^\-{3}(?:\s*?)\n([\s\S]+?)(?:\s*?)\n\-{3}(?:\s*?)(?:\n|$)", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromSeconds(10));
@@ -20,6 +22,21 @@
         public static readonly YamlDotNet.Serialization.Serializer YamlSerializer = new YamlDotNet.Serialization.Serializer();
         public static readonly string Pattern = @"(?:{0}|[A-Z](?:[a-z]*?)(?={0}|[A-Z]|$)|(?:[a-z]+?)(?={0}|[A-Z]|$)|[A-Z]+?(?={0}|[A-Z][a-z]|$))";
         public static readonly HashSet<string> Keyword = new HashSet<string> { "BI", "IP", "ML", "MAM", "OS", "VM", "VMs", "APIM", "vCenters" };
+
+        public static string Serialze(string targetDir, string name, JObject root)
+        {
+            var fileName = $"{name}.json";
+            if (!Directory.Exists(targetDir))
+            {
+                Directory.CreateDirectory(targetDir);
+            }
+            using (var sw = new StreamWriter(Path.Combine(targetDir, fileName)))
+            using (var writer = new JsonTextWriter(sw))
+            {
+                JsonSerializer.Serialize(writer, root);
+            }
+            return fileName;
+        }
 
         public static object GetYamlHeaderByMeta(string filePath, string metaName)
         {

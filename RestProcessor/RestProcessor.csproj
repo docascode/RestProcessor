@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileUtility.cs" />
+    <Compile Include="Generator\OperationGroupGenerator.cs" />
     <Compile Include="GroupServiceMapping\GroupServiceMapping.cs" />
     <Compile Include="Model\Obsolete\DocumentationItem.cs" />
     <Compile Include="Model\Obsolete\Mapping.cs" />
@@ -74,7 +75,8 @@
     <Compile Include="RefResolver.cs" />
     <Compile Include="RestParser.cs" />
     <Compile Include="RestSplitter.cs" />
-    <Compile Include="TagsUtility.cs" />
+    <Compile Include="Generator\TagsGenerator.cs" />
+    <Compile Include="SplitType.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>
