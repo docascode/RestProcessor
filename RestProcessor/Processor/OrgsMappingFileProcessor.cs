@@ -33,7 +33,7 @@
                         throw new InvalidOperationException("Target file of apis page options should not be null or empty.");
                     }
                     var targetIndexPath = Path.Combine(targetRootDir, orgsMappingFile.ApisPageOptions.TargetFile);
-                    writer.WriteLine($"# [Getting started with REST]({FileUtility.GetRelativePath(targetIndexPath, targetApiDir)})");
+                    writer.WriteLine($"# [{orgsMappingFile.ApisPageOptions.TocTitle}]({FileUtility.GetRelativePath(targetIndexPath, targetApiDir)})");
                 }
 
                 // Write organization info
@@ -74,7 +74,9 @@
                             {
                                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, service.UrlGroup));
                                 var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
+
                                 var restFileInfo = RestSplitter.Process(targetDir, sourceFile, swagger.OperationGroupMapping, orgsMappingFile.IsOperationLevel);
+
                                 if (restFileInfo == null)
                                 {
                                     continue;

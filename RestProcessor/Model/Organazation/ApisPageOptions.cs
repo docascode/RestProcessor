@@ -10,6 +10,9 @@
         [JsonProperty("enable_auto_generate")]
         public bool EnableAutoGenerate { get; set; }
 
+        [JsonProperty("toc_title")]
+        public string TocTitle { get; set; }
+
         [JsonProperty("target_file")]
         public string TargetFile { get; set; }
 
