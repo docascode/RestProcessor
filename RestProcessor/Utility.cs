@@ -20,7 +20,7 @@
         public static readonly Regex YamlHeaderRegex = new Regex(@"^\-{3}(?:\s*?)\n([\s\S]+?)(?:\s*?)\n\-{3}(?:\s*?)(?:\n|$)", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromSeconds(10));
         public static readonly YamlDotNet.Serialization.Deserializer YamlDeserializer = new YamlDotNet.Serialization.Deserializer();
         public static readonly YamlDotNet.Serialization.Serializer YamlSerializer = new YamlDotNet.Serialization.Serializer();
-        public static readonly string Pattern = @"(?:{0}|[A-Z](?:[a-z]*?)(?={0}|[A-Z]|$)|(?:[a-z]+?)(?={0}|[A-Z]|$)|[A-Z]+?(?={0}|[A-Z][a-z]|$))";
+        public static readonly string Pattern = @"(?:{0}|[A-Z]+?(?={0}|[A-Z][a-z]|$)|[A-Z](?:[a-z]*?)(?={0}|[A-Z]|$)|(?:[a-z]+?)(?={0}|[A-Z]|$))";
         public static readonly HashSet<string> Keyword = new HashSet<string> { "BI", "IP", "ML", "MAM", "OS", "VM", "VMs", "APIM", "vCenters" };
 
         public static string Serialze(string targetDir, string name, JObject root)
@@ -102,6 +102,11 @@
 
         public static string ExtractPascalNameByRegex(string name)
         {
+            if (name.Contains(" "))
+            {
+                return name;
+            }
+
             var result = new List<string>();
             var p = string.Format(Pattern, string.Join("|", Keyword));
             while (name.Length > 0)
