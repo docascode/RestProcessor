@@ -57,6 +57,8 @@
 
                         // Clear up original paths in operation group
                         rootJObj["paths"] = new JObject();
+                        rootJObj["x-internal-split-members"] = null;
+                        rootJObj["x-internal-split-type"] = null;
 
                         // Add split members into operation group
                         var splitMembers = new JArray();
