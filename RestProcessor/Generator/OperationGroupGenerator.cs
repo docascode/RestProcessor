@@ -57,8 +57,6 @@
 
                         // Clear up original paths in operation group
                         rootJObj["paths"] = new JObject();
-                        rootJObj["x-internal-split-members"] = null;
-                        rootJObj["x-internal-split-type"] = null;
 
                         // Add split members into operation group
                         var splitMembers = new JArray();
@@ -83,6 +81,11 @@
                     }
 
                     fileNameInfo.FileName = Utility.Serialze(targetDir, fileName, rootJObj);
+
+                    // Clear up internal data
+                    rootJObj["x-internal-split-members"] = null;
+                    rootJObj["x-internal-split-type"] = null;
+                    rootJObj["x-internal-toc-name"] = null;
                     yield return fileNameInfo;
                 }
 
