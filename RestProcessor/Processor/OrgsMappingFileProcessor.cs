@@ -75,7 +75,7 @@
                                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, service.UrlGroup));
                                 var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
 
-                                var restFileInfo = RestSplitter.Process(targetDir, sourceFile, swagger.OperationGroupMapping, orgsMappingFile.IsOperationLevel, orgsMappingFile.IsGroupdedByTag);
+                                var restFileInfo = RestSplitter.Process(targetDir, sourceFile, service.TocTitle, swagger.OperationGroupMapping, orgsMappingFile.IsOperationLevel, orgsMappingFile.IsGroupdedByTag);
 
                                 if (restFileInfo == null)
                                 {

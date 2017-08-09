@@ -26,7 +26,7 @@
             public string TocName { get; set; }
         }
 
-        public static RestFileInfo Process(string targetDir, string filePath, OperationGroupMapping operationGroupMapping, bool isOperationLevel, bool isGroupedByTag)
+        public static RestFileInfo Process(string targetDir, string filePath, string serviceName, OperationGroupMapping operationGroupMapping, bool isOperationLevel, bool isGroupedByTag)
         {
             var restFileInfo = new RestFileInfo();
             if (!Directory.Exists(targetDir))
@@ -48,6 +48,7 @@
                 var refResolver = new RefResolver(rootJObj, filePath);
                 refResolver.Resolve();
 
+                rootJObj["x-internal-service-name"] = serviceName;
                 var fileNameInfos = isGroupedByTag ?
                     TagsGenerator.Generate(rootJObj, targetDir, filePath, operationGroupMapping, isOperationLevel).ToList() :
                     OperationGroupGenerator.Generate(rootJObj, targetDir, filePath, operationGroupMapping, isOperationLevel).ToList();
