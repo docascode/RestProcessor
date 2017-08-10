@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
 
@@ -16,6 +17,12 @@
             NullValueHandling = NullValueHandling.Ignore,
             Formatting = Formatting.Indented
         };
+
+        public static bool ShouldSplitToOperation(JObject root)
+        {
+            var paths = ((JObject)root["paths"]);
+            return paths.Count > 1 || (paths.Count == 1 && paths.Values().First().Values().Count() > 1);
+        }
 
         public static readonly Regex YamlHeaderRegex = new Regex(@"^\-{3}(?:\s*?)\n([\s\S]+?)(?:\s*?)\n\-{3}(?:\s*?)(?:\n|$)", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromSeconds(10));
         public static readonly YamlDotNet.Serialization.Deserializer YamlDeserializer = new YamlDotNet.Serialization.Deserializer();

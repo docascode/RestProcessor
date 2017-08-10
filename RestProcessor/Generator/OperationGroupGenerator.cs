@@ -1,4 +1,6 @@
-﻿namespace RestProcessor
+﻿using System.Linq;
+
+namespace RestProcessor
 {
     using System;
     using System.Collections.Generic;
@@ -47,7 +49,7 @@
                     rootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
 
                     // Only split when the children count larger than 1
-                    if (isOperationLevel && ((JObject)rootJObj["paths"]).Count > 1)
+                    if (isOperationLevel && Utility.ShouldSplitToOperation(rootJObj))
                     {
                         // Split operation group to operation
                         fileNameInfo.ChildrenFileNameInfo = new List<RestSplitter.FileNameInfo>(GenerateOperations(rootJObj, (JObject)rootJObj["paths"], targetDir, fileName));
@@ -88,7 +90,6 @@
                     rootJObj["x-internal-toc-name"] = null;
                     yield return fileNameInfo;
                 }
-
             }
         }
 
