@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace RestProcessor
+﻿namespace RestProcessor
 {
     using System;
     using System.Collections.Generic;
