@@ -83,9 +83,9 @@
                     fileNameInfo.FileName = Utility.Serialze(targetDir, fileName, rootJObj);
 
                     // Clear up internal data
-                    rootJObj["x-internal-split-members"] = null;
-                    rootJObj["x-internal-split-type"] = null;
-                    rootJObj["x-internal-toc-name"] = null;
+                    ClearKey(rootJObj, "x-internal-split-members");
+                    ClearKey(rootJObj, "x-internal-split-type");
+                    ClearKey(rootJObj, "x-internal-toc-name");
                     yield return fileNameInfo;
                 }
             }
@@ -199,7 +199,7 @@
 
                     rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
                     var operationFileName = Utility.Serialze(Path.Combine(targetDir, operationGroup), operationName, rootJObj);
-                    rootJObj["x-internal-split-type"] = null;
+                    ClearKey(rootJObj, "x-internal-split-type");
 
                     yield return new RestSplitter.FileNameInfo
                     {
@@ -207,6 +207,15 @@
                         FileName = Path.Combine(operationGroup, operationFileName)
                     };
                 }
+            }
+        }
+
+        private static void ClearKey(JObject jObject, string key)
+        {
+            JToken obj;
+            if (jObject.TryGetValue(key, out obj))
+            {
+                jObject.Remove(key);
             }
         }
     }
