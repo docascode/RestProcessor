@@ -57,6 +57,7 @@
     <Compile Include="FileUtility.cs" />
     <Compile Include="Generator\OperationGroupGenerator.cs" />
     <Compile Include="GroupServiceMapping\GroupServiceMapping.cs" />
+    <Compile Include="Model\MsExample.cs" />
     <Compile Include="Model\Obsolete\DocumentationItem.cs" />
     <Compile Include="Model\Obsolete\Mapping.cs" />
     <Compile Include="Model\Obsolete\MappingFile.cs" />

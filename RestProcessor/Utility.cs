@@ -30,7 +30,7 @@
         public static readonly string Pattern = @"(?:{0}|[A-Z]+?(?={0}|[A-Z][a-z]|$)|[A-Z](?:[a-z]*?)(?={0}|[A-Z]|$)|(?:[a-z]+?)(?={0}|[A-Z]|$))";
         public static readonly HashSet<string> Keyword = new HashSet<string> { "BI", "IP", "ML", "MAM", "OS", "VM", "VMs", "APIM", "vCenters" };
 
-        public static string Serialze(string targetDir, string name, JObject root)
+        public static string Serialize(string targetDir, string name, JObject root)
         {
             var fileName = $"{name}.json";
             if (!Directory.Exists(targetDir))
@@ -43,6 +43,11 @@
                 JsonSerializer.Serialize(writer, root);
             }
             return fileName;
+        }
+
+        public static void Serialize(TextWriter writer, object obj)
+        {
+            JsonSerializer.Serialize(writer, obj);
         }
 
         public static object GetYamlHeaderByMeta(string filePath, string metaName)
@@ -87,6 +92,11 @@
                 Console.WriteLine();
                 return null;
             }
+        }
+
+        public static T YamlDeserialize<T>(TextReader stream)
+        {
+            return YamlDeserializer.Deserialize<T>(stream);
         }
 
         public static void Serialize(string path, object obj)

@@ -80,7 +80,7 @@
                         rootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
                     }
 
-                    fileNameInfo.FileName = Utility.Serialze(targetDir, fileName, rootJObj);
+                    fileNameInfo.FileName = Utility.Serialize(targetDir, fileName, rootJObj);
 
                     // Clear up internal data
                     ClearKey(rootJObj, "x-internal-split-members");
@@ -198,7 +198,7 @@
                     };
 
                     rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
-                    var operationFileName = Utility.Serialze(Path.Combine(targetDir, operationGroup), operationName, rootJObj);
+                    var operationFileName = Utility.Serialize(Path.Combine(targetDir, operationGroup), operationName, rootJObj);
                     ClearKey(rootJObj, "x-internal-split-type");
 
                     yield return new RestSplitter.FileNameInfo

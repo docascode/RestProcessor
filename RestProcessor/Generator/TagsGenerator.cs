@@ -35,7 +35,7 @@
                         fileNameInfo.TocName = Utility.ExtractPascalNameByRegex(fileNameWithoutExt);
                     }
 
-                    fileNameInfo.FileName = Utility.Serialze(targetDir, fileName, rootJObj);
+                    fileNameInfo.FileName = Utility.Serialize(targetDir, fileName, rootJObj);
                     yield return fileNameInfo;
                 }
             }
