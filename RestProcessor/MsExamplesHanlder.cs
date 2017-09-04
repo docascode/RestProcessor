@@ -9,6 +9,8 @@
 
     public static class MsExamplesHanlder
     {
+        public const string InternalMsExamplesMappingKey = "x-internal-ms-examples-mapping";
+
         public static void AddMapping(string sourceRootDir, string targetRootDir, string mappingFilePath)
         {
             var orgsMappingFile = Utility.ReadFromFile<OrgsMappingFile>(mappingFilePath);
@@ -62,7 +64,7 @@
                         if (mapping.Count > 0)
                         {
                             shouldUpdate = true;
-                            operation.Add("x-internal-ms-examples-mapping", mapping);
+                            operation.Add(InternalMsExamplesMappingKey, mapping);
                         }
                     }
                 });
