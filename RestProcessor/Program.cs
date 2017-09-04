@@ -14,7 +14,7 @@
                     return 1;
                 }
 
-                if (args[3] != null)
+                if (args.Length == 4 && args[3] != null)
                 {
                     bool generateMsExamplesMapping;
                     if (bool.TryParse(args[3], out generateMsExamplesMapping) && generateMsExamplesMapping)
