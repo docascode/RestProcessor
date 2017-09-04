@@ -8,13 +8,25 @@
         {
             try
             {
-                if (args.Length != 3)
+                if (args.Length < 3 || args.Length > 4)
                 {
-                    Console.WriteLine($"Usage: {AppDomain.CurrentDomain.FriendlyName} [source_root_directory] [target_root_directory] [mappingfile.json]");
+                    Console.WriteLine($"Usage: {AppDomain.CurrentDomain.FriendlyName} [source_root_directory] [target_root_directory] [mappingfile.json] [boolean:generateMsExamplesMapping]");
                     return 1;
                 }
 
-                RestParser.Process(args[0], args[1], args[2]);
+                if (args[3] != null)
+                {
+                    bool generateMsExamplesMapping;
+                    if (bool.TryParse(args[3], out generateMsExamplesMapping) && generateMsExamplesMapping)
+                    {
+                        MsExamplesHanlder.AddMapping(args[0], args[1], args[2]);
+                    }
+                }
+                else
+                {
+                    RestParser.Process(args[0], args[1], args[2]);
+                }
+
                 return 0;
             }
             catch (Exception ex)
