@@ -1,5 +1,6 @@
 ﻿namespace RestProcessor
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -12,30 +13,67 @@
         {
             var pathsJObj = (JObject)rootJObj["paths"];
             var tags = GetTags(pathsJObj);
+            if (tags.Count == 0)
+            {
+                Console.WriteLine($"tags is null or empty for file {filePath}.");
+            }
             foreach (var tag in tags)
             {
                 var paths = FindPathsByTag(pathsJObj, tag);
-                if (paths.Count > 0)
+                var filteredPaths = FindPathsByTag(pathsJObj, tag);
+                if(filteredPaths.Count > 0)
                 {
-                    rootJObj["paths"] = paths;
-                    var fileNameInfo = new RestSplitter.FileNameInfo();
-                    var fileName = tag;
-
-                    // Get file name from operation group mapping
-                    string newOperationGourpName;
-                    if (operationGroupMapping != null && operationGroupMapping.TryGetValue(tag, out newOperationGourpName))
+                    var fileNameInfo = new RestSplitter.FileNameInfo
                     {
-                        fileName = newOperationGourpName;
-                        fileNameInfo.TocName = newOperationGourpName;
-                        rootJObj["x-internal-operation-group-name"] = newOperationGourpName;
-                    }
-                    else
+                        TocName = tag
+                    };
+                   
+                    // Reset paths to filtered paths
+                    rootJObj["paths"] = filteredPaths;
+                    rootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
+
+                    // Only split when the children count larger than 1
+                    if (isOperationLevel && Utility.ShouldSplitToOperation(rootJObj))
                     {
-                        var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
-                        fileNameInfo.TocName = Utility.ExtractPascalNameByRegex(fileNameWithoutExt);
+                        // Split operation group to operation
+                        fileNameInfo.ChildrenFileNameInfo = new List<RestSplitter.FileNameInfo>(GenerateOperations(rootJObj, (JObject)rootJObj["paths"], targetDir, tag));
+
+                        // Sort
+                        fileNameInfo.ChildrenFileNameInfo.Sort((a, b) => string.CompareOrdinal(a.TocName, b.TocName));
+
+                        // Clear up original paths in operation group
+                        rootJObj["paths"] = new JObject();
+
+                        // Add split members into operation group
+                        var splitMembers = new JArray();
+
+                        foreach (var childInfo in fileNameInfo.ChildrenFileNameInfo)
+                        {
+                            var relativePath = FileUtility.NormalizePath(childInfo.FileName);
+                            var dotIndex = relativePath.LastIndexOf('.');
+                            var relativePathWithoutExt = relativePath;
+                            if (dotIndex > 0)
+                            {
+                                // Remove ".json"
+                                relativePathWithoutExt = relativePath.Remove(dotIndex);
+                            }
+                            splitMembers.Add(new JObject
+                            {
+                                { "displayName", childInfo.TocName },
+                                { "relativePath", relativePathWithoutExt },
+                            });
+                        }
+                        rootJObj["x-internal-split-members"] = splitMembers;
+                        rootJObj["x-internal-split-type"] = SplitType.TagOperation.ToString();
                     }
 
-                    fileNameInfo.FileName = Utility.Serialize(targetDir, fileName, rootJObj);
+                    fileNameInfo.FileName = Utility.Serialize(targetDir, tag, rootJObj);
+
+                    // Clear up internal data
+                    ClearKey(rootJObj, "x-internal-split-members");
+                    ClearKey(rootJObj, "x-internal-split-type");
+                    ClearKey(rootJObj, "x-internal-toc-name");
+
                     yield return fileNameInfo;
                 }
             }
@@ -107,6 +145,66 @@
                 {
                     yield return tagJToken.ToString();
                 }
+            }
+        }
+
+        private static IEnumerable<RestSplitter.FileNameInfo> GenerateOperations(JObject rootJObj, JObject paths, string targetDir, string tagName)
+        {
+            foreach (var path in paths)
+            {
+                foreach (var item in (JObject)path.Value)
+                {
+                    // Skip for parameters
+                    if (item.Key.Equals("parameters"))
+                    {
+                        continue;
+                    }
+
+                    var operationObj = (JObject)item.Value;
+                    var operationName = GetOperationName(operationObj);
+                    var operationTocName = Utility.ExtractPascalNameByRegex(operationName);
+                    operationObj["x-internal-toc-name"] = operationTocName;
+
+                    // Reuse the root object, to reuse the other properties
+                    rootJObj["paths"] = new JObject
+                    {
+                        {
+                            path.Key, new JObject
+                            {
+                                { item.Key, operationObj }
+                            }
+                        }
+                    };
+
+                    rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
+                    var operationFileName = Utility.Serialize(Path.Combine(targetDir, tagName), operationName, rootJObj);
+                    ClearKey(rootJObj, "x-internal-split-type");
+
+                    yield return new RestSplitter.FileNameInfo
+                    {
+                        TocName = operationTocName,
+                        FileName = Path.Combine(tagName, operationFileName)
+                    };
+                }
+            }
+        }
+
+        private static string GetOperationName(JObject operation)
+        {
+            JToken value;
+            if (operation.TryGetValue("operationId", out value) && value != null)
+            {
+                return value.ToString();
+            }
+            throw new InvalidOperationException($"operationId is not defined in {operation}");
+        }
+
+        private static void ClearKey(JObject jObject, string key)
+        {
+            JToken obj;
+            if (jObject.TryGetValue(key, out obj))
+            {
+                jObject.Remove(key);
             }
         }
     }

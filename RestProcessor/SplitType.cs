@@ -5,5 +5,6 @@
         None,
         Operation,
         OperationGroup,
+        TagOperation
     }
 }
