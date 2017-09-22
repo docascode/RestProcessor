@@ -19,6 +19,10 @@
 
         protected BaseGenerator(JObject rootJObj, string targetDir, string filePath, bool isOperationLevel)
         {
+            Guard.ArgumentNotNull(rootJObj, nameof(rootJObj));
+            Guard.ArgumentNotNullOrEmpty(targetDir, nameof(targetDir));
+            Guard.ArgumentNotNullOrEmpty(filePath, nameof(filePath));
+
             RootJObj = rootJObj;
             TargetDir = targetDir;
             FilePath = filePath;
