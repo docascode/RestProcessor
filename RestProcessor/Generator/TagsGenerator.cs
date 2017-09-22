@@ -1,25 +1,33 @@
-﻿namespace RestProcessor
+﻿namespace RestProcessor.Generator
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
 
     using Newtonsoft.Json.Linq;
 
-    public static class TagsGenerator
+    public class TagsGenerator : BaseGenerator
     {
-        public static IEnumerable<RestSplitter.FileNameInfo> Generate(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, bool isOperationLevel)
+        #region Constructors
+
+        public TagsGenerator(JObject rootJObj, string targetDir, string filePath, bool isOperationLevel) : base(rootJObj, targetDir, filePath, isOperationLevel)
         {
-            var pathsJObj = (JObject)rootJObj["paths"];
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public override IEnumerable<RestSplitter.FileNameInfo> Generate()
+        {
+            var pathsJObj = (JObject)RootJObj["paths"];
             var tags = GetTags(pathsJObj);
             if (tags.Count == 0)
             {
-                Console.WriteLine($"tags is null or empty for file {filePath}.");
+                Console.WriteLine($"tags is null or empty for file {FilePath}.");
             }
             foreach (var tag in tags)
             {
-                var paths = FindPathsByTag(pathsJObj, tag);
                 var filteredPaths = FindPathsByTag(pathsJObj, tag);
                 if(filteredPaths.Count > 0)
                 {
@@ -29,20 +37,20 @@
                     };
                    
                     // Reset paths to filtered paths
-                    rootJObj["paths"] = filteredPaths;
-                    rootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
+                    RootJObj["paths"] = filteredPaths;
+                    RootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
 
                     // Only split when the children count larger than 1
-                    if (isOperationLevel && Utility.ShouldSplitToOperation(rootJObj))
+                    if (IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj))
                     {
                         // Split operation group to operation
-                        fileNameInfo.ChildrenFileNameInfo = new List<RestSplitter.FileNameInfo>(GenerateOperations(rootJObj, (JObject)rootJObj["paths"], targetDir, tag));
+                        fileNameInfo.ChildrenFileNameInfo = new List<RestSplitter.FileNameInfo>(GenerateOperations(RootJObj, (JObject)RootJObj["paths"], TargetDir, tag));
 
                         // Sort
                         fileNameInfo.ChildrenFileNameInfo.Sort((a, b) => string.CompareOrdinal(a.TocName, b.TocName));
 
                         // Clear up original paths in operation group
-                        rootJObj["paths"] = new JObject();
+                        RootJObj["paths"] = new JObject();
 
                         // Add split members into operation group
                         var splitMembers = new JArray();
@@ -63,21 +71,39 @@
                                 { "relativePath", relativePathWithoutExt },
                             });
                         }
-                        rootJObj["x-internal-split-members"] = splitMembers;
-                        rootJObj["x-internal-split-type"] = SplitType.TagOperation.ToString();
+                        RootJObj["x-internal-split-members"] = splitMembers;
+                        RootJObj["x-internal-split-type"] = SplitType.TagOperation.ToString();
                     }
 
-                    fileNameInfo.FileName = Utility.Serialize(targetDir, tag, rootJObj);
+                    fileNameInfo.FileName = Utility.Serialize(TargetDir, tag, RootJObj);
 
                     // Clear up internal data
-                    ClearKey(rootJObj, "x-internal-split-members");
-                    ClearKey(rootJObj, "x-internal-split-type");
-                    ClearKey(rootJObj, "x-internal-toc-name");
+                    ClearKey(RootJObj, "x-internal-split-members");
+                    ClearKey(RootJObj, "x-internal-split-type");
+                    ClearKey(RootJObj, "x-internal-toc-name");
 
                     yield return fileNameInfo;
                 }
             }
         }
+
+        #endregion
+
+        #region Protected Methods
+
+        protected override string GetOperationName(JObject operation)
+        {
+            JToken value;
+            if (operation.TryGetValue("operationId", out value) && value != null)
+            {
+                return value.ToString();
+            }
+            throw new InvalidOperationException($"operationId is not defined in {operation}");
+        }
+
+        #endregion
+
+        #region Private Methods
 
         private static JObject FindPathsByTag(JObject paths, string tag)
         {
@@ -148,64 +174,6 @@
             }
         }
 
-        private static IEnumerable<RestSplitter.FileNameInfo> GenerateOperations(JObject rootJObj, JObject paths, string targetDir, string tagName)
-        {
-            foreach (var path in paths)
-            {
-                foreach (var item in (JObject)path.Value)
-                {
-                    // Skip for parameters
-                    if (item.Key.Equals("parameters"))
-                    {
-                        continue;
-                    }
-
-                    var operationObj = (JObject)item.Value;
-                    var operationName = GetOperationName(operationObj);
-                    var operationTocName = Utility.ExtractPascalNameByRegex(operationName);
-                    operationObj["x-internal-toc-name"] = operationTocName;
-
-                    // Reuse the root object, to reuse the other properties
-                    rootJObj["paths"] = new JObject
-                    {
-                        {
-                            path.Key, new JObject
-                            {
-                                { item.Key, operationObj }
-                            }
-                        }
-                    };
-
-                    rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
-                    var operationFileName = Utility.Serialize(Path.Combine(targetDir, tagName), operationName, rootJObj);
-                    ClearKey(rootJObj, "x-internal-split-type");
-
-                    yield return new RestSplitter.FileNameInfo
-                    {
-                        TocName = operationTocName,
-                        FileName = Path.Combine(tagName, operationFileName)
-                    };
-                }
-            }
-        }
-
-        private static string GetOperationName(JObject operation)
-        {
-            JToken value;
-            if (operation.TryGetValue("operationId", out value) && value != null)
-            {
-                return value.ToString();
-            }
-            throw new InvalidOperationException($"operationId is not defined in {operation}");
-        }
-
-        private static void ClearKey(JObject jObject, string key)
-        {
-            JToken obj;
-            if (jObject.TryGetValue(key, out obj))
-            {
-                jObject.Remove(key);
-            }
-        }
+        #endregion
     }
 }

@@ -5,6 +5,8 @@
     using System.IO;
     using System.Linq;
 
+    using RestProcessor.Generator;
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -49,9 +51,8 @@
                 refResolver.Resolve();
 
                 rootJObj["x-internal-service-name"] = serviceName;
-                var fileNameInfos = isGroupedByTag ?
-                    TagsGenerator.Generate(rootJObj, targetDir, filePath, operationGroupMapping, isOperationLevel).ToList() :
-                    OperationGroupGenerator.Generate(rootJObj, targetDir, filePath, operationGroupMapping, isOperationLevel).ToList();
+                var generator = GeneratorFactory.CreateGenerator(isGroupedByTag, rootJObj, targetDir, filePath, operationGroupMapping, isOperationLevel);
+                var fileNameInfos = generator.Generate().ToList();
 
                 if (fileNameInfos.Any())
                 {

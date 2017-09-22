@@ -55,6 +55,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileUtility.cs" />
+    <Compile Include="Generator\BaseGenerator.cs" />
+    <Compile Include="Generator\GeneratorFactory.cs" />
+    <Compile Include="Generator\IGenerator.cs" />
     <Compile Include="Generator\OperationGroupGenerator.cs" />
     <Compile Include="GroupServiceMapping\GroupServiceMapping.cs" />
     <Compile Include="Model\MsExample.cs" />
