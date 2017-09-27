@@ -72,7 +72,7 @@
                             });
                         }
                         RootJObj["x-internal-split-members"] = splitMembers;
-                        RootJObj["x-internal-split-type"] = SplitType.TagOperation.ToString();
+                        RootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
                     }
 
                     fileNameInfo.FileName = Utility.Serialize(TargetDir, tag, RootJObj);
