@@ -1,45 +1,109 @@
-﻿namespace RestProcessor
+﻿namespace RestProcessor.Generator
 {
+    using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
 
     using Newtonsoft.Json.Linq;
 
-    public static class TagsGenerator
+    public class TagsGenerator : BaseGenerator
     {
-        public static IEnumerable<RestSplitter.FileNameInfo> Generate(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, bool isOperationLevel)
+        #region Constructors
+
+        public TagsGenerator(JObject rootJObj, string targetDir, string filePath, bool isOperationLevel) : base(rootJObj, targetDir, filePath, isOperationLevel)
         {
-            var pathsJObj = (JObject)rootJObj["paths"];
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public override IEnumerable<RestSplitter.FileNameInfo> Generate()
+        {
+            var pathsJObj = (JObject)RootJObj["paths"];
             var tags = GetTags(pathsJObj);
+            if (tags.Count == 0)
+            {
+                Console.WriteLine($"tags is null or empty for file {FilePath}.");
+            }
             foreach (var tag in tags)
             {
-                var paths = FindPathsByTag(pathsJObj, tag);
-                if (paths.Count > 0)
+                var filteredPaths = FindPathsByTag(pathsJObj, tag);
+                if(filteredPaths.Count > 0)
                 {
-                    rootJObj["paths"] = paths;
-                    var fileNameInfo = new RestSplitter.FileNameInfo();
-                    var fileName = tag;
-
-                    // Get file name from operation group mapping
-                    string newOperationGourpName;
-                    if (operationGroupMapping != null && operationGroupMapping.TryGetValue(tag, out newOperationGourpName))
+                    var fileNameInfo = new RestSplitter.FileNameInfo
                     {
-                        fileName = newOperationGourpName;
-                        fileNameInfo.TocName = newOperationGourpName;
-                        rootJObj["x-internal-operation-group-name"] = newOperationGourpName;
-                    }
-                    else
+                        TocName = tag
+                    };
+                   
+                    // Reset paths to filtered paths
+                    RootJObj["paths"] = filteredPaths;
+                    RootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
+
+                    // Only split when the children count larger than 1
+                    if (IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj))
                     {
-                        var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
-                        fileNameInfo.TocName = Utility.ExtractPascalNameByRegex(fileNameWithoutExt);
+                        // Split operation group to operation
+                        fileNameInfo.ChildrenFileNameInfo = new List<RestSplitter.FileNameInfo>(GenerateOperations(RootJObj, (JObject)RootJObj["paths"], TargetDir, tag));
+
+                        // Sort
+                        fileNameInfo.ChildrenFileNameInfo.Sort((a, b) => string.CompareOrdinal(a.TocName, b.TocName));
+
+                        // Clear up original paths in operation group
+                        RootJObj["paths"] = new JObject();
+
+                        // Add split members into operation group
+                        var splitMembers = new JArray();
+
+                        foreach (var childInfo in fileNameInfo.ChildrenFileNameInfo)
+                        {
+                            var relativePath = FileUtility.NormalizePath(childInfo.FileName);
+                            var dotIndex = relativePath.LastIndexOf('.');
+                            var relativePathWithoutExt = relativePath;
+                            if (dotIndex > 0)
+                            {
+                                // Remove ".json"
+                                relativePathWithoutExt = relativePath.Remove(dotIndex);
+                            }
+                            splitMembers.Add(new JObject
+                            {
+                                { "displayName", childInfo.TocName },
+                                { "relativePath", relativePathWithoutExt },
+                            });
+                        }
+                        RootJObj["x-internal-split-members"] = splitMembers;
+                        RootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
                     }
 
-                    fileNameInfo.FileName = Utility.Serialize(targetDir, fileName, rootJObj);
+                    fileNameInfo.FileName = Utility.Serialize(TargetDir, tag, RootJObj);
+
+                    // Clear up internal data
+                    ClearKey(RootJObj, "x-internal-split-members");
+                    ClearKey(RootJObj, "x-internal-split-type");
+                    ClearKey(RootJObj, "x-internal-toc-name");
+
                     yield return fileNameInfo;
                 }
             }
         }
+
+        #endregion
+
+        #region Protected Methods
+
+        protected override string GetOperationName(JObject operation)
+        {
+            JToken value;
+            if (operation.TryGetValue("operationId", out value) && value != null)
+            {
+                return value.ToString();
+            }
+            throw new InvalidOperationException($"operationId is not defined in {operation}");
+        }
+
+        #endregion
+
+        #region Private Methods
 
         private static JObject FindPathsByTag(JObject paths, string tag)
         {
@@ -109,5 +173,7 @@
                 }
             }
         }
+
+        #endregion
     }
 }

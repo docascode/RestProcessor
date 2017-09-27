@@ -1,4 +1,4 @@
-﻿namespace RestProcessor
+﻿namespace RestProcessor.Generator
 {
     using System;
     using System.Collections.Generic;
@@ -6,15 +6,30 @@
 
     using Newtonsoft.Json.Linq;
 
-    public class OperationGroupGenerator
+    public class OperationGroupGenerator : BaseGenerator
     {
-        public static IEnumerable<RestSplitter.FileNameInfo> Generate(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, bool isOperationLevel)
+        protected OperationGroupMapping OperationGroupMapping { get; }
+
+        #region Constructors
+        public OperationGroupGenerator(JObject rootJObj, string targetDir, string filePath, bool isOperationLevel, OperationGroupMapping operationGroupMapping) : base(rootJObj, targetDir, filePath, isOperationLevel)
         {
-            var pathsJObj = (JObject)rootJObj["paths"];
+            OperationGroupMapping = operationGroupMapping;
+        }
+        #endregion
+
+        #region Public Methods
+
+        #endregion
+
+        #region Protected Methods
+
+        public override IEnumerable<RestSplitter.FileNameInfo> Generate()
+        {
+            var pathsJObj = (JObject)RootJObj["paths"];
             var operationGroups = GetOperationGroups(pathsJObj);
             if (operationGroups.Count == 0)
             {
-                Console.WriteLine($"Operation groups is null or empty for file {filePath}.");
+                Console.WriteLine($"Operation groups is null or empty for file {FilePath}.");
             }
             else
             {
@@ -23,18 +38,18 @@
                     var filteredPaths = FindPathsByOperationGroup(pathsJObj, operationGroup);
                     if (filteredPaths.Count == 0)
                     {
-                        throw new InvalidOperationException($"Operation group '{operationGroup}' could not be found in for {FileUtility.GetDirectoryName(targetDir)}");
+                        throw new InvalidOperationException($"Operation group '{operationGroup}' could not be found in for {FileUtility.GetDirectoryName(TargetDir)}");
                     }
 
                     // Get file name from operation group mapping
                     var fileNameInfo = new RestSplitter.FileNameInfo();
                     var fileName = operationGroup;
                     string newOperationGourpName;
-                    if (operationGroupMapping != null && operationGroupMapping.TryGetValue(operationGroup, out newOperationGourpName))
+                    if (OperationGroupMapping != null && OperationGroupMapping.TryGetValue(operationGroup, out newOperationGourpName))
                     {
                         fileName = newOperationGourpName;
                         fileNameInfo.TocName = newOperationGourpName;
-                        rootJObj["x-internal-operation-group-name"] = newOperationGourpName;
+                        RootJObj["x-internal-operation-group-name"] = newOperationGourpName;
                     }
                     else
                     {
@@ -43,20 +58,20 @@
                     }
 
                     // Reset paths to filtered paths
-                    rootJObj["paths"] = filteredPaths;
-                    rootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
+                    RootJObj["paths"] = filteredPaths;
+                    RootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
 
                     // Only split when the children count larger than 1
-                    if (isOperationLevel && Utility.ShouldSplitToOperation(rootJObj))
+                    if (IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj))
                     {
                         // Split operation group to operation
-                        fileNameInfo.ChildrenFileNameInfo = new List<RestSplitter.FileNameInfo>(GenerateOperations(rootJObj, (JObject)rootJObj["paths"], targetDir, fileName));
+                        fileNameInfo.ChildrenFileNameInfo = new List<RestSplitter.FileNameInfo>(GenerateOperations(RootJObj, (JObject)RootJObj["paths"], TargetDir, fileName));
 
                         // Sort
                         fileNameInfo.ChildrenFileNameInfo.Sort((a, b) => string.CompareOrdinal(a.TocName, b.TocName));
 
                         // Clear up original paths in operation group
-                        rootJObj["paths"] = new JObject();
+                        RootJObj["paths"] = new JObject();
 
                         // Add split members into operation group
                         var splitMembers = new JArray();
@@ -76,20 +91,29 @@
                                 { "relativePath", relativePathWithoutExt },
                             });
                         }
-                        rootJObj["x-internal-split-members"] = splitMembers;
-                        rootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
+                        RootJObj["x-internal-split-members"] = splitMembers;
+                        RootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
                     }
 
-                    fileNameInfo.FileName = Utility.Serialize(targetDir, fileName, rootJObj);
+                    fileNameInfo.FileName = Utility.Serialize(TargetDir, fileName, RootJObj);
 
                     // Clear up internal data
-                    ClearKey(rootJObj, "x-internal-split-members");
-                    ClearKey(rootJObj, "x-internal-split-type");
-                    ClearKey(rootJObj, "x-internal-toc-name");
+                    ClearKey(RootJObj, "x-internal-split-members");
+                    ClearKey(RootJObj, "x-internal-split-type");
+                    ClearKey(RootJObj, "x-internal-toc-name");
                     yield return fileNameInfo;
                 }
             }
         }
+
+        protected override string GetOperationName(JObject operation)
+        {
+            return GetOperationGroupPerOperation(operation).Item2;
+        }
+
+        #endregion
+
+        #region Private Methods
 
         private static JObject FindPathsByOperationGroup(JObject paths, string expectedOpGroup)
         {
@@ -169,54 +193,6 @@
             return Tuple.Create(result[0], result[1]);
         }
 
-        private static IEnumerable<RestSplitter.FileNameInfo> GenerateOperations(JObject rootJObj, JObject paths, string targetDir, string operationGroup)
-        {
-            foreach (var path in paths)
-            {
-                foreach (var item in (JObject)path.Value)
-                {
-                    // Skip for parameters
-                    if (item.Key.Equals("parameters"))
-                    {
-                        continue;
-                    }
-
-                    var operationObj = (JObject)item.Value;
-                    var operationName = GetOperationGroupPerOperation(operationObj).Item2;
-                    var operationTocName = Utility.ExtractPascalNameByRegex(operationName);
-                    operationObj["x-internal-toc-name"] = operationTocName;
-
-                    // Reuse the root object, to reuse the other properties
-                    rootJObj["paths"] = new JObject
-                    {
-                        {
-                            path.Key, new JObject
-                            {
-                                { item.Key, operationObj }
-                            }
-                        }
-                    };
-
-                    rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
-                    var operationFileName = Utility.Serialize(Path.Combine(targetDir, operationGroup), operationName, rootJObj);
-                    ClearKey(rootJObj, "x-internal-split-type");
-
-                    yield return new RestSplitter.FileNameInfo
-                    {
-                        TocName = operationTocName,
-                        FileName = Path.Combine(operationGroup, operationFileName)
-                    };
-                }
-            }
-        }
-
-        private static void ClearKey(JObject jObject, string key)
-        {
-            JToken obj;
-            if (jObject.TryGetValue(key, out obj))
-            {
-                jObject.Remove(key);
-            }
-        }
+        #endregion
     }
 }
