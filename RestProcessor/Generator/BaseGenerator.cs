@@ -3,6 +3,8 @@
     using System.Collections.Generic;
     using System.IO;
 
+    using RestProcessor.Model;
+
     using Newtonsoft.Json.Linq;
 
     public abstract class BaseGenerator : IGenerator
@@ -13,20 +15,21 @@
 
         protected string FilePath { get; }
 
-        protected bool IsOperationLevel { get; }
+        protected MappingConfig MappingConfig { get; }
 
         #region Constructors
 
-        protected BaseGenerator(JObject rootJObj, string targetDir, string filePath, bool isOperationLevel)
+        protected BaseGenerator(JObject rootJObj, string targetDir, string filePath, MappingConfig mappingConfig)
         {
             Guard.ArgumentNotNull(rootJObj, nameof(rootJObj));
             Guard.ArgumentNotNullOrEmpty(targetDir, nameof(targetDir));
             Guard.ArgumentNotNullOrEmpty(filePath, nameof(filePath));
+            Guard.ArgumentNotNull(mappingConfig, nameof(mappingConfig));
 
             RootJObj = rootJObj;
             TargetDir = targetDir;
             FilePath = filePath;
-            IsOperationLevel = isOperationLevel;
+            MappingConfig = mappingConfig;
         }
 
 

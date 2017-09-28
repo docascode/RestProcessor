@@ -18,10 +18,10 @@
             Formatting = Formatting.Indented
         };
 
-        public static bool ShouldSplitToOperation(JObject root)
+        public static bool ShouldSplitToOperation(JObject root, int splitOperationCountGreaterThan)
         {
             var paths = ((JObject)root["paths"]);
-            return paths.Count > 1 || (paths.Count == 1 && paths.Values().First().Values().Count() > 1);
+            return paths.Count > splitOperationCountGreaterThan || (paths.Count == splitOperationCountGreaterThan && paths.Values().First().Values().Count() > splitOperationCountGreaterThan);
         }
 
         public static readonly Regex YamlHeaderRegex = new Regex(@"^\-{3}(?:\s*?)\n([\s\S]+?)(?:\s*?)\n\-{3}(?:\s*?)(?:\n|$)", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromSeconds(10));

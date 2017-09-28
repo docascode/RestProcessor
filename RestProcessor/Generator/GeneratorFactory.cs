@@ -1,16 +1,18 @@
 ﻿namespace RestProcessor.Generator
 {
+    using RestProcessor.Model;
+
     using Newtonsoft.Json.Linq;
 
     public class GeneratorFactory
     {
-        public static IGenerator CreateGenerator(bool isGroupedByTag, JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, bool isOperationLevel)
+        public static IGenerator CreateGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig)
         {
-            if (isGroupedByTag)
+            if (mappingConfig.IsGroupedByTag)
             {
-                return new TagsGenerator(rootJObj, targetDir, filePath, isOperationLevel);
+                return new TagsGenerator(rootJObj, targetDir, filePath, mappingConfig);
             }
-            return new OperationGroupGenerator(rootJObj, targetDir, filePath, isOperationLevel, operationGroupMapping);
+            return new OperationGroupGenerator(rootJObj, targetDir, filePath, operationGroupMapping, mappingConfig);
         }
     }
 }

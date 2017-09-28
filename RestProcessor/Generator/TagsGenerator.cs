@@ -4,13 +4,15 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using RestProcessor.Model;
+
     using Newtonsoft.Json.Linq;
 
     public class TagsGenerator : BaseGenerator
     {
         #region Constructors
 
-        public TagsGenerator(JObject rootJObj, string targetDir, string filePath, bool isOperationLevel) : base(rootJObj, targetDir, filePath, isOperationLevel)
+        public TagsGenerator(JObject rootJObj, string targetDir, string filePath, MappingConfig mappingConfig) : base(rootJObj, targetDir, filePath, mappingConfig)
         {
         }
 
@@ -40,8 +42,8 @@
                     RootJObj["paths"] = filteredPaths;
                     RootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
 
-                    // Only split when the children count larger than 1
-                    if (IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj))
+                    // Only split when the children count larger than MappingConfig.SplitOperationCountGreaterThan
+                    if (MappingConfig.IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj, MappingConfig.SplitOperationCountGreaterThan))
                     {
                         // Split operation group to operation
                         fileNameInfo.ChildrenFileNameInfo = new List<RestSplitter.FileNameInfo>(GenerateOperations(RootJObj, (JObject)RootJObj["paths"], TargetDir, tag));
