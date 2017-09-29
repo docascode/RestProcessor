@@ -5,6 +5,8 @@
     using System.IO;
     using System.Linq;
 
+    using RestProcessor.Model;
+
     public class MappingProcessor : MappingProcessorBase
     {
         public void Process(string sourceRootDir, string targetRootDir, MappingFile mappingFile)
@@ -19,7 +21,14 @@
                 // Split rest files
                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, mappingItem.TargetDir));
                 var sourceFile = Path.Combine(sourceRootDir, mappingItem.SourceSwagger);
-                var restFileInfo = RestSplitter.Process(targetDir, sourceFile, string.Empty, mappingItem.OperationGroupMapping, false, false);
+
+                var mappingConfig = new MappingConfig
+                {
+                    IsOperationLevel = false,
+                    IsGroupedByTag = false
+                };
+
+                var restFileInfo = RestSplitter.Split(targetDir, sourceFile, string.Empty, mappingItem.OperationGroupMapping, mappingConfig);
                 if (restFileInfo == null)
                 {
                     continue;

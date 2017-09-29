@@ -9,6 +9,7 @@
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using RestProcessor.Model;
 
     public static class RestSplitter
     {
@@ -28,7 +29,7 @@
             public string TocName { get; set; }
         }
 
-        public static RestFileInfo Process(string targetDir, string filePath, string serviceName, OperationGroupMapping operationGroupMapping, bool isOperationLevel, bool isGroupedByTag)
+        public static RestFileInfo Split(string targetDir, string filePath, string serviceName, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig)
         {
             var restFileInfo = new RestFileInfo();
             if (!Directory.Exists(targetDir))
@@ -51,7 +52,7 @@
                 refResolver.Resolve();
 
                 rootJObj["x-internal-service-name"] = serviceName;
-                var generator = GeneratorFactory.CreateGenerator(isGroupedByTag, rootJObj, targetDir, filePath, operationGroupMapping, isOperationLevel);
+                var generator = GeneratorFactory.CreateGenerator(rootJObj, targetDir, filePath, operationGroupMapping, mappingConfig);
                 var fileNameInfos = generator.Generate().ToList();
 
                 if (fileNameInfos.Any())

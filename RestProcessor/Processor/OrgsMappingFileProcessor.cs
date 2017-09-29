@@ -5,6 +5,8 @@
     using System.IO;
     using System.Linq;
 
+    using RestProcessor.Model;
+
     public class OrgsMappingProcessor : MappingProcessorBase
     {
         public void Process(string sourceRootDir, string targetRootDir, OrgsMappingFile orgsMappingFile)
@@ -23,6 +25,13 @@
         {
             var targetApiDir = GetApiDirectory(targetRootDir, orgsMappingFile.TargetApiRootDir);
             var targetTocPath = Path.Combine(targetApiDir, TocFileName);
+            var mappingConfig = new MappingConfig
+            {
+                IsOperationLevel = orgsMappingFile.IsOperationLevel,
+                IsGroupedByTag = orgsMappingFile.IsGroupdedByTag,
+                SplitOperationCountGreaterThan = orgsMappingFile.SplitOperationCountGreaterThan
+            };
+
             using (var writer = new StreamWriter(targetTocPath))
             {
                 // Write auto generated apis page
@@ -70,50 +79,7 @@
                         var subTocDict = new SortedDictionary<string, List<SwaggerToc>>();
                         if (service.SwaggerInfo != null)
                         {
-                            foreach (var swagger in service.SwaggerInfo)
-                            {
-                                var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, service.UrlGroup));
-                                var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
-
-                                var restFileInfo = RestSplitter.Process(targetDir, sourceFile, service.TocTitle, swagger.OperationGroupMapping, orgsMappingFile.IsOperationLevel, orgsMappingFile.IsGroupdedByTag);
-
-                                if (restFileInfo == null)
-                                {
-                                    continue;
-                                }
-                                var tocTitle = Utility.ExtractPascalNameByRegex(restFileInfo.TocTitle);
-
-                                var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;
-                                List<SwaggerToc> subTocList;
-                                if (!subTocDict.TryGetValue(subGroupName, out subTocList))
-                                {
-                                    subTocList = new List<SwaggerToc>();
-                                    subTocDict.Add(subGroupName, subTocList);
-                                }
-
-                                foreach (var fileNameInfo in restFileInfo.FileNameInfos)
-                                {
-                                    var subTocTitle = fileNameInfo.TocName;
-                                    var filePath = FileUtility.NormalizePath(Path.Combine(service.UrlGroup, fileNameInfo.FileName));
-
-                                    if (subTocList.Any(toc => toc.Title == subTocTitle))
-                                    {
-                                        throw new InvalidOperationException($"Sub toc '{subTocTitle}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{swagger.Source}' to avoid conflicting");
-                                    }
-
-                                    var childrenToc = new List<SwaggerToc>();
-                                    if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
-                                    {
-                                        foreach (var nameInfo in fileNameInfo.ChildrenFileNameInfo)
-                                        {
-                                            childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, nameInfo.FileName))));
-                                        }
-                                    }
-
-                                    subTocList.Add(new SwaggerToc(subTocTitle, filePath, childrenToc));
-                                }
-                                Console.WriteLine($"Done splitting swagger file from '{swagger.Source}' to '{service.UrlGroup}'");
-                            }
+                            subTocDict = SplitSwaggers(sourceRootDir, targetApiDir, service, mappingConfig);
                         }
 
                         // 3. Conceptual toc
@@ -234,6 +200,58 @@
             {
                 orgInfo.Services.Sort((x, y) => string.CompareOrdinal(x.TocTitle, y.TocTitle));
             }
+        }
+
+        private static SortedDictionary<string, List<SwaggerToc>> SplitSwaggers(string sourceRootDir, string targetApiDir, ServiceInfo service, MappingConfig mappingConfig)
+        {
+            var subTocDict = new SortedDictionary<string, List<SwaggerToc>>();
+
+            foreach (var swagger in service.SwaggerInfo)
+            {
+                var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, service.UrlGroup));
+                var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
+
+                var restFileInfo = RestSplitter.Split(targetDir, sourceFile, service.TocTitle, swagger.OperationGroupMapping, mappingConfig);
+
+                if (restFileInfo == null)
+                {
+                    continue;
+                }
+                var tocTitle = Utility.ExtractPascalNameByRegex(restFileInfo.TocTitle);
+
+                var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;
+                List<SwaggerToc> subTocList;
+                if (!subTocDict.TryGetValue(subGroupName, out subTocList))
+                {
+                    subTocList = new List<SwaggerToc>();
+                    subTocDict.Add(subGroupName, subTocList);
+                }
+
+                foreach (var fileNameInfo in restFileInfo.FileNameInfos)
+                {
+                    var subTocTitle = fileNameInfo.TocName;
+                    var filePath = FileUtility.NormalizePath(Path.Combine(service.UrlGroup, fileNameInfo.FileName));
+
+                    if (subTocList.Any(toc => toc.Title == subTocTitle))
+                    {
+                        throw new InvalidOperationException($"Sub toc '{subTocTitle}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{swagger.Source}' to avoid conflicting");
+                    }
+
+                    var childrenToc = new List<SwaggerToc>();
+                    if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
+                    {
+                        foreach (var nameInfo in fileNameInfo.ChildrenFileNameInfo)
+                        {
+                            childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, nameInfo.FileName))));
+                        }
+                    }
+
+                    subTocList.Add(new SwaggerToc(subTocTitle, filePath, childrenToc));
+                }
+                Console.WriteLine($"Done splitting swagger file from '{swagger.Source}' to '{service.UrlGroup}'");
+            }
+
+            return subTocDict;
         }
     }
 }

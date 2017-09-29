@@ -4,6 +4,8 @@
     using System.Collections.Generic;
     using System.IO;
 
+    using RestProcessor.Model;
+
     using Newtonsoft.Json.Linq;
 
     public class OperationGroupGenerator : BaseGenerator
@@ -11,7 +13,7 @@
         protected OperationGroupMapping OperationGroupMapping { get; }
 
         #region Constructors
-        public OperationGroupGenerator(JObject rootJObj, string targetDir, string filePath, bool isOperationLevel, OperationGroupMapping operationGroupMapping) : base(rootJObj, targetDir, filePath, isOperationLevel)
+        public OperationGroupGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig) : base(rootJObj, targetDir, filePath, mappingConfig)
         {
             OperationGroupMapping = operationGroupMapping;
         }
@@ -61,8 +63,8 @@
                     RootJObj["paths"] = filteredPaths;
                     RootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
 
-                    // Only split when the children count larger than 1
-                    if (IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj))
+                    // Only split when the children count larger than MappingConfig.SplitOperationCountGreaterThan
+                    if (MappingConfig.IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj, MappingConfig.SplitOperationCountGreaterThan))
                     {
                         // Split operation group to operation
                         fileNameInfo.ChildrenFileNameInfo = new List<RestSplitter.FileNameInfo>(GenerateOperations(RootJObj, (JObject)RootJObj["paths"], TargetDir, fileName));
