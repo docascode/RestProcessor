@@ -6,6 +6,6 @@
 
         public bool IsGroupedByTag { get; set; }
 
-        public int SplitOperationCountGreaterThan { get; set; } = 1;
+        public int SplitOperationCountGreaterThan { get; set; }
     }
 }
