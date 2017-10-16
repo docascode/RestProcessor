@@ -24,6 +24,6 @@
         public bool IsGroupdedByTag { get; set; }
 
         [JsonProperty("split_operation_count_greater_than")]
-        public int SplitOperationCountGreaterThan { get; set; } = 1;
+        public int SplitOperationCountGreaterThan { get; set; }
     }
 }
