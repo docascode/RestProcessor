@@ -84,6 +84,7 @@
     <Compile Include="Generator\TagsGenerator.cs" />
     <Compile Include="SplitType.cs" />
     <Compile Include="Utility.cs" />
+    <Compile Include="XMsPathsResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

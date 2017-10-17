@@ -29,7 +29,8 @@
             {
                 IsOperationLevel = orgsMappingFile.IsOperationLevel,
                 IsGroupedByTag = orgsMappingFile.IsGroupdedByTag,
-                SplitOperationCountGreaterThan = orgsMappingFile.SplitOperationCountGreaterThan
+                SplitOperationCountGreaterThan = orgsMappingFile.SplitOperationCountGreaterThan,
+                NeedResolveXMsPaths = orgsMappingFile.NeedResolveXMsPaths
             };
 
             using (var writer = new StreamWriter(targetTocPath))
