@@ -107,24 +107,9 @@
                     if (operationObj.TryGetValue("parameters", out operationParameters))
                     {
                         JArray parameters = new JArray();
-
-                        foreach(var p in (JArray)operationParameters)
-                        {
-                            if (!parameters.Any(v => v["$ref"]?.ToString() == p["$ref"]?.ToString()))
-                            {
-                                parameters.Add(p);
-                            }
-                        }
-
-                        foreach (var p in (JArray)pathParameters)
-                        {
-                            if (!parameters.Any(v => v["$ref"]?.ToString() == p["$ref"]?.ToString()))
-                            {
-                                parameters.Add(p);
-                            }
-                        }
-                        
-                        operationObj["parameters"] = parameters;
+                        parameters.Merge(operationParameters);
+                        parameters.Merge(pathParameters);
+                        operationObj["parameters"] = DistinctParameters(parameters);
                     }
                     else
                     {
@@ -132,6 +117,27 @@
                     }
                 }
             }
+        }
+
+        private JArray DistinctParameters(JArray parameters)
+        {
+            JArray distinctedParameters = new JArray();
+
+            foreach (var p in parameters)
+            {
+                if (!distinctedParameters.Any(v => IsParameterEquals(v, p)))
+                {
+                    distinctedParameters.Add(p);
+                }
+            }
+
+            return distinctedParameters;
+        }
+    
+        private bool IsParameterEquals(JToken left, JToken right)
+        {
+            // todo: compare as docfx. https://github.com/dotnet/docfx/blob/dev/src/Microsoft.DocAsCode.Build.RestApi/SwaggerModelConverter.cs
+            return string.Equals(left["$ref"]?.ToString(), right["$ref"]?.ToString());
         }
 
         #endregion
