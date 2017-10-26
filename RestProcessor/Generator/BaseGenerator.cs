@@ -6,6 +6,7 @@
     using RestProcessor.Model;
 
     using Newtonsoft.Json.Linq;
+    using System.Linq;
 
     public abstract class BaseGenerator : IGenerator
     {
@@ -106,8 +107,23 @@
                     if (operationObj.TryGetValue("parameters", out operationParameters))
                     {
                         JArray parameters = new JArray();
-                        parameters.Merge(operationParameters);
-                        parameters.Merge(pathParameters);
+
+                        foreach(var p in (JArray)operationParameters)
+                        {
+                            if (!parameters.Any(v => v["$ref"]?.ToString() == p["$ref"]?.ToString()))
+                            {
+                                parameters.Add(p);
+                            }
+                        }
+
+                        foreach (var p in (JArray)pathParameters)
+                        {
+                            if (!parameters.Any(v => v["$ref"]?.ToString() == p["$ref"]?.ToString()))
+                            {
+                                parameters.Add(p);
+                            }
+                        }
+                        
                         operationObj["parameters"] = parameters;
                     }
                     else
@@ -117,6 +133,7 @@
                 }
             }
         }
+
         #endregion
     }
 }
