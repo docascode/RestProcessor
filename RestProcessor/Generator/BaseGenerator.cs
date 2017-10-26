@@ -95,6 +95,28 @@
             }
         }
 
+        protected void MergePathParametersToOperations(JObject filteredPaths, JToken pathParameters)
+        {
+            foreach (var path in filteredPaths)
+            {
+                foreach (var item in (JObject)path.Value)
+                {
+                    var operationObj = (JObject)item.Value;
+                    JToken operationParameters;
+                    if (operationObj.TryGetValue("parameters", out operationParameters))
+                    {
+                        JArray parameters = new JArray();
+                        parameters.Merge(operationParameters);
+                        parameters.Merge(pathParameters);
+                        operationObj["parameters"] = parameters;
+                    }
+                    else
+                    {
+                        operationObj["parameters"] = pathParameters;
+                    }
+                }
+            }
+        }
         #endregion
     }
 }

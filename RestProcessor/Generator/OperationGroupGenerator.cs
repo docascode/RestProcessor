@@ -37,10 +37,15 @@
             {
                 foreach (var operationGroup in operationGroups)
                 {
-                    var filteredPaths = FindPathsByOperationGroup(pathsJObj, operationGroup);
+                    JToken pathParameters = null;
+                    var filteredPaths = FindPathsByOperationGroup(pathsJObj, operationGroup, ref pathParameters);
                     if (filteredPaths.Count == 0)
                     {
                         throw new InvalidOperationException($"Operation group '{operationGroup}' could not be found in for {FileUtility.GetDirectoryName(TargetDir)}");
+                    }
+                    if(pathParameters != null)
+                    {
+                        MergePathParametersToOperations(filteredPaths, pathParameters);
                     }
 
                     // Get file name from operation group mapping
@@ -117,7 +122,7 @@
 
         #region Private Methods
 
-        private static JObject FindPathsByOperationGroup(JObject paths, string expectedOpGroup)
+        private static JObject FindPathsByOperationGroup(JObject paths, string expectedOpGroup, ref JToken pathParameters)
         {
             var filteredPaths = new JObject();
             foreach (var path in paths)
@@ -128,6 +133,7 @@
                     // Skip find tag for parameters
                     if (item.Key.Equals("parameters"))
                     {
+                        pathParameters = item.Value;
                         continue;
                     }
                     var opGroup = GetOperationGroupPerOperation((JObject)item.Value).Item1;

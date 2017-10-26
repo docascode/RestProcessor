@@ -30,9 +30,15 @@
             }
             foreach (var tag in tags)
             {
-                var filteredPaths = FindPathsByTag(pathsJObj, tag);
+                JToken pathParameters = null;
+                var filteredPaths = FindPathsByTag(pathsJObj, tag, ref pathParameters);
                 if(filteredPaths.Count > 0)
                 {
+                    if (pathParameters != null)
+                    {
+                        MergePathParametersToOperations(filteredPaths, pathParameters);
+                    }
+
                     var fileNameInfo = new RestSplitter.FileNameInfo
                     {
                         TocName = tag
@@ -107,7 +113,7 @@
 
         #region Private Methods
 
-        private static JObject FindPathsByTag(JObject paths, string tag)
+        private static JObject FindPathsByTag(JObject paths, string tag, ref JToken pathParameters)
         {
             var filteredPaths = new JObject();
             foreach (var path in paths)
@@ -118,6 +124,7 @@
                     // Skip find tag for parameters
                     if (item.Key.Equals("parameters"))
                     {
+                        pathParameters = item.Value;
                         continue;
                     }
                     var tags = GetTagsPerOperation((JObject)item.Value);
