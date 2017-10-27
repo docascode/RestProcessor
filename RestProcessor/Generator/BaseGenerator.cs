@@ -136,8 +136,17 @@
     
         private bool IsParameterEquals(JToken left, JToken right)
         {
-            // todo: compare as docfx. https://github.com/dotnet/docfx/blob/dev/src/Microsoft.DocAsCode.Build.RestApi/SwaggerModelConverter.cs
-            return string.Equals(left["$ref"]?.ToString(), right["$ref"]?.ToString());
+            if (left["$ref"] != null && right["$ref"] != null)
+            {
+                return string.Equals(left["$ref"].ToString(), right["$ref"].ToString());
+            }
+
+            if(left["name"] != null && right["name"] != null && left["in"] != null && right["in"] != null)
+            {
+                return string.Equals(left["name"].ToString(), right["name"].ToString())
+                    && string.Equals(left["in"].ToString(), right["in"].ToString());
+            }
+            return false;
         }
 
         #endregion
