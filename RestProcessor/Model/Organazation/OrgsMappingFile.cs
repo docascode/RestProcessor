@@ -25,5 +25,8 @@
 
         [JsonProperty("split_operation_count_greater_than")]
         public int SplitOperationCountGreaterThan { get; set; }
+
+        [JsonProperty("need_resolve_x_ms_paths")]
+        public bool NeedResolveXMsPaths { get; set; } = true;
     }
 }
