@@ -5,9 +5,9 @@ configuration:
   - Release
 
 build:
-  project: RestProcessor.sln
+  project: RestApi.sln
 
 artifacts:
-  - path: RestProcessor\bin\$(configuration)
+  - path: Microsoft.RestApi.RestCI\bin\$(configuration)
     name: RestProcessorArtifacts
     type: zip
