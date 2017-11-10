@@ -4,16 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{42D7A942-10CB-4E3A-BC01-CE045860CDF8}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>Microsoft.RestApi.RestCI</RootNamespace>
-    <AssemblyName>Microsoft.RestApi.RestCI</AssemblyName>
+    <ProjectGuid>{4622E5AC-C0D5-402F-BD9E-19ED61076627}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Microsoft.RestApi.RestTransformer</RootNamespace>
+    <AssemblyName>Microsoft.RestApi.RestTransformer</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +21,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -42,14 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Microsoft.RestApi.RestSplitter\Microsoft.RestApi.RestSplitter.csproj">
-      <Project>{38C000D2-A748-4FD4-89FB-F64AB89ECA9F}</Project>
-      <Name>Microsoft.RestApi.RestSplitter</Name>
-    </ProjectReference>
+    <Compile Include="RestTransformer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
