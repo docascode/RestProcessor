@@ -14,6 +14,7 @@
         private readonly string _sourceRootDir;
         private readonly string _targetRootDir;
         private readonly OrgsMappingFile _mappingFile;
+        private static IList<RestFileInfo> _restFileInfos;
 
         protected const string TocFileName = "toc.md";
         protected static readonly Regex TocRegex = new Regex(@"^(?<headerLevel>#+)(( |\t)*)\[(?<tocTitle>.+)\]\((?<tocLink>(?!http[s]?://).*?)\)( |\t)*#*( |\t)*(\n|$)", RegexOptions.Compiled);
@@ -27,9 +28,10 @@
             _sourceRootDir = sourceRootDir;
             _targetRootDir = targetRootDir;
             _mappingFile = Utility.ReadFromFile<OrgsMappingFile>(mappingFilePath);
+            _restFileInfos = new List<RestFileInfo>();
         }
 
-        public void Process()
+        public IList<RestFileInfo> Process()
         {
             // Sort by org and service name
             SortOrgsMappingFile(_mappingFile);
@@ -39,6 +41,8 @@
 
             // Write toc structure from OrgsMappingFile
             WriteToc(_sourceRootDir, _targetRootDir, _mappingFile);
+
+            return _restFileInfos;
         }
 
         #region Prviate Method
@@ -239,6 +243,8 @@
                 {
                     continue;
                 }
+                _restFileInfos.Add(restFileInfo);
+
                 var tocTitle = Utility.ExtractPascalNameByRegex(restFileInfo.TocTitle);
 
                 var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;

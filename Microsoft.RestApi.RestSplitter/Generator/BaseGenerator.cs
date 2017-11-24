@@ -56,7 +56,7 @@
             }
         }
 
-        protected IEnumerable<FileNameInfo> GenerateOperations(JObject rootJObj, JObject paths, string targetDir, string tagName)
+        protected IEnumerable<FileNameInfo> GenerateOperations(JObject rootJObj, JObject paths, string targetDir, string groupName)
         {
             foreach (var path in paths)
             {
@@ -85,13 +85,16 @@
                     };
 
                     rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
-                    var operationFileName = Utility.Serialize(Path.Combine(targetDir, tagName), operationName, rootJObj);
+                    rootJObj["x-internal-operation-name"] = operationName;
+                    var operationFile = Utility.Serialize(Path.Combine(targetDir, groupName), operationName, rootJObj);
                     ClearKey(rootJObj, "x-internal-split-type");
+                    ClearKey(rootJObj, "x-internal-operation-name");
 
                     yield return new FileNameInfo
                     {
                         TocName = operationTocName,
-                        FileName = Path.Combine(tagName, operationFileName)
+                        FileName = Path.ChangeExtension(Path.Combine(groupName, operationFile.Item1), "yml"),
+                        FilePath = operationFile.Item2
                     };
                 }
             }

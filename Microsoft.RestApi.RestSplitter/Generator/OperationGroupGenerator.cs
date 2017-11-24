@@ -102,8 +102,9 @@
                         RootJObj["x-internal-split-members"] = splitMembers;
                         RootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
                     }
-
-                    fileNameInfo.FileName = Utility.Serialize(TargetDir, fileName, RootJObj);
+                    var file = Utility.Serialize(TargetDir, fileName, RootJObj);
+                    fileNameInfo.FileName = file.Item1;
+                    fileNameInfo.FilePath = file.Item2;
 
                     // Clear up internal data
                     ClearKey(RootJObj, "x-internal-split-members");

@@ -13,6 +13,8 @@
     {
         public string FileName { get; set; }
 
+        public string FilePath { get; set; }
+
         public List<FileNameInfo> ChildrenFileNameInfo { get; set; }
 
         public string TocName { get; set; }
