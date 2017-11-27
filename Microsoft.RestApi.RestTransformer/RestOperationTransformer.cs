@@ -10,7 +10,6 @@
     using Microsoft.RestApi.RestTransformer.Models;
 
     using Newtonsoft.Json.Linq;
-    using System.IO;
     using Newtonsoft.Json;
     using System.Text.RegularExpressions;
 
@@ -49,17 +48,19 @@
             var paths = TransformPaths(viewModel, scheme, host, apiVersion, parameters);
 
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
-            var gourpName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
+            var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
             var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
 
             return new OperationEntity
             {
-                Id = Utility.TrimWhiteSpace($"{swaggerModel.Host}.{serviceName}.{gourpName}.{operationName}"),
+                Id = Utility.TrimWhiteSpace($"{swaggerModel.Host}.{serviceName}.{groupName}.{operationName}"),
                 Name = operationName,
                 Service = serviceName,
                 Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description),
                 ApiVersion = apiVersion,
-                GroupName = gourpName,
+                GroupName = groupName,
+                IsDeprecated = swaggerModel.Metadata.GetValueFromMetaData<bool>("deprecated"),
+                IsPreview = swaggerModel.Metadata.GetValueFromMetaData<bool>("x-ms-preview"),
                 Responses = responses,
                 Parameters = SortParameters(paths, parameters.Where(p => p.ParameterEntityType == ParameterEntityType.Query || p.ParameterEntityType == ParameterEntityType.Path).ToList()),
                 RequestBodies = parameters.Where(p => p.ParameterEntityType == ParameterEntityType.Body).ToList(),
@@ -321,8 +322,7 @@
                     var enumNode = nodeObjectDict.GetDictionaryFromMetaData<Dictionary<string, object>>("x-ms-enum");
                     if (enumNode != null && enumNode.TryGetValue("name", out var enumName))
                     {
-
-                        // x-ms-enum may be have enum{name, description}
+                        // todo: x-ms-enum may be have enum{name, description}
                         definitionObject.DefinitionObjectType = DefinitionObjectType.Enum;
                         definitionObject.Type = (string)enumName;
                         definitionObject.EnumValues = nodeObjectDict.GetArrayFromMetaData<string>("enum");
@@ -372,11 +372,6 @@
             DefinitionObject definitionObject = new DefinitionObject();
             ResolveObject(string.Empty, nodeObject, definitionObject);
             ResolveDefinition(definitionObject);
-            using (var sw = new StreamWriter("C:\\1.json"))
-            using (var writer = new JsonTextWriter(sw))
-            {
-                JsonSerializer.Serialize(writer, definitionObject);
-            }
             return definitionObject;
         }
 

@@ -105,7 +105,8 @@
                         {
                             new BaseParameterTypeEntity
                             {
-                                Id = (string)hostParameter.GetValue("type")
+                                Id = (string)hostParameter.GetValue("type"),
+
                             }
                         };
                         hostParameterEntities.Add(entity);

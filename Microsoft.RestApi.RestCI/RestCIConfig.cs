@@ -9,6 +9,6 @@ namespace Microsoft.RestApi.RestCI
     public class RestCIConfig
     {
         [JsonProperty("use_yaml_schema")]
-        public bool UseYamlSchema { get; set; }
+        public bool UseYamlSchema { get; set; } = true;
     }
 }

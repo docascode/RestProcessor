@@ -89,33 +89,33 @@
             if(fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath))
             {
                 //if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure-docs-rest-apis\\docs-ref-autogen\\virtualnetwork\\ApplicationSecurityGroups\\List.json")
+                //{
+                //}
+
+                var folder = Path.GetDirectoryName(fileNameInfo.FilePath);
+
+                var swaggerModel = SwaggerJsonParser.Parse(fileNameInfo.FilePath);
+                var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
+
+                //var fileName = $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.raw.json";
+                //using (var sw = new StreamWriter(Path.Combine(folder, fileName)))
+                //using (var writer = new JsonTextWriter(sw))
+                //{
+                //    JsonSerializer.Serialize(writer, viewModel);
+                //}
+                //Console.WriteLine($"Done generate view model for {fileName}");
+
+                var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.yml");
+                try
                 {
-                    var folder = Path.GetDirectoryName(fileNameInfo.FilePath);
-
-                    //var swaggerModel = SwaggerJsonParser.Parse(fileNameInfo.FilePath);
-                    var swaggerModel = new SwaggerModel();
-                    var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
-
-                    //var fileName = $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.raw.json";
-                    //using (var sw = new StreamWriter(Path.Combine(folder, fileName)))
-                    //using (var writer = new JsonTextWriter(sw))
-                    //{
-                    //    JsonSerializer.Serialize(writer, viewModel);
-                    //}
-                    //Console.WriteLine($"Done generate view model for {fileName}");
-
-                    var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.yml");
-                    try
-                    {
-                        RestTransformer.Process(ymlPath, swaggerModel, viewModel);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error generate yml files for {fileNameInfo.FilePath}, details: {ex}");
-                    }
-                    
-                    Console.WriteLine($"Done generate yml model for {ymlPath}");
+                    RestTransformer.Process(ymlPath, swaggerModel, viewModel, folder);
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error generate yml files for {fileNameInfo.FilePath}, details: {ex}");
+                }
+
+                Console.WriteLine($"Done generate yml model for {ymlPath}");
 
                 if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
                 {

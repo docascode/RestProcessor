@@ -7,20 +7,23 @@
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
     using Microsoft.DocAsCode.DataContracts.RestApi;
 
-    using Newtonsoft.Json;
-
     public class RestTransformer
     {
         public static readonly YamlDotNet.Serialization.Serializer YamlSerializer = new YamlDotNet.Serialization.Serializer();
 
-        public static void Process(string filePath, SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel)
+        public static void Process(string filePath, SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel, string folder)
         {
             if(viewModel.Metadata.TryGetValue("x-internal-split-type", out var fileType))
             {
                 string currentFileType = (string)fileType;
                 if (currentFileType == "OperationGroup")
                 {
-
+                    using (var writer = new StreamWriter(filePath))
+                    {
+                        writer.WriteLine("### YamlMime:RESTOperationGroup");
+                        YamlSerializer.Serialize(writer, RestOperationGroupTransformer.Transform(swaggerModel, viewModel, folder));
+                    }
+                    File.Delete(Path.ChangeExtension(filePath, ".json"));
                 }
                 else if (currentFileType == "Operation")
                 {

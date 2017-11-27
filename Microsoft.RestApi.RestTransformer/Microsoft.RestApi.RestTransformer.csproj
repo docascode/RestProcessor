@@ -32,29 +32,29 @@
     <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.4.9\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.DocAsCode.Build.Common, Version=2.27.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.DocAsCode.Build.Common.2.27.0\lib\net461\Microsoft.DocAsCode.Build.Common.dll</HintPath>
+    <Reference Include="Microsoft.DocAsCode.Build.Common, Version=2.28.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.DocAsCode.Build.Common.2.28.0-alpha-1040-gf427018\lib\net461\Microsoft.DocAsCode.Build.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.DocAsCode.Build.RestApi, Version=2.27.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.DocAsCode.Build.RestApi.2.27.0\lib\net461\Microsoft.DocAsCode.Build.RestApi.dll</HintPath>
+    <Reference Include="Microsoft.DocAsCode.Build.RestApi, Version=2.28.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.DocAsCode.Build.RestApi.2.28.0-alpha-1040-gf427018\lib\net461\Microsoft.DocAsCode.Build.RestApi.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.DocAsCode.Common, Version=2.27.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.DocAsCode.Common.2.27.0\lib\net461\Microsoft.DocAsCode.Common.dll</HintPath>
+    <Reference Include="Microsoft.DocAsCode.Common, Version=2.28.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.DocAsCode.Common.2.28.0-alpha-1040-gf427018\lib\net461\Microsoft.DocAsCode.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.DocAsCode.DataContracts.Common, Version=2.27.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.DocAsCode.DataContracts.Common.2.27.0\lib\net461\Microsoft.DocAsCode.DataContracts.Common.dll</HintPath>
+    <Reference Include="Microsoft.DocAsCode.DataContracts.Common, Version=2.28.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.DocAsCode.DataContracts.Common.2.28.0-alpha-1040-gf427018\lib\net461\Microsoft.DocAsCode.DataContracts.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.DocAsCode.DataContracts.RestApi, Version=2.27.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.DocAsCode.DataContracts.RestApi.2.27.0\lib\net461\Microsoft.DocAsCode.DataContracts.RestApi.dll</HintPath>
+    <Reference Include="Microsoft.DocAsCode.DataContracts.RestApi, Version=2.28.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.DocAsCode.DataContracts.RestApi.2.28.0-alpha-1040-gf427018\lib\net461\Microsoft.DocAsCode.DataContracts.RestApi.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.DocAsCode.MarkdownLite, Version=2.27.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.DocAsCode.MarkdownLite.2.27.0\lib\net461\Microsoft.DocAsCode.MarkdownLite.dll</HintPath>
+    <Reference Include="Microsoft.DocAsCode.MarkdownLite, Version=2.28.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.DocAsCode.MarkdownLite.2.28.0-alpha-1040-gf427018\lib\net461\Microsoft.DocAsCode.MarkdownLite.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.DocAsCode.Plugins, Version=2.27.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.DocAsCode.Plugins.2.27.0\lib\net461\Microsoft.DocAsCode.Plugins.dll</HintPath>
+    <Reference Include="Microsoft.DocAsCode.Plugins, Version=2.28.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.DocAsCode.Plugins.2.28.0-alpha-1040-gf427018\lib\net461\Microsoft.DocAsCode.Plugins.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.DocAsCode.YamlSerialization, Version=2.27.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.DocAsCode.YamlSerialization.2.27.0\lib\net461\Microsoft.DocAsCode.YamlSerialization.dll</HintPath>
+    <Reference Include="Microsoft.DocAsCode.YamlSerialization, Version=2.28.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.DocAsCode.YamlSerialization.2.28.0-alpha-1040-gf427018\lib\net461\Microsoft.DocAsCode.YamlSerialization.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -99,9 +99,11 @@
     <Compile Include="Models\IdentifiableEntity.cs" />
     <Compile Include="Models\NamedEntity.cs" />
     <Compile Include="Models\OperationEntity.cs" />
+    <Compile Include="Models\OperationGroupEntity.cs" />
     <Compile Include="Models\ParameterEntity.cs" />
     <Compile Include="Models\PathEntity.cs" />
     <Compile Include="Models\ResponseEntity.cs" />
+    <Compile Include="RestOperationGroupTransformer.cs" />
     <Compile Include="RestOperationTransformer.cs" />
     <Compile Include="RestTransformer.cs" />
     <Compile Include="Utility.cs" />
