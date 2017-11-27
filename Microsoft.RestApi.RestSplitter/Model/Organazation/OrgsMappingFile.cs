@@ -25,5 +25,8 @@
 
         [JsonProperty("split_operation_count_greater_than")]
         public int SplitOperationCountGreaterThan { get; set; }
+
+        [JsonProperty("use_yaml_schema")]
+        public bool UseYamlSchema { get; set; } = true;
     }
 }

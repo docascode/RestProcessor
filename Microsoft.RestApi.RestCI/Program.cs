@@ -86,36 +86,34 @@
 
         private static void RestTransformerWrapper(FileNameInfo fileNameInfo)
         {
-            if(fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath))
+            if(fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath) && File.Exists(fileNameInfo.FilePath))
             {
-                //if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure-docs-rest-apis\\docs-ref-autogen\\virtualnetwork\\ApplicationSecurityGroups\\List.json")
-                //{
-                //}
-
-                var folder = Path.GetDirectoryName(fileNameInfo.FilePath);
-
-                var swaggerModel = SwaggerJsonParser.Parse(fileNameInfo.FilePath);
-                var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
-
-                //var fileName = $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.raw.json";
-                //using (var sw = new StreamWriter(Path.Combine(folder, fileName)))
-                //using (var writer = new JsonTextWriter(sw))
-                //{
-                //    JsonSerializer.Serialize(writer, viewModel);
-                //}
-                //Console.WriteLine($"Done generate view model for {fileName}");
-
-                var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.yml");
-                try
+                if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure-docs-rest-apis\\docs-ref-autogen\\servicemap\\Maps\\Generate.json")
                 {
-                    RestTransformer.Process(ymlPath, swaggerModel, viewModel, folder);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error generate yml files for {fileNameInfo.FilePath}, details: {ex}");
-                }
+                    var folder = Path.GetDirectoryName(fileNameInfo.FilePath);
 
-                Console.WriteLine($"Done generate yml model for {ymlPath}");
+                    var swaggerModel = SwaggerJsonParser.Parse(fileNameInfo.FilePath);
+                    var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
+
+                    var fileName = $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.raw.json";
+                    using (var sw = new StreamWriter(Path.Combine(folder, fileName)))
+                    using (var writer = new JsonTextWriter(sw))
+                    {
+                        JsonSerializer.Serialize(writer, viewModel);
+                    }
+                    Console.WriteLine($"Done generate view model for {fileName}");
+
+                    var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.yml");
+                    try
+                    {
+                        RestTransformer.Process(ymlPath, swaggerModel, viewModel, folder);
+                        Console.WriteLine($"Done generate yml model for {ymlPath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error generate yml files for {fileNameInfo.FilePath}, details: {ex}");
+                    }
+                }
 
                 if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
                 {

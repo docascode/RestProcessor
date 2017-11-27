@@ -103,7 +103,7 @@
                         RootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
                     }
                     var file = Utility.Serialize(TargetDir, fileName, RootJObj);
-                    fileNameInfo.FileName = file.Item1;
+                    fileNameInfo.FileName = MappingConfig.UseYamlSchema ? Path.ChangeExtension(file.Item1, "yml") : file.Item1;
                     fileNameInfo.FilePath = file.Item2;
 
                     // Clear up internal data

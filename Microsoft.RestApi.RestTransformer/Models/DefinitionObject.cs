@@ -29,6 +29,10 @@
 
         public bool IsFlatten { get; set; }
 
+        public string DiscriminatorKey { get; set; }
+
+        public string DiscriminatorValue { get; set; }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public DefinitionObjectType DefinitionObjectType { get; set; }
 

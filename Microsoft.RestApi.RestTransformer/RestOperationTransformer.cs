@@ -12,6 +12,7 @@
     using Newtonsoft.Json.Linq;
     using Newtonsoft.Json;
     using System.Text.RegularExpressions;
+    using System.IO;
 
     public static class RestOperationTransformer
     {
@@ -33,27 +34,33 @@
             var parameters = TransformParameters(hostParameters, viewModel, ref parameterDefinitionObject);
             var definitions = TransformDefinitions(parameterDefinitionObject);
 
-            var responseDefinitionObject = new DefinitionObject();
-            var responses = TransformResponses(viewModel, ref responseDefinitionObject);
-            var responseDefinitions = TransformDefinitions(responseDefinitionObject, true);
-
-            foreach (var definition in responseDefinitions)
+            var responseDefinitionObjects = new List<DefinitionObject>();
+            var responses = TransformResponses(viewModel, ref responseDefinitionObjects);
+            //using (var sw = new StreamWriter("C:\\1.json"))
+            //using (var writer = new JsonTextWriter(sw))
+            //{
+            //    JsonSerializer.Serialize(writer, responseDefinitionObjects);
+            //}
+            foreach (var responseDefinitionObject in responseDefinitionObjects)
             {
-                if (!definitions.Any(d => d.Name == definition.Name))
+                var responseDefinitions = TransformDefinitions(responseDefinitionObject, true);
+                foreach (var definition in responseDefinitions)
                 {
-                    definitions.Add(definition);
+                    if (!definitions.Any(d => d.Name == definition.Name))
+                    {
+                        definitions.Add(definition);
+                    }
                 }
             }
 
             var paths = TransformPaths(viewModel, scheme, host, apiVersion, parameters);
-
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
             var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
 
             return new OperationEntity
             {
-                Id = Utility.TrimWhiteSpace($"{swaggerModel.Host}.{serviceName}.{groupName}.{operationName}"),
+                Id = Utility.TrimWhiteSpace($"{swaggerModel.Host}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
                 Name = operationName,
                 Service = serviceName,
                 Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description),
@@ -135,7 +142,7 @@
                 }
                 if (item.DefinitionObjectType == DefinitionObjectType.Object || (item.DefinitionObjectType == DefinitionObjectType.Array && item.PropertyItems?.Count > 0))
                 {
-                    if (string.IsNullOrEmpty(item.AdditionalType))
+                    if (!string.IsNullOrEmpty(item.AdditionalType))
                     {
                         var parameterItems = GetRequestBody(item);
                         var definition = new DefinitionEntity
@@ -158,7 +165,7 @@
                         definitions.Add(definition);
                     }
 
-                    var tmpDefinitions = TransformDefinitions(item);
+                    var tmpDefinitions = TransformDefinitions(item, includeRoot);
                     foreach (var tmpDefinition in tmpDefinitions)
                     {
                         if (!definitions.Any(d => d.Name == tmpDefinition.Name))
@@ -169,7 +176,6 @@
                 }
                 else if (item.DefinitionObjectType == DefinitionObjectType.Enum)
                 {
-
                     var definition = new DefinitionEntity
                     {
                         Name = item.Type,
@@ -189,7 +195,7 @@
 
             foreach (var allOf in definitionObject.AllOfs)
             {
-                var tmpDefinitions = TransformDefinitions(allOf);
+                var tmpDefinitions = TransformDefinitions(allOf, includeRoot);
                 foreach (var tmpDefinition in tmpDefinitions)
                 {
                     if (!definitions.Any(d => d.Name == tmpDefinition.Name))
@@ -211,7 +217,7 @@
             return paths;
         }
 
-        private static void ResolveObject(string key, JObject nodeObject, DefinitionObject definitionObject, string[] requiredFields = null)
+        private static void ResolveObject(string key, JObject nodeObject, DefinitionObject definitionObject, string[] requiredFields = null, string discriminator = null)
         {
             if (nodeObject.Type == JTokenType.Object)
             {
@@ -228,8 +234,14 @@
                 {
                     definitionObject.IsRequired = true;
                 }
-
+                if (!string.IsNullOrEmpty(discriminator) && string.Equals(discriminator, definitionObject.Name))
+                {
+                    definitionObject.DiscriminatorKey = discriminator;
+                }
+                definitionObject.DiscriminatorValue = nodeObjectDict.GetValueFromMetaData<string>("x-ms-discriminator-value");
+                
                 var requiredProperties = nodeObjectDict.GetArrayFromMetaData<string>("required");
+                var discriminatorProperty = nodeObjectDict.GetValueFromMetaData<string>("discriminator");
 
                 var allOf = nodeObjectDict.GetArrayFromMetaData<JObject>("allOf");
                 if (allOf != null && allOf.Count() > 0)
@@ -238,7 +250,7 @@
                     foreach (var oneAllOf in allOf)
                     {
                         var childDefinitionObject = new DefinitionObject();
-                        ResolveObject(string.Empty, oneAllOf, childDefinitionObject, requiredProperties);
+                        ResolveObject(string.Empty, oneAllOf, childDefinitionObject, requiredProperties, discriminatorProperty);
                         definitionObject.AllOfs.Add(childDefinitionObject);
                     }
                 }
@@ -251,8 +263,7 @@
                     foreach (var property in properties)
                     {
                         var childDefinitionObject = new DefinitionObject();
-
-                        ResolveObject(property.Key, (JObject)property.Value, childDefinitionObject, requiredProperties);
+                        ResolveObject(property.Key, (JObject)property.Value, childDefinitionObject, requiredProperties, discriminatorProperty);
                         definitionObject.PropertyItems.Add(childDefinitionObject);
                     }
                 }
@@ -268,7 +279,7 @@
                     {
                         var childDefinitionObject = new DefinitionObject();
                         definitionObject.AdditionalType = additionalProperties.GetValueFromMetaData<string>("x-internal-ref-name");
-                        ResolveObject(string.Empty, additionalPropertiesNode, childDefinitionObject, requiredProperties);
+                        ResolveObject(string.Empty, additionalPropertiesNode, childDefinitionObject, requiredProperties, discriminatorProperty);
                         definitionObject.PropertyItems.Add(childDefinitionObject);
                     }
                     else
@@ -287,7 +298,7 @@
                         foreach (var oneAllOf in allOfsNode.ToObject<JArray>())
                         {
                             var childDefinitionObject = new DefinitionObject();
-                            ResolveObject(string.Empty, (JObject)oneAllOf, childDefinitionObject, requiredProperties);
+                            ResolveObject(string.Empty, (JObject)oneAllOf, childDefinitionObject, requiredProperties, discriminatorProperty);
                             definitionObject.AllOfs.Add(childDefinitionObject);
                         }
                     }
@@ -308,7 +319,7 @@
                         {
                             var childDefinitionObject = new DefinitionObject();
 
-                            ResolveObject(property.Key, (JObject)property.Value, childDefinitionObject, requiredProperties);
+                            ResolveObject(property.Key, (JObject)property.Value, childDefinitionObject, requiredProperties, discriminatorProperty);
                             definitionObject.PropertyItems.Add(childDefinitionObject);
                         }
                     }
@@ -319,15 +330,19 @@
                 }
                 else
                 {
-                    var enumNode = nodeObjectDict.GetDictionaryFromMetaData<Dictionary<string, object>>("x-ms-enum");
-                    if (enumNode != null && enumNode.TryGetValue("name", out var enumName))
+                    var enumValues = nodeObjectDict.GetArrayFromMetaData<string>("enum");
+                    if(enumValues != null)
                     {
-                        // todo: x-ms-enum may be have enum{name, description}
                         definitionObject.DefinitionObjectType = DefinitionObjectType.Enum;
-                        definitionObject.Type = (string)enumName;
                         definitionObject.EnumValues = nodeObjectDict.GetArrayFromMetaData<string>("enum");
+
+                        var enumNode = nodeObjectDict.GetDictionaryFromMetaData<Dictionary<string, object>>("x-ms-enum");
+                        if (enumNode != null && enumNode.TryGetValue("name", out var enumName))
+                        {
+                            definitionObject.Type = (string)enumName;
+                        }
                     }
-                    else
+                    else if(definitionObject.AllOfs.Count == 0 && definitionObject.PropertyItems.Count == 0)
                     {
                         definitionObject.DefinitionObjectType = DefinitionObjectType.Simple;
                         definitionObject.Type = currentType;
@@ -380,14 +395,36 @@
             var parameters = new List<ParameterEntity>();
             foreach (var property in definitionObject.PropertyItems)
             {
+                var types = new List<BaseParameterTypeEntity>();
                 var parameterTypeEntity = new BaseParameterTypeEntity
                 {
                     Id = property.Type,
                 };
+
                 if (property.DefinitionObjectType == DefinitionObjectType.Array)
                 {
+                    parameterTypeEntity = new BaseParameterTypeEntity
+                    {
+                        Id = property.Type,
+                    };
                     parameterTypeEntity.IsArray = true;
+                    types.Add(parameterTypeEntity);
                 }
+                else if (property.DefinitionObjectType == DefinitionObjectType.Enum)
+                {
+                    foreach (var value in property.EnumValues)
+                    {
+                        types.Add(new BaseParameterTypeEntity
+                        {
+                            Id = value,
+                        });
+                    }
+                }
+                else
+                {
+                    types.Add(parameterTypeEntity);
+                }
+
                 if (!string.IsNullOrEmpty(property.AdditionalType))
                 {
                     parameterTypeEntity.AdditionalTypes = new List<IdentifiableEntity>
@@ -395,8 +432,9 @@
                         new IdentifiableEntity{ Id = "string" },
                         new IdentifiableEntity{ Id = property.AdditionalType }
                     };
+                    types.Add(parameterTypeEntity);
                 }
-
+                
                 if (!parameters.Any(p => p.Name == property.Name))
                 {
                     parameters.Add(new ParameterEntity
@@ -405,10 +443,7 @@
                         Description = property.Description,
                         IsRequired = property.IsRequired,
                         IsReadOnly = property.IsReadOnly,
-                        Types = new List<BaseParameterTypeEntity>()
-                        {
-                            parameterTypeEntity
-                        },
+                        Types = types,
                         In = "body",
                         ParameterEntityType = ParameterEntityType.Body,
                         Pattern = property.Pattern,
@@ -518,7 +553,7 @@
             return pathEntities;
         }
 
-        private static IList<ResponseEntity> TransformResponses(RestApiChildItemViewModel child, ref DefinitionObject definitionObject)
+        private static IList<ResponseEntity> TransformResponses(RestApiChildItemViewModel child, ref List<DefinitionObject> definitionObjects)
         {
             var responses = new List<ResponseEntity>();
             foreach (var response in child.Responses)
@@ -527,7 +562,8 @@
                 var schema = response.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("schema");
                 if (schema != null)
                 {
-                    definitionObject = ResolveSchema(response.Metadata.GetValueFromMetaData<JObject>("schema"));
+                    var definitionObject = ResolveSchema(response.Metadata.GetValueFromMetaData<JObject>("schema"));
+                    definitionObjects.Add(definitionObject);
 
                     var schemaType = schema.GetValueFromMetaData<string>("type");
                     if ((schemaType != null && schemaType == "object") || schema.GetValueFromMetaData<JObject>("properties") != null)

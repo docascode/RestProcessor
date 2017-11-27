@@ -18,12 +18,28 @@
                 string currentFileType = (string)fileType;
                 if (currentFileType == "OperationGroup")
                 {
-                    using (var writer = new StreamWriter(filePath))
+                    var groupInfo = RestOperationGroupTransformer.Transform(swaggerModel, viewModel, folder);
+                    if (groupInfo != null)
                     {
-                        writer.WriteLine("### YamlMime:RESTOperationGroup");
-                        YamlSerializer.Serialize(writer, RestOperationGroupTransformer.Transform(swaggerModel, viewModel, folder));
+                        using (var writer = new StreamWriter(filePath))
+                        {
+                            writer.WriteLine("### YamlMime:RESTOperationGroup");
+                            YamlSerializer.Serialize(writer, groupInfo);
+                        }
                     }
-                    File.Delete(Path.ChangeExtension(filePath, ".json"));
+                    else
+                    {
+                        Console.WriteLine($"Warining: the group has no members: {folder}");
+                    }
+                    
+                    if (File.Exists(Path.ChangeExtension(filePath, ".json")))
+                    {
+                        File.Delete(Path.ChangeExtension(filePath, ".json"));
+                    }
+                    else
+                    {
+                        Console.WriteLine($"There is a duplicate operation group");
+                    }
                 }
                 else if (currentFileType == "Operation")
                 {
@@ -34,7 +50,14 @@
                             writer.WriteLine("### YamlMime:RESTOperation");
                             YamlSerializer.Serialize(writer, RestOperationTransformer.Transform(swaggerModel, viewModel.Children.First()));
                         }
-                        File.Delete(Path.ChangeExtension(filePath, ".json"));
+                        if (File.Exists(Path.ChangeExtension(filePath, ".json")))
+                        {
+                            File.Delete(Path.ChangeExtension(filePath, ".json"));
+                        }
+                        else
+                        {
+                            Console.WriteLine($"There is a duplicate operation");
+                        }
                     }
                     else
                     {

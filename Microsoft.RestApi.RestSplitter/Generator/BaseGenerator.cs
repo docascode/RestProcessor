@@ -90,10 +90,11 @@
                     ClearKey(rootJObj, "x-internal-split-type");
                     ClearKey(rootJObj, "x-internal-operation-name");
 
+                    var fileName = Path.Combine(groupName, operationFile.Item1);
                     yield return new FileNameInfo
                     {
                         TocName = operationTocName,
-                        FileName = Path.ChangeExtension(Path.Combine(groupName, operationFile.Item1), "yml"),
+                        FileName = MappingConfig.UseYamlSchema ? Path.ChangeExtension(fileName, "yml") : fileName,
                         FilePath = operationFile.Item2
                     };
                 }

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.IO;
 
     using Microsoft.RestApi.Common;
     using Microsoft.RestApi.RestSplitter.Model;
@@ -85,7 +86,7 @@
                     }
 
                     var file = Utility.Serialize(TargetDir, tag, RootJObj);
-                    fileNameInfo.FileName = file.Item1;
+                    fileNameInfo.FileName = MappingConfig.UseYamlSchema ? Path.ChangeExtension(file.Item1, "yml") : file.Item1;
                     fileNameInfo.FilePath = file.Item2;
 
                     // Clear up internal data

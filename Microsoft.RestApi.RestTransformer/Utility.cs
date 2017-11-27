@@ -151,7 +151,7 @@
             {
                 return null;
             }
-            return value.Replace(" ", "").ToLower();
+            return value.Replace(" ", "");
         }
     }
 }
