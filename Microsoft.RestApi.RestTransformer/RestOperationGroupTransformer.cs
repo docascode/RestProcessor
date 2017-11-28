@@ -23,30 +23,35 @@
             if(members != null && members.Count() > 0)
             {
                 var operations = new List<Operation>();
-                var operationPaths = Directory.GetFiles(Path.Combine(folder, Utility.TrimWhiteSpace(groupName)), "*.json");
-                foreach(var operationPath in operationPaths)
+                if(members[0].TryGetValue("relativePath", out var relativePath))
                 {
-                    var childSwaggerModel = SwaggerJsonParser.Parse(operationPath);
-                    var childViewModel = SwaggerModelConverter.FromSwaggerModel(childSwaggerModel);
+                    var directoryName =  Path.GetDirectoryName(Path.Combine(folder, (string)relativePath + ".json"));
+                    var operationPaths = Directory.GetFiles(directoryName, "*.json");
 
-                    var model = childViewModel.Children.FirstOrDefault();
-                    var operationName = childSwaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
-                    var operation = new Operation
+                    foreach (var operationPath in operationPaths)
                     {
-                        Id = Utility.TrimWhiteSpace($"{swaggerModel.Host}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
-                        Summary = Utility.GetSummary(model?.Summary, model?.Description)
+                        var childSwaggerModel = SwaggerJsonParser.Parse(operationPath);
+                        var childViewModel = SwaggerModelConverter.FromSwaggerModel(childSwaggerModel);
+
+                        var model = childViewModel.Children.FirstOrDefault();
+                        var operationName = childSwaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
+                        var operation = new Operation
+                        {
+                            Id = Utility.TrimWhiteSpace($"{swaggerModel.Host}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
+                            Summary = Utility.GetSummary(model?.Summary, model?.Description)
+                        };
+                        operations.Add(operation);
+                    }
+                    return new OperationGroupEntity
+                    {
+                        Id = Utility.TrimWhiteSpace($"{swaggerModel.Host}.{serviceName}.{groupName}")?.ToLower(),
+                        ApiVersion = apiVersion,
+                        Name = groupName,
+                        Operations = operations,
+                        Service = serviceName,
+                        Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description)
                     };
-                    operations.Add(operation);
                 }
-                return new OperationGroupEntity
-                {
-                    Id = Utility.TrimWhiteSpace($"{swaggerModel.Host}.{serviceName}.{groupName}")?.ToLower(),
-                    ApiVersion = apiVersion,
-                    Name = groupName,
-                    Operations = operations,
-                    Service = serviceName,
-                    Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description)
-                };
             }
             return null;
         }

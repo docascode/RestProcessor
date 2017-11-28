@@ -88,7 +88,7 @@
         {
             if(fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath) && File.Exists(fileNameInfo.FilePath))
             {
-                if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure-docs-rest-apis\\docs-ref-autogen\\servicemap\\Maps\\Generate.json")
+                //if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure-docs-rest-apis\\docs-ref-autogen\\batchservice\\Certificate\\List.json")
                 {
                     var folder = Path.GetDirectoryName(fileNameInfo.FilePath);
 

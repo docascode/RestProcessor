@@ -40,11 +40,20 @@
 
         public string Format { get; set; }
 
-        public string[] EnumValues { get; set; }
+        public IList<EnumValue> EnumValues { get; set; }
 
         public IList<DefinitionObject> PropertyItems { get; set; }
 
         public IList<DefinitionObject> AllOfs { get; set; }
+    }
+
+    public class EnumValue
+    {
+        public string Name { get; set; }
+
+        public string Value { get; set; }
+
+        public string Description { get; set; }
     }
 
     public enum DefinitionObjectType
