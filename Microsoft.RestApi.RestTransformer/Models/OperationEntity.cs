@@ -53,5 +53,8 @@
 
         [YamlMember(Alias = "examples")]
         public IList<ExampleEntity> Examples { get; set; }
+
+        [YamlMember(Alias = "security")]
+        public IList<SecurityEntity> Securities { get; set; }
     }
 }

@@ -17,6 +17,9 @@
 
         [YamlMember(Alias = "properties")]
         public IList<DefinitionParameterEntity> ParameterItems { get; set; }
+
+        [YamlIgnore]
+        public List<string> AllOfTypes { get; set; }
     }
 
     public class DefinitionParameterEntity: BaseParameterEntity

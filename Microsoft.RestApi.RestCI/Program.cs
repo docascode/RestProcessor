@@ -88,20 +88,20 @@
         {
             if(fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath) && File.Exists(fileNameInfo.FilePath))
             {
-                //if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure-docs-rest-apis\\docs-ref-autogen\\batchservice\\Certificate\\List.json")
+                //if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure-docs-rest-apis\\docs-ref-autogen\\monitor\\AlertRules\\CreateOrUpdate.json")
                 {
                     var folder = Path.GetDirectoryName(fileNameInfo.FilePath);
 
                     var swaggerModel = SwaggerJsonParser.Parse(fileNameInfo.FilePath);
                     var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
 
-                    var fileName = $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.raw.json";
-                    using (var sw = new StreamWriter(Path.Combine(folder, fileName)))
-                    using (var writer = new JsonTextWriter(sw))
-                    {
-                        JsonSerializer.Serialize(writer, viewModel);
-                    }
-                    Console.WriteLine($"Done generate view model for {fileName}");
+                    //var fileName = $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.raw.json";
+                    //using (var sw = new StreamWriter(Path.Combine(folder, fileName)))
+                    //using (var writer = new JsonTextWriter(sw))
+                    //{
+                    //    JsonSerializer.Serialize(writer, viewModel);
+                    //}
+                    //Console.WriteLine($"Done generate view model for {fileName}");
 
                     var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.yml");
                     try

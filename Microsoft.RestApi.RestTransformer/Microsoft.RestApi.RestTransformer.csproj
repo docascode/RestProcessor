@@ -91,6 +91,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helper.cs" />
     <Compile Include="Models\BaseParameterEntity.cs" />
     <Compile Include="Models\DefinitionEntity.cs" />
     <Compile Include="Models\DefinitionObject.cs" />
@@ -103,9 +104,11 @@
     <Compile Include="Models\ParameterEntity.cs" />
     <Compile Include="Models\PathEntity.cs" />
     <Compile Include="Models\ResponseEntity.cs" />
+    <Compile Include="Models\SecurityEntity.cs" />
     <Compile Include="RestOperationGroupTransformer.cs" />
     <Compile Include="RestOperationTransformer.cs" />
     <Compile Include="RestTransformer.cs" />
+    <Compile Include="StringConverter.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>

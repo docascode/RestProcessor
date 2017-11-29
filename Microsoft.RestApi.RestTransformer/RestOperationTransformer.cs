@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
 
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
@@ -11,10 +12,8 @@
 
     using Newtonsoft.Json.Linq;
     using Newtonsoft.Json;
-    using System.Text.RegularExpressions;
-    using System.IO;
 
-    public static class RestOperationTransformer
+    public class RestOperationTransformer
     {
         private static readonly JsonSerializer JsonSerializer = new JsonSerializer
         {
@@ -22,12 +21,10 @@
             Formatting = Formatting.Indented
         };
 
-        /// <summary>
-        /// todo: polymorphic and discriminator
-        /// </summary>
-        /// <param name="swaggerModel"></param>
-        /// <param name="viewModel"></param>
-        /// <returns></returns>
+        private static IList<DefinitionObject> _allDefinitionObjects;
+        private static Queue<DefinitionObject> _needResolveDefinitionObjects;
+        private static IList<string> _resolvedTypes { get; set; }
+
         public static OperationEntity Transform(SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel)
         {
             var scheme = Utility.GetScheme(swaggerModel.Metadata);
@@ -36,24 +33,15 @@
             var hostParameters = hostWithParameters.Item2;
             var apiVersion = swaggerModel.Info.Version;
 
+            _resolvedTypes = new List<string>();
+            _allDefinitionObjects = GetAllDefinitionObjects(swaggerModel);
+            _needResolveDefinitionObjects = new Queue<DefinitionObject>();
+
             var parameterDefinitionObject = new DefinitionObject();
             var parameters = TransformParameters(hostParameters, viewModel, ref parameterDefinitionObject);
-            var definitions = TransformDefinitions(parameterDefinitionObject);
 
             var responseDefinitionObjects = new List<DefinitionObject>();
             var responses = TransformResponses(viewModel, ref responseDefinitionObjects);
-
-            foreach (var responseDefinitionObject in responseDefinitionObjects)
-            {
-                var responseDefinitions = TransformDefinitions(responseDefinitionObject, true);
-                foreach (var definition in responseDefinitions)
-                {
-                    if (!definitions.Any(d => d.Name == definition.Name))
-                    {
-                        definitions.Add(definition);
-                    }
-                }
-            }
 
             var paths = TransformPaths(viewModel, scheme, host, apiVersion, parameters);
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
@@ -71,58 +59,181 @@
                 IsDeprecated = swaggerModel.Metadata.GetValueFromMetaData<bool>("deprecated"),
                 IsPreview = swaggerModel.Metadata.GetValueFromMetaData<bool>("x-ms-preview"),
                 Responses = responses,
-                Parameters = SortParameters(paths, parameters.Where(p => p.ParameterEntityType == ParameterEntityType.Query || p.ParameterEntityType == ParameterEntityType.Path).ToList()),
+                Parameters = Helper.SortParameters(paths, parameters.Where(p => p.ParameterEntityType == ParameterEntityType.Query || p.ParameterEntityType == ParameterEntityType.Path).ToList()),
                 RequestBodies = parameters.Where(p => p.ParameterEntityType == ParameterEntityType.Body).ToList(),
                 RequestHeaders = parameters.Where(p => p.ParameterEntityType == ParameterEntityType.Header).ToList(),
-                Paths = HandlePathsDefaultValues(paths, apiVersion),
+                Paths = Helper.HandlePathsDefaultValues(paths, apiVersion),
                 Produces = viewModel.Metadata.GetArrayFromMetaData<string>("produces"),
                 Consumes = viewModel.Metadata.GetArrayFromMetaData<string>("consumes"),
                 Examples = TransformExamples(viewModel, paths, parameters, parameterDefinitionObject),
-                Definitions = definitions
+                Definitions = TransformDefinitions(parameterDefinitionObject, responseDefinitionObjects),
+                //Securities = TransformSecurities(swaggerModel)
             };
 
         }
 
-        private static string GetOptionalFullPath(IList<PathEntity> paths)
-        {
-            var pathContent = paths.Where(p => p.IsOptional).FirstOrDefault()?.Content;
-            if (string.IsNullOrEmpty(pathContent))
-            {
-                pathContent = paths.First().Content;
-            }
-            return pathContent;
-        }
+        #region Definitions
 
-        private static IList<ParameterEntity> SortParameters(IList<PathEntity> paths, IList<ParameterEntity> parameters)
+        private static IList<DefinitionObject> GetAllDefinitionObjects(SwaggerModel swaggerModel)
         {
-            var sortedParameters = new List<ParameterEntity>();
-            var pathContent = GetOptionalFullPath(paths);
-            var regex = new Regex("{.*?}");
-            var matchResults = regex.Matches(pathContent);
-            for (int i = 0; i < matchResults.Count; i++)
+            var allDefinitionObjects = new List<DefinitionObject>();
+            if (swaggerModel.Definitions != null)
             {
-                var parameter = parameters.SingleOrDefault(p => $"{{{p.Name}}}" == matchResults[i].Value);
-                if (parameter != null)
+                var definitions = ((JObject)swaggerModel.Definitions).ToObject<Dictionary<string, JObject>>();
+                foreach(var definition in definitions)
                 {
-                    sortedParameters.Add(parameter);
+                    var definitionObject = ResolveSchema(definition.Value);
+                    definitionObject.Name = definition.Key;
+                    definitionObject.Type = definition.Key;
+                    allDefinitionObjects.Add(definitionObject);
                 }
             }
-            return sortedParameters;
+            return allDefinitionObjects;
         }
 
-        private static IList<DefinitionEntity> TransformDefinitions(DefinitionObject definitionObject, bool includeRoot = false, bool fistChildInAllOf = false)
+        private static IList<string> FindPolymorphicDefinitionEntities(string baseType)
+        {
+            var foundDefinitionObjects = _allDefinitionObjects.Where(d => d.AllOfs != null && d.AllOfs.Any(a => a.Type == baseType)).ToList();
+            foreach (var foundDefinitionObject in foundDefinitionObjects)
+            {
+                if(!_resolvedTypes.Any(t => t == foundDefinitionObject.Type))
+                {
+                    _needResolveDefinitionObjects.Enqueue(foundDefinitionObject);
+                    _resolvedTypes.Add(foundDefinitionObject.Type);
+                }
+            }
+            return foundDefinitionObjects.Select(p => p.Type).ToList();
+        }
+
+        private static string FindDiscriminatorDefinitionEntity(string discriminatorKey)
+        {
+            var foundDefinitionObject = _allDefinitionObjects.FirstOrDefault(d => !string.IsNullOrEmpty(d.DiscriminatorValue) && string.Equals(d.DiscriminatorValue, discriminatorKey));
+            if (foundDefinitionObject != null)
+            {
+                if (!_resolvedTypes.Any(t => t == foundDefinitionObject.Type))
+                {
+                    _needResolveDefinitionObjects.Enqueue(foundDefinitionObject);
+                    _resolvedTypes.Add(foundDefinitionObject.Type);
+                }
+            }
+            return foundDefinitionObject?.Type;
+        }
+
+       
+        private static IList<ParameterEntity> GetDefinitionParameters(DefinitionObject definitionObject, bool filterReadOnly = true)
+        {
+            var parameters = new List<ParameterEntity>();
+            foreach (var property in definitionObject.PropertyItems)
+            {
+                if (!filterReadOnly || (filterReadOnly == true && property.IsReadOnly == false))
+                {
+                    string typesTitle = null;
+                    var types = new List<BaseParameterTypeEntity>();
+                    var parameterTypeEntity = new BaseParameterTypeEntity
+                    {
+                        Id = property.Type,
+                    };
+
+                    if (property.DefinitionObjectType == DefinitionObjectType.Array)
+                    {
+                        parameterTypeEntity = new BaseParameterTypeEntity
+                        {
+                            Id = property.Type,
+                        };
+                        parameterTypeEntity.IsArray = true;
+                        types.Add(parameterTypeEntity);
+                    }
+                    else if (!string.IsNullOrEmpty(property.DiscriminatorKey))
+                    {
+                        if (property.DefinitionObjectType == DefinitionObjectType.Enum)
+                        {
+                            typesTitle = "enum:";
+                            foreach (var enumValue in property.EnumValues)
+                            {
+                                var foundValue = FindDiscriminatorDefinitionEntity(enumValue.Value);
+                                if (!string.IsNullOrEmpty(foundValue))
+                                {
+                                    types.Add(new BaseParameterTypeEntity
+                                    {
+                                        Id = foundValue // resolve the x-ms-discriminator-value
+                                    });
+                                }
+                            }
+                        }
+                        else
+                        {
+                            typesTitle = property.Type;
+                            var foundValues = FindPolymorphicDefinitionEntities(property.Type);
+                            foreach (var foundValue in foundValues)
+                            {
+                                types.Add(new BaseParameterTypeEntity
+                                {
+                                    Id = foundValue
+                                });
+                            }
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(property.AdditionalType))
+                    {
+                        parameterTypeEntity.IsDictionary = true;
+                        parameterTypeEntity.AdditionalTypes = new List<IdentifiableEntity>
+                        {
+                            new IdentifiableEntity{ Id = "string" },
+                            new IdentifiableEntity{ Id = property.AdditionalType }
+                        };
+                        types.Add(parameterTypeEntity);
+                    }
+                    else
+                    {
+                        types.Add(parameterTypeEntity);
+                    }
+
+                    if (!parameters.Any(p => p.Name == property.Name))
+                    {
+                        parameters.Add(new ParameterEntity
+                        {
+                            Name = property.Name,
+                            Description = property.Description,
+                            IsRequired = property.IsRequired,
+                            IsReadOnly = property.IsReadOnly,
+                            Types = types,
+                            TypesTitle = typesTitle ?? property.Type,
+                            In = "body",
+                            ParameterEntityType = ParameterEntityType.Body,
+                            Pattern = property.Pattern,
+                            Format = property.Format
+                        });
+                    }
+                }
+            }
+
+            foreach (var allOf in definitionObject.AllOfs)
+            {
+                var tmpParameters = GetDefinitionParameters(allOf, filterReadOnly);
+                foreach (var tmpParameter in tmpParameters)
+                {
+                    if (!parameters.Any(d => d.Name == tmpParameter.Name))
+                    {
+                        parameters.Add(tmpParameter);
+                    }
+                }
+            }
+            return parameters;
+        }
+
+        private static IList<DefinitionEntity> GetDefinitions(DefinitionObject definitionObject, bool includeRoot = false, bool fistChildInAllOf = false)
         {
             var definitions = new List<DefinitionEntity>();
             if (includeRoot && !string.IsNullOrEmpty(definitionObject.Type))
             {
-                if (!fistChildInAllOf)
+                if (!fistChildInAllOf && string.IsNullOrEmpty(definitionObject.DiscriminatorKey))
                 {
-                    var parameterItems = GetRequestBody(definitionObject, false);
+                    var parameterItems = GetDefinitionParameters(definitionObject, false);
                     var definition = new DefinitionEntity
                     {
                         Name = definitionObject.Type,
                         Description = definitionObject.DefinitionObjectType == DefinitionObjectType.Array ? definitionObject.SubDescription : definitionObject.Description,
-                        Kind = definitionObject.DefinitionObjectType.ToString(),
+                        Kind = Kind = definitionObject.DefinitionObjectType == DefinitionObjectType.Enum ? "enum" : "object",
                         ParameterItems = parameterItems.Select(p => new DefinitionParameterEntity
                         {
                             Name = p.Name,
@@ -131,10 +242,11 @@
                             Types = p.Types,
                             TypesTitle = p.TypesTitle,
                             Pattern = p.Pattern,
-                            Format = p.Format
-
-                        }).ToList()
+                            Format = p.Format,
+                        }).ToList(),
+                        AllOfTypes = !string.IsNullOrEmpty(definitionObject.DiscriminatorValue) ? definitionObject.AllOfs?.Select(p => p.Type).ToList() : null
                     };
+                    
                     definitions.Add(definition);
                 }
             }
@@ -151,7 +263,7 @@
                 {
                     if (!string.IsNullOrEmpty(item.AdditionalType))
                     {
-                        var parameterItems = GetRequestBody(item, false);
+                        var parameterItems = GetDefinitionParameters(item, false);
                         var definition = new DefinitionEntity
                         {
                             Name = item.Type,
@@ -172,7 +284,7 @@
                         definitions.Add(definition);
                     }
 
-                    var tmpDefinitions = TransformDefinitions(item, includeRoot);
+                    var tmpDefinitions = GetDefinitions(item, includeRoot);
                     foreach (var tmpDefinition in tmpDefinitions)
                     {
                         if (!definitions.Any(d => d.Name == tmpDefinition.Name))
@@ -181,7 +293,7 @@
                         }
                     }
                 }
-                else if (item.DefinitionObjectType == DefinitionObjectType.Enum)
+                else if (item.DefinitionObjectType == DefinitionObjectType.Enum && string.IsNullOrEmpty(item.DiscriminatorKey))
                 {
                     var definition = new DefinitionEntity
                     {
@@ -203,7 +315,7 @@
 
             foreach (var allOf in definitionObject.AllOfs)
             {
-                var tmpDefinitions = TransformDefinitions(allOf, includeRoot, true);
+                var tmpDefinitions = GetDefinitions(allOf, includeRoot, true);
                 foreach (var tmpDefinition in tmpDefinitions)
                 {
                     if (!definitions.Any(d => d.Name == tmpDefinition.Name))
@@ -216,14 +328,393 @@
             return definitions;
         }
 
-        private static IList<PathEntity> HandlePathsDefaultValues(IList<PathEntity> paths, string apiVersion)
+        private static IList<DefinitionEntity> TransformDefinitions(DefinitionObject parameterDefinitionObject, IList<DefinitionObject> responseDefinitionObjects)
         {
-            foreach (var path in paths)
+            var definitions = GetDefinitions(parameterDefinitionObject);
+            foreach (var responseDefinitionObject in responseDefinitionObjects)
             {
-                path.Content = path.Content.Replace("{api-version}", apiVersion);
+                var responseDefinitions = GetDefinitions(responseDefinitionObject, true);
+                foreach (var definition in responseDefinitions)
+                {
+                    if (!definitions.Any(d => d.Name == definition.Name))
+                    {
+                        definitions.Add(definition);
+                    }
+                }
             }
-            return paths;
+
+            while(_needResolveDefinitionObjects.Count > 0)
+            {
+                var definitionObject = _needResolveDefinitionObjects.Dequeue();
+                var resolveDefinitions = GetDefinitions(definitionObject, true);
+                foreach (var definition in resolveDefinitions)
+                {
+                    if (!definitions.Any(d => d.Name == definition.Name))
+                    {
+                        definitions.Add(definition);
+                    }
+                }
+
+            }
+            return definitions;
         }
+
+        #endregion
+
+        #region Parameters
+        private static IList<ParameterEntity> TransformParameters(List<ParameterEntity> hostParameters, RestApiChildItemViewModel viewModel, ref DefinitionObject definitionObject)
+        {
+            var parameters = hostParameters == null ? new List<ParameterEntity>() : new List<ParameterEntity>(hostParameters);
+            foreach (var parameter in viewModel.Parameters)
+            {
+                var inType = parameter.Metadata.GetValueFromMetaData<string>("in");
+                if (inType != null && Enum.TryParse<ParameterEntityType>(inType, true, out var parameterEntityType))
+                {
+                    var isRequired = parameter.Metadata.GetValueFromMetaData<bool>("required");
+                    if (parameter.Metadata.TryGetValue("x-ms-required", out var msRequired))
+                    {
+                        isRequired = (bool)msRequired;
+                    }
+                    var types = new List<BaseParameterTypeEntity>();
+                    if (parameter.Metadata.TryGetValue("type", out var type))
+                    {
+                        types.Add(new BaseParameterTypeEntity
+                        {
+                            Id = (string)type
+                        });
+
+                        var parameterEntity = new ParameterEntity
+                        {
+                            Name = parameter.Name,
+                            Description = parameter.Description,
+                            IsRequired = isRequired,
+                            Pattern = parameter.Metadata.GetValueFromMetaData<string>("pattern"),
+                            Format = parameter.Metadata.GetValueFromMetaData<string>("format"),
+                            In = inType,
+                            ParameterEntityType = parameterEntityType,
+                            Types = types,
+                        };
+                        parameters.Add(parameterEntity);
+                    }
+                    else if (parameter.Metadata.TryGetValue("schema", out var schema))
+                    {
+                        definitionObject = ResolveSchema((JObject)schema);
+                        definitionObject.Name = parameter.Name;
+                        parameters.AddRange(GetDefinitionParameters(definitionObject));
+                    }
+                }
+            }
+            return parameters;
+        }
+        #endregion
+
+        #region Paths
+
+        private static string FormatPathQueryStrings(IEnumerable<ParameterEntity> queryParameters)
+        {
+            var queryStrings = queryParameters.Select(p =>
+            {
+                return $"{p.Name}={{{p.Name}}}";
+            });
+            return string.Join("&", queryStrings);
+        }
+
+        private static IList<PathEntity> TransformPaths(RestApiChildItemViewModel viewModel, string scheme, string host, string apiVersion, IList<ParameterEntity> parameters)
+        {
+            var pathEntities = new List<PathEntity>();
+
+            // todo: do the enum, if the parameter is enum and the enum value only have one.
+            var requiredQueryStrings = parameters.Where(p => p.IsRequired && p.In == "query");
+            var requiredBasePath = viewModel.Path;
+            if (requiredQueryStrings.Any())
+            {
+                requiredBasePath = requiredBasePath + "?" + FormatPathQueryStrings(requiredQueryStrings);
+            }
+
+            pathEntities.Add(new PathEntity
+            {
+                Content = $"{viewModel.OperationName.ToUpper()} {scheme}://{host}{requiredBasePath}",
+                IsOptional = false
+            });
+
+
+            var allQueryStrings = parameters.Where(p => p.In == "query");
+            var optionBasePath = viewModel.Path;
+            if (!allQueryStrings.All(p => p.IsRequired))
+            {
+                optionBasePath = optionBasePath + "?" + FormatPathQueryStrings(allQueryStrings);
+
+                pathEntities.Add(new PathEntity
+                {
+                    Content = $"{viewModel.OperationName.ToUpper()} {scheme}://{host}{optionBasePath}",
+                    IsOptional = true
+                });
+            }
+            return pathEntities;
+        }
+
+        #endregion
+
+        #region Responses
+        private static IList<ResponseEntity> TransformResponses(RestApiChildItemViewModel child, ref List<DefinitionObject> definitionObjects)
+        {
+            var responses = new List<ResponseEntity>();
+            foreach (var response in child.Responses)
+            {
+                var typesName = new List<BaseParameterTypeEntity>();
+                var schema = response.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("schema");
+                if (schema != null)
+                {
+                    var definitionObject = ResolveSchema(response.Metadata.GetValueFromMetaData<JObject>("schema"));
+                    //using (var sw = new StreamWriter("C:\\1.json"))
+                    //using (var writer = new JsonTextWriter(sw))
+                    //{
+                    //    JsonSerializer.Serialize(writer, definitionObject);
+                    //}
+                    definitionObjects.Add(definitionObject);
+                    if (!string.IsNullOrEmpty(definitionObject.Type))
+                    {
+                        if(definitionObject.DefinitionObjectType == DefinitionObjectType.Array)
+                        {
+                            typesName.Add(new BaseParameterTypeEntity
+                            {
+                                IsArray = true,
+                                Id = definitionObject.Type
+                            });
+                        }
+                        else
+                        {
+                            typesName.Add(new BaseParameterTypeEntity
+                            {
+                                Id = definitionObject.Type
+                            });
+                        }
+                    }
+                }
+
+                var headerList = new List<ResponseHeader>();
+                var headers = response.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("headers");
+                if (headers != null)
+                {
+                    foreach(var header in headers)
+                    {
+                        var headerValue = ((JObject)header.Value).ToObject<Dictionary<string, object>>();
+                        headerList.Add(new ResponseHeader
+                        {
+                            Name = header.Key,
+                            Value = headerValue?.GetValueFromMetaData<string>("type")
+                        });
+                    }
+                }
+
+                responses.Add(new ResponseEntity
+                {
+                    Name = Utility.GetStatusCodeString(response.HttpStatusCode),
+                    Description = response.Description,
+                    Types = typesName.Count == 0 ? null : typesName,
+                    ResponseHeaders = headerList.Count == 0 ? null : headerList
+                });
+            }
+            return responses;
+        }
+        #endregion
+
+        #region Example
+
+        private static string GetExampleRequest(IList<PathEntity> paths, Dictionary<string, object> parameters)
+        {
+            var pathContent = Helper.GetOptionalFullPath(paths);
+            if (parameters != null)
+            {
+                foreach (var parameter in parameters)
+                {
+                    if (pathContent != null && pathContent.Contains($"{{{parameter.Key}}}"))
+                    {
+                        pathContent = pathContent?.Replace($"{{{parameter.Key}}}", Convert.ToString(parameter.Value));
+                    }
+                }
+            }
+            if (pathContent.Contains('?'))
+            {
+                var contents = pathContent.Split('?');
+                if (contents[1].Contains('&'))
+                {
+                    var queries = contents[1].Split('&');
+                    contents[1] = string.Join("&", queries.Where(q => !q.Contains("={")));
+                }
+                pathContent = string.Join("?", contents);
+            }
+            return pathContent;
+        }
+
+        private static List<ExampleResponseEntity> GetExampleResponses(Dictionary<string, object> msExampleResponses)
+        {
+            var exampleResponses = new List<ExampleResponseEntity>();
+            foreach (var msExampleResponse in msExampleResponses)
+            {
+                var msExampleResponseValue = ((JObject)msExampleResponse.Value).ToObject<Dictionary<string, object>>();
+                string body = null;
+                if (msExampleResponseValue.TryGetValue("body", out var msBody) && msBody != null)
+                {
+                    body = JsonUtility.ToJsonString(msBody);
+                }
+                else if (msExampleResponseValue.TryGetValue("value", out var msValue) && msValue != null)
+                {
+                    body = JsonUtility.ToJsonString(msExampleResponseValue);
+                }
+
+                string header = null;
+                if (msExampleResponseValue.TryGetValue("headers", out var msHeader) && msHeader != null)
+                {
+                    header = JsonUtility.ToJsonString(msHeader);
+                }
+
+                var exampleResponse = new ExampleResponseEntity
+                {
+                    StatusCode = msExampleResponse.Key,
+                    Body = string.IsNullOrEmpty(body) ? null : body,
+                    Headers = string.IsNullOrEmpty(header) ? null : header,
+                };
+                exampleResponses.Add(exampleResponse);
+            }
+            return exampleResponses;
+        }
+
+        private static string GetExampleRequestBody(Dictionary<string, object> msExampleParameters, IList<ParameterEntity> bodyParameters, DefinitionObject parameterDefinitionObject)
+        {
+            if (msExampleParameters != null)
+            {
+                foreach (var msExampleParameter in msExampleParameters)
+                {
+                    if (msExampleParameter.Key == parameterDefinitionObject.Name)
+                    {
+                        return JsonUtility.ToJsonString(msExampleParameter.Value);
+                    }
+                }
+            }
+
+            foreach (var bodyParameter in bodyParameters)
+            {
+                if (msExampleParameters != null)
+                {
+                    foreach (var msExampleParameter in msExampleParameters)
+                    {
+                        if (msExampleParameter.Key == bodyParameter.Name || msExampleParameter.Key == "parameters")
+                        {
+                            return JsonUtility.ToJsonString(msExampleParameter.Value);
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static IList<ExampleEntity> TransformExamples(RestApiChildItemViewModel viewModel, IList<PathEntity> paths, IList<ParameterEntity> parameters, DefinitionObject parameterDefinitionObject)
+        {
+            var examples = new List<ExampleEntity>();
+            var msExamples = viewModel.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("x-ms-examples");
+            if (msExamples != null)
+            {
+                foreach (var msExample in msExamples)
+                {
+                    var msExampleValue = ((JObject)msExample.Value).ToObject<Dictionary<string, object>>();
+                    var msExampleParameters = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("parameters");
+                    var msExampleResponses = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("responses");
+
+                    var example = new ExampleEntity
+                    {
+                        Name = msExample.Key,
+                        Request = GetExampleRequest(paths, msExampleParameters),
+                        RequestBody = GetExampleRequestBody(msExampleParameters, parameters.Where(p => p.In == "body").ToList(), parameterDefinitionObject),
+                        ExampleResponses = GetExampleResponses(msExampleResponses)
+                    };
+
+                    examples.Add(example);
+                }
+            }
+            return examples;
+        }
+
+        #endregion
+
+        #region Security
+
+        private static IList<SecurityEntity> GetAllSecurityEntities(SwaggerModel swaggerModel)
+        {
+            var allSecurities = new List<SecurityEntity>();
+            var securityDefinitionsModel = swaggerModel.Metadata.GetDictionaryFromMetaData<Dictionary<string, JObject>>("securityDefinitions");
+            if (securityDefinitionsModel != null)
+            {
+                foreach (var definition in securityDefinitionsModel)
+                {
+                    var securityEntity = new SecurityEntity
+                    {
+                        Key = definition.Key
+                    };
+                    var definitionValue = definition.Value.ToObject<Dictionary<string, object>>();
+                    if(definitionValue != null)
+                    {
+                        securityEntity.Name = definitionValue.GetValueFromMetaData<string>("name");
+                        securityEntity.Type = definitionValue.GetValueFromMetaData<string>("type");
+                        securityEntity.Description = definitionValue.GetValueFromMetaData<string>("description");
+                        securityEntity.In = definitionValue.GetValueFromMetaData<string>("in");
+                        securityEntity.Flow = definitionValue.GetValueFromMetaData<string>("flow");
+                        securityEntity.AuthorizationUrl = definitionValue.GetValueFromMetaData<string>("authorizationUrl");
+                        securityEntity.TokenUrl = definitionValue.GetValueFromMetaData<string>("tokenUrl");
+                        var scopes = definitionValue.GetDictionaryFromMetaData<Dictionary<string, string>>("scopes");
+                        if (scopes != null)
+                        {
+                            securityEntity.Scopes = new List<SecurityScopeEntity>();
+                            foreach(var scope in scopes)
+                            {
+                                securityEntity.Scopes.Add(new SecurityScopeEntity
+                                {
+                                    Name = scope.Key,
+                                    Description = scope.Value
+                                });
+                            }
+                        }
+                    }
+                    allSecurities.Add(securityEntity);
+                }
+            }
+            return allSecurities;
+        }
+
+        private static IList<SecurityEntity> TransformSecurities(SwaggerModel swaggerModel)
+        {
+            var securities = new List<SecurityEntity>();
+            var securitiesModel = swaggerModel.Metadata.GetArrayFromMetaData<JObject>("security");
+            if (securitiesModel != null)
+            {
+                var allSecurities = GetAllSecurityEntities(swaggerModel);
+                foreach (var securityModel in securitiesModel)
+                {
+                    var security = securityModel.ToObject<Dictionary<string, object>>().FirstOrDefault();
+                    var foundSecurity = allSecurities.FirstOrDefault(s => s.Key == security.Key);
+                    var scopes = ((JArray)security.Value).ToObject<string[]>();
+                    var securityEntity = new SecurityEntity
+                    {
+                        Name = foundSecurity?.Name,
+                        Type = foundSecurity?.Type,
+                        Description = foundSecurity?.Description,
+                        In = foundSecurity?.In,
+                        Flow = foundSecurity?.Flow,
+                        AuthorizationUrl = foundSecurity?.AuthorizationUrl,
+                        TokenUrl = foundSecurity?.TokenUrl,
+                        Scopes = scopes == null ? null : foundSecurity.Scopes.Where(s => scopes.Any(sc => s.Name == sc)).ToList()
+                    };
+                    securities.Add(securityEntity);
+                }
+            }
+
+            return securities;
+        }
+
+        #endregion
+
+        #region Parse JObject to DefinitionObject
 
         private static void ResolveObject(string key, JObject nodeObject, DefinitionObject definitionObject, string[] requiredFields = null, string discriminator = null)
         {
@@ -246,12 +737,9 @@
                 {
                     definitionObject.IsRequired = true;
                 }
-                if (!string.IsNullOrEmpty(discriminator) && string.Equals(discriminator, definitionObject.Name))
-                {
-                    definitionObject.DiscriminatorKey = discriminator;
-                }
+
                 definitionObject.DiscriminatorValue = nodeObjectDict.GetValueFromMetaData<string>("x-ms-discriminator-value");
-                
+                definitionObject.DiscriminatorKey = nodeObjectDict.GetValueFromMetaData<string>("discriminator");
                 var requiredProperties = nodeObjectDict.GetArrayFromMetaData<string>("required");
                 var discriminatorProperty = nodeObjectDict.GetValueFromMetaData<string>("discriminator");
 
@@ -328,7 +816,7 @@
                     }
                     if (itemsDefine.TryGetValue("properties", out var propertiesNode))
                     {
-                        
+
                         var properties = propertiesNode.ToObject<Dictionary<string, object>>();
                         foreach (var property in properties)
                         {
@@ -346,11 +834,16 @@
                 else
                 {
                     var enumValues = nodeObjectDict.GetArrayFromMetaData<string>("enum");
-                    if(enumValues != null)
+                    if (enumValues != null)
                     {
+                        if (!string.IsNullOrEmpty(discriminator) && string.Equals(discriminator, definitionObject.Name))
+                        {
+                            definitionObject.DiscriminatorKey = discriminator;
+                        }
+
                         definitionObject.DefinitionObjectType = DefinitionObjectType.Enum;
                         var enumObjects = new List<EnumValue>();
-                        foreach(var v in enumValues)
+                        foreach (var v in enumValues)
                         {
                             enumObjects.Add(new EnumValue { Value = v });
                         }
@@ -363,7 +856,7 @@
                         if (enumNode != null && enumNode.TryGetValue("values", out var enumValue))
                         {
                             var values = (JArray)enumValue;
-                            if(values != null)
+                            if (values != null)
                             {
                                 foreach (var v in values)
                                 {
@@ -381,16 +874,16 @@
 
                         definitionObject.EnumValues = enumObjects;
                     }
-                    else if(definitionObject.AllOfs.Count == 0 && definitionObject.PropertyItems.Count == 0)
+                    else if (definitionObject.AllOfs.Count == 0 && definitionObject.PropertyItems.Count == 0)
                     {
                         definitionObject.DefinitionObjectType = DefinitionObjectType.Simple;
                         definitionObject.Type = currentType;
                     }
                 }
 
-                if(definitionObject.DefinitionObjectType == DefinitionObjectType.Object || definitionObject.DefinitionObjectType == DefinitionObjectType.Array)
+                if (definitionObject.DefinitionObjectType == DefinitionObjectType.Object || definitionObject.DefinitionObjectType == DefinitionObjectType.Array)
                 {
-                    if(string.IsNullOrEmpty(definitionObject.Type))
+                    if (string.IsNullOrEmpty(definitionObject.Type))
                     {
                         definitionObject.Type = definitionObject.Name.FirstLetterToUpper();
                     }
@@ -437,349 +930,6 @@
             return definitionObject;
         }
 
-        private static IList<ParameterEntity> GetRequestBody(DefinitionObject definitionObject, bool filterReadOnly = true)
-        {
-            var parameters = new List<ParameterEntity>();
-            foreach (var property in definitionObject.PropertyItems)
-            {
-                if (!filterReadOnly || (filterReadOnly == true &&  property.IsReadOnly == false))
-                {
-                    var types = new List<BaseParameterTypeEntity>();
-                    var parameterTypeEntity = new BaseParameterTypeEntity
-                    {
-                        Id = property.Type,
-                    };
-
-                    if (property.DefinitionObjectType == DefinitionObjectType.Array)
-                    {
-                        parameterTypeEntity = new BaseParameterTypeEntity
-                        {
-                            Id = property.Type,
-                        };
-                        parameterTypeEntity.IsArray = true;
-                        types.Add(parameterTypeEntity);
-                    }
-                    /// should decide the discriminator Key/value here
-                    //else if (property.DefinitionObjectType == DefinitionObjectType.Enum)
-                    //{
-                    //    foreach (var value in property.EnumValues)
-                    //    {
-                    //        types.Add(new BaseParameterTypeEntity
-                    //        {
-                    //            Id = value,
-                    //        });
-                    //    }
-                    //}
-
-                    else if (!string.IsNullOrEmpty(property.AdditionalType))
-                    {
-                        parameterTypeEntity.AdditionalTypes = new List<IdentifiableEntity>
-                        {
-                            new IdentifiableEntity{ Id = "string" },
-                            new IdentifiableEntity{ Id = property.AdditionalType }
-                        };
-                        types.Add(parameterTypeEntity);
-                    }
-                    else
-                    {
-                        types.Add(parameterTypeEntity);
-                    }
-
-                    if (!parameters.Any(p => p.Name == property.Name))
-                    {
-                        parameters.Add(new ParameterEntity
-                        {
-                            Name = property.Name,
-                            Description = property.Description,
-                            IsRequired = property.IsRequired,
-                            IsReadOnly = property.IsReadOnly,
-                            Types = types,
-                            In = "body",
-                            ParameterEntityType = ParameterEntityType.Body,
-                            Pattern = property.Pattern,
-                            Format = property.Format
-                        });
-                    }
-                }
-            }
-
-            foreach (var allOf in definitionObject.AllOfs)
-            {
-                var tmpParameters = GetRequestBody(allOf, filterReadOnly);
-                foreach (var tmpParameter in tmpParameters)
-                {
-                    if (!parameters.Any(d => d.Name == tmpParameter.Name))
-                    {
-                        parameters.Add(tmpParameter);
-                    }
-                }
-            }
-            return parameters;
-        }
-
-        private static IList<ParameterEntity> TransformParameters(List<ParameterEntity> hostParameters, RestApiChildItemViewModel viewModel, ref DefinitionObject definitionObject)
-        {
-            var parameters = hostParameters == null ? new List<ParameterEntity>() : new List<ParameterEntity>(hostParameters);
-            foreach (var parameter in viewModel.Parameters)
-            {
-                var inType = parameter.Metadata.GetValueFromMetaData<string>("in");
-                if (inType != null && Enum.TryParse<ParameterEntityType>(inType, true, out var parameterEntityType))
-                {
-                    var isRequired = parameter.Metadata.GetValueFromMetaData<bool>("required");
-                    if (parameter.Metadata.TryGetValue("x-ms-required", out var msRequired))
-                    {
-                        isRequired = (bool)msRequired;
-                    }
-                    var types = new List<BaseParameterTypeEntity>();
-                    if (parameter.Metadata.TryGetValue("type", out var type))
-                    {
-                        types.Add(new BaseParameterTypeEntity
-                        {
-                            Id = (string)type
-                        });
-
-                        var parameterEntity = new ParameterEntity
-                        {
-                            Name = parameter.Name,
-                            Description = parameter.Description,
-                            IsRequired = isRequired,
-                            Pattern = parameter.Metadata.GetValueFromMetaData<string>("pattern"),
-                            Format = parameter.Metadata.GetValueFromMetaData<string>("format"),
-                            In = inType,
-                            ParameterEntityType = parameterEntityType,
-                            Types = types,
-                        };
-                        parameters.Add(parameterEntity);
-                    }
-                    else if (parameter.Metadata.TryGetValue("schema", out var schema))
-                    {
-                        definitionObject = ResolveSchema((JObject)schema);
-                        definitionObject.Name = parameter.Name;
-                        parameters.AddRange(GetRequestBody(definitionObject));
-                    }
-                }
-            }
-            return parameters;
-        }
-
-        private static string FormatPathQueryStrings(IEnumerable<ParameterEntity> queryParameters)
-        {
-            var queryStrings = queryParameters.Select(p =>
-            {
-                return $"{p.Name}={{{p.Name}}}";
-            });
-            return string.Join("&", queryStrings);
-        }
-
-        private static IList<PathEntity> TransformPaths(RestApiChildItemViewModel viewModel, string scheme, string host, string apiVersion, IList<ParameterEntity> parameters)
-        {
-            var pathEntities = new List<PathEntity>();
-
-            // todo: do the enum, if the parameter is enum and the enum value only have one.
-            var requiredQueryStrings = parameters.Where(p => p.IsRequired && p.In == "query");
-            var requiredBasePath = viewModel.Path;
-            if (requiredQueryStrings.Any())
-            {
-                requiredBasePath = requiredBasePath + "?" + FormatPathQueryStrings(requiredQueryStrings);
-            }
-
-            pathEntities.Add(new PathEntity
-            {
-                Content = $"{viewModel.OperationName.ToUpper()} {scheme}://{host}{requiredBasePath}",
-                IsOptional = false
-            });
-
-
-            var allQueryStrings = parameters.Where(p => p.In == "query");
-            var optionBasePath = viewModel.Path;
-            if (!allQueryStrings.All(p => p.IsRequired))
-            {
-                optionBasePath = optionBasePath + "?" + FormatPathQueryStrings(allQueryStrings);
-
-                pathEntities.Add(new PathEntity
-                {
-                    Content = $"{viewModel.OperationName.ToUpper()} {scheme}://{host}{optionBasePath}",
-                    IsOptional = true
-                });
-            }
-            return pathEntities;
-        }
-
-        private static IList<ResponseEntity> TransformResponses(RestApiChildItemViewModel child, ref List<DefinitionObject> definitionObjects)
-        {
-            var responses = new List<ResponseEntity>();
-            foreach (var response in child.Responses)
-            {
-                var typesName = new List<BaseParameterTypeEntity>();
-                var schema = response.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("schema");
-                if (schema != null)
-                {
-                    var definitionObject = ResolveSchema(response.Metadata.GetValueFromMetaData<JObject>("schema"));
-                    using (var sw = new StreamWriter("C:\\1.json"))
-                    using (var writer = new JsonTextWriter(sw))
-                    {
-                        JsonSerializer.Serialize(writer, definitionObject);
-                    }
-                    definitionObjects.Add(definitionObject);
-                    if (!string.IsNullOrEmpty(definitionObject.Type))
-                    {
-                        if(definitionObject.DefinitionObjectType == DefinitionObjectType.Array)
-                        {
-                            typesName.Add(new BaseParameterTypeEntity
-                            {
-                                IsArray = true,
-                                Id = definitionObject.Type
-                            });
-                        }
-                        else
-                        {
-                            typesName.Add(new BaseParameterTypeEntity
-                            {
-                                Id = definitionObject.Type
-                            });
-                        }
-                    }
-                }
-
-                var headerList = new List<ResponseHeader>();
-                var headers = response.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("headers");
-                if (headers != null)
-                {
-                    foreach(var header in headers)
-                    {
-                        var headerValue = ((JObject)header.Value).ToObject<Dictionary<string, object>>();
-                        headerList.Add(new ResponseHeader
-                        {
-                            Name = header.Key,
-                            Value = headerValue?.GetValueFromMetaData<string>("type")
-                        });
-                    }
-                }
-
-                responses.Add(new ResponseEntity
-                {
-                    Name = Utility.GetStatusCodeString(response.HttpStatusCode),
-                    Description = response.Description,
-                    Types = typesName.Count == 0 ? null : typesName,
-                    ResponseHeaders = headerList.Count == 0 ? null : headerList
-                });
-            }
-            return responses;
-        }
-
-        private static string GetExampleRequest(IList<PathEntity> paths, Dictionary<string, object> parameters)
-        {
-            var pathContent = GetOptionalFullPath(paths);
-            if (parameters != null)
-            {
-                foreach (var parameter in parameters)
-                {
-                    if (pathContent != null && pathContent.Contains($"{{{parameter.Key}}}"))
-                    {
-                        pathContent = pathContent?.Replace($"{{{parameter.Key}}}", Convert.ToString(parameter.Value));
-                    }
-                }
-            }
-            if (pathContent.Contains('?'))
-            {
-                var contents = pathContent.Split('?');
-                if (contents[1].Contains('&'))
-                {
-                    var queries = contents[1].Split('&');
-                    contents[1] = string.Join("&", queries.Where(q => !q.Contains("={")));
-                }
-                pathContent = string.Join("?", contents);
-            }
-            return pathContent;
-        }
-
-        private static List<ExampleResponseEntity> GetExampleResponses(Dictionary<string, object> msExampleResponses)
-        {
-            var exampleResponses = new List<ExampleResponseEntity>();
-            foreach (var msExampleResponse in msExampleResponses)
-            {
-                var msExampleResponseValue = ((JObject)msExampleResponse.Value).ToObject<Dictionary<string, object>>();
-                string body = null;
-                if (msExampleResponseValue.TryGetValue("body", out var msBody) && msBody != null)
-                {
-                    body = JsonUtility.ToJsonString(msBody);
-                }
-                else if (msExampleResponseValue.TryGetValue("value", out var msValue) && msValue != null)
-                {
-                    body = JsonUtility.ToJsonString(msExampleResponseValue);
-                }
-
-                string header = null;
-                if (msExampleResponseValue.TryGetValue("headers", out var msHeader) && msHeader != null)
-                {
-                    header = JsonUtility.ToJsonString(msHeader);
-                }
-
-                var exampleResponse = new ExampleResponseEntity
-                {
-                    StatusCode = msExampleResponse.Key,
-                    Body = body,
-                    Headers = header
-                };
-                exampleResponses.Add(exampleResponse);
-            }
-            return exampleResponses;
-        }
-
-        private static string GetExampleRequestBody(Dictionary<string, object> msExampleParameters, IList<ParameterEntity> bodyParameters, DefinitionObject parameterDefinitionObject)
-        {
-            if (msExampleParameters != null)
-            {
-                foreach (var msExampleParameter in msExampleParameters)
-                {
-                    if (msExampleParameter.Key == parameterDefinitionObject.Name)
-                    {
-                        return JsonUtility.ToJsonString(msExampleParameter.Value);
-                    }
-                }
-            }
-
-            foreach (var bodyParameter in bodyParameters)
-            {
-                if (msExampleParameters != null)
-                {
-                    foreach (var msExampleParameter in msExampleParameters)
-                    {
-                        if (msExampleParameter.Key == bodyParameter.Name || msExampleParameter.Key == "parameters")
-                        {
-                            return JsonUtility.ToJsonString(msExampleParameter.Value);
-                        }
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        private static IList<ExampleEntity> TransformExamples(RestApiChildItemViewModel viewModel, IList<PathEntity> paths, IList<ParameterEntity> parameters, DefinitionObject parameterDefinitionObject)
-        {
-            var examples = new List<ExampleEntity>();
-            var msExamples = viewModel.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("x-ms-examples");
-            if (msExamples != null)
-            {
-                foreach (var msExample in msExamples)
-                {
-                    var msExampleValue = ((JObject)msExample.Value).ToObject<Dictionary<string, object>>();
-                    var msExampleParameters = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("parameters");
-                    var msExampleResponses = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("responses");
-
-                    var example = new ExampleEntity
-                    {
-                        Name = msExample.Key,
-                        Request = GetExampleRequest(paths, msExampleParameters),
-                        RequestBody = GetExampleRequestBody(msExampleParameters, parameters.Where(p => p.In == "body").ToList(), parameterDefinitionObject),
-                        ExampleResponses = GetExampleResponses(msExampleResponses)
-                    };
-
-                    examples.Add(example);
-                }
-            }
-            return examples;
-        }
+        #endregion
     }
 }

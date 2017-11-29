@@ -6,10 +6,10 @@
 
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
     using Microsoft.DocAsCode.DataContracts.RestApi;
-
+    using Microsoft.DocAsCode.YamlSerialization;
     public class RestTransformer
     {
-        public static readonly YamlDotNet.Serialization.Serializer YamlSerializer = new YamlDotNet.Serialization.Serializer();
+        public static readonly YamlSerializer YamlSerializer = new YamlSerializer();
 
         public static void Process(string filePath, SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel, string folder)
         {
