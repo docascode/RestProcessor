@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.RestApi.RestTransformer.Models
 {
+    using System.Collections.Generic;
 
     using YamlDotNet.Serialization;
 
@@ -9,9 +10,15 @@
         public string StatusCode { get; set; }
 
         [YamlMember(Alias = "headers")]
-        public string Headers { get; set; }
+        public IList<ExampleResponseHeaderEntity> Headers { get; set; }
 
         [YamlMember(Alias = "body")]
         public string Body { get; set; }
+    }
+
+    public class ExampleResponseHeaderEntity : NamedEntity
+    {
+        [YamlMember(Alias = "value")]
+        public string Value { get; set; }
     }
 }

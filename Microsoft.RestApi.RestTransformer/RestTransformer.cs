@@ -52,7 +52,7 @@
                         }
                         if (File.Exists(Path.ChangeExtension(filePath, ".json")))
                         {
-                            File.Delete(Path.ChangeExtension(filePath, ".json"));
+                            //File.Delete(Path.ChangeExtension(filePath, ".json"));
                         }
                         else
                         {

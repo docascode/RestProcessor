@@ -17,6 +17,7 @@
         {
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
+            var basePath = swaggerModel.Metadata.GetValueFromMetaData<string>("basePath");
             var apiVersion = swaggerModel.Info.Version;
             
             var members = swaggerModel.Metadata.GetArrayFromMetaData<JObject>("x-internal-split-members");
@@ -37,14 +38,14 @@
                         var operationName = childSwaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
                         var operation = new Operation
                         {
-                            Id = Utility.TrimWhiteSpace($"{swaggerModel.Host}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
+                            Id = Utility.TrimWhiteSpace($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
                             Summary = Utility.GetSummary(model?.Summary, model?.Description)
                         };
                         operations.Add(operation);
                     }
                     return new OperationGroupEntity
                     {
-                        Id = Utility.TrimWhiteSpace($"{swaggerModel.Host}.{serviceName}.{groupName}")?.ToLower(),
+                        Id = Utility.TrimWhiteSpace($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}")?.ToLower(),
                         ApiVersion = apiVersion,
                         Name = groupName,
                         Operations = operations,

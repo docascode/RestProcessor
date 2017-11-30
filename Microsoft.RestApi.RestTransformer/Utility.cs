@@ -9,7 +9,6 @@
 
     using Newtonsoft.Json.Linq;
 
-
     public static class Utility
     {
         public static T GetValueFromMetaData<T>(this Dictionary<string, object> metadata, string key)
@@ -161,6 +160,26 @@
                 return null;
             }
             return str.Length > 1 ?char.ToUpper(str[0]) + str.Substring(1) : str.ToUpper();
+        }
+
+        public static string GetHostWithBasePath(string host, string basePath)
+        {
+            basePath = basePath?.Trim('/');
+            if (string.IsNullOrEmpty(basePath))
+            {
+                return host;
+            }
+            return $"{host}/{basePath}";
+        }
+
+        public static string GetHostWithBasePathUId(string host, string basePath)
+        {
+            basePath = basePath?.Trim('/');
+            if (string.IsNullOrEmpty(basePath))
+            {
+                return host;
+            }
+            return $"{host}.{basePath}";
         }
     }
 }

@@ -108,7 +108,6 @@
     <Compile Include="RestOperationGroupTransformer.cs" />
     <Compile Include="RestOperationTransformer.cs" />
     <Compile Include="RestTransformer.cs" />
-    <Compile Include="StringConverter.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>

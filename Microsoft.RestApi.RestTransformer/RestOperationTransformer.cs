@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
 
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
@@ -43,14 +42,15 @@
             var responseDefinitionObjects = new List<DefinitionObject>();
             var responses = TransformResponses(viewModel, ref responseDefinitionObjects);
 
-            var paths = TransformPaths(viewModel, scheme, host, apiVersion, parameters);
+            var basePath = swaggerModel.Metadata.GetValueFromMetaData<string>("basePath");
+            var paths = TransformPaths(viewModel, scheme, host, basePath, apiVersion, parameters);
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
             var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
 
             return new OperationEntity
             {
-                Id = Utility.TrimWhiteSpace($"{swaggerModel.Host}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
+                Id = Utility.TrimWhiteSpace($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
                 Name = operationName,
                 Service = serviceName,
                 Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description),
@@ -67,7 +67,7 @@
                 Consumes = viewModel.Metadata.GetArrayFromMetaData<string>("consumes"),
                 Examples = TransformExamples(viewModel, paths, parameters, parameterDefinitionObject),
                 Definitions = TransformDefinitions(parameterDefinitionObject, responseDefinitionObjects),
-                //Securities = TransformSecurities(swaggerModel)
+                Securities = TransformSecurities(swaggerModel)
             };
 
         }
@@ -147,7 +147,7 @@
                     {
                         if (property.DefinitionObjectType == DefinitionObjectType.Enum)
                         {
-                            typesTitle = "enum:";
+                            typesTitle = "enum";
                             foreach (var enumValue in property.EnumValues)
                             {
                                 var foundValue = FindDiscriminatorDefinitionEntity(enumValue.Value);
@@ -176,6 +176,7 @@
                     else if (!string.IsNullOrEmpty(property.AdditionalType))
                     {
                         parameterTypeEntity.IsDictionary = true;
+                        parameterTypeEntity.Id = "object";
                         parameterTypeEntity.AdditionalTypes = new List<IdentifiableEntity>
                         {
                             new IdentifiableEntity{ Id = "string" },
@@ -197,7 +198,7 @@
                             IsRequired = property.IsRequired,
                             IsReadOnly = property.IsReadOnly,
                             Types = types,
-                            TypesTitle = typesTitle ?? property.Type,
+                            TypesTitle = string.IsNullOrEmpty(typesTitle) ? null : typesTitle,
                             In = "body",
                             ParameterEntityType = ParameterEntityType.Body,
                             Pattern = property.Pattern,
@@ -226,14 +227,14 @@
             var definitions = new List<DefinitionEntity>();
             if (includeRoot && !string.IsNullOrEmpty(definitionObject.Type))
             {
-                if (!fistChildInAllOf && string.IsNullOrEmpty(definitionObject.DiscriminatorKey))
+                if (!fistChildInAllOf && string.IsNullOrEmpty(definitionObject.DiscriminatorKey) && definitionObject.DefinitionObjectType != DefinitionObjectType.Simple)
                 {
                     var parameterItems = GetDefinitionParameters(definitionObject, false);
                     var definition = new DefinitionEntity
                     {
                         Name = definitionObject.Type,
                         Description = definitionObject.DefinitionObjectType == DefinitionObjectType.Array ? definitionObject.SubDescription : definitionObject.Description,
-                        Kind = Kind = definitionObject.DefinitionObjectType == DefinitionObjectType.Enum ? "enum" : "object",
+                        Kind = definitionObject.DefinitionObjectType == DefinitionObjectType.Enum ? "enum" : "object",
                         ParameterItems = parameterItems.Select(p => new DefinitionParameterEntity
                         {
                             Name = p.Name,
@@ -419,34 +420,34 @@
             return string.Join("&", queryStrings);
         }
 
-        private static IList<PathEntity> TransformPaths(RestApiChildItemViewModel viewModel, string scheme, string host, string apiVersion, IList<ParameterEntity> parameters)
+        private static IList<PathEntity> TransformPaths(RestApiChildItemViewModel viewModel, string scheme, string host, string basePath, string apiVersion, IList<ParameterEntity> parameters)
         {
             var pathEntities = new List<PathEntity>();
 
             // todo: do the enum, if the parameter is enum and the enum value only have one.
             var requiredQueryStrings = parameters.Where(p => p.IsRequired && p.In == "query");
-            var requiredBasePath = viewModel.Path;
+            var requiredPath = viewModel.Path;
             if (requiredQueryStrings.Any())
             {
-                requiredBasePath = requiredBasePath + "?" + FormatPathQueryStrings(requiredQueryStrings);
+                requiredPath = requiredPath + "?" + FormatPathQueryStrings(requiredQueryStrings);
             }
 
             pathEntities.Add(new PathEntity
             {
-                Content = $"{viewModel.OperationName.ToUpper()} {scheme}://{host}{requiredBasePath}",
+                Content = $"{viewModel.OperationName.ToUpper()} {scheme}://{Utility.GetHostWithBasePath(host, basePath)}{requiredPath}",
                 IsOptional = false
             });
 
 
             var allQueryStrings = parameters.Where(p => p.In == "query");
-            var optionBasePath = viewModel.Path;
+            var optionPath = viewModel.Path;
             if (!allQueryStrings.All(p => p.IsRequired))
             {
-                optionBasePath = optionBasePath + "?" + FormatPathQueryStrings(allQueryStrings);
+                optionPath = optionPath + "?" + FormatPathQueryStrings(allQueryStrings);
 
                 pathEntities.Add(new PathEntity
                 {
-                    Content = $"{viewModel.OperationName.ToUpper()} {scheme}://{host}{optionBasePath}",
+                    Content = $"{viewModel.OperationName.ToUpper()} {scheme}://{Utility.GetHostWithBasePath(host, basePath)}{optionPath}",
                     IsOptional = true
                 });
             }
@@ -466,11 +467,6 @@
                 if (schema != null)
                 {
                     var definitionObject = ResolveSchema(response.Metadata.GetValueFromMetaData<JObject>("schema"));
-                    //using (var sw = new StreamWriter("C:\\1.json"))
-                    //using (var writer = new JsonTextWriter(sw))
-                    //{
-                    //    JsonSerializer.Serialize(writer, definitionObject);
-                    //}
                     definitionObjects.Add(definitionObject);
                     if (!string.IsNullOrEmpty(definitionObject.Type))
                     {
@@ -563,17 +559,25 @@
                     body = JsonUtility.ToJsonString(msExampleResponseValue);
                 }
 
-                string header = null;
+                var headers = new List<ExampleResponseHeaderEntity>();
                 if (msExampleResponseValue.TryGetValue("headers", out var msHeader) && msHeader != null)
                 {
-                    header = JsonUtility.ToJsonString(msHeader);
+                    var msHeaderDict = ((JObject)msHeader).ToObject<Dictionary<string, string>>();
+                    foreach (var header in msHeaderDict)
+                    {
+                        headers.Add(new ExampleResponseHeaderEntity
+                        {
+                            Name = header.Key,
+                            Value = header.Value
+                        });
+                    }
                 }
 
                 var exampleResponse = new ExampleResponseEntity
                 {
                     StatusCode = msExampleResponse.Key,
                     Body = string.IsNullOrEmpty(body) ? null : body,
-                    Headers = string.IsNullOrEmpty(header) ? null : header,
+                    Headers = headers.Count> 0 ? headers : null
                 };
                 exampleResponses.Add(exampleResponse);
             }
@@ -703,7 +707,7 @@
                         Flow = foundSecurity?.Flow,
                         AuthorizationUrl = foundSecurity?.AuthorizationUrl,
                         TokenUrl = foundSecurity?.TokenUrl,
-                        Scopes = scopes == null ? null : foundSecurity.Scopes.Where(s => scopes.Any(sc => s.Name == sc)).ToList()
+                        Scopes = scopes == null ? null : foundSecurity.Scopes?.Where(s => scopes.Any(sc => s.Name == sc)).ToList()
                     };
                     securities.Add(securityEntity);
                 }
