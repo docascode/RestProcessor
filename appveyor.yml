@@ -1,4 +1,5 @@
 before_build:
+  - nuget sources add -Name docfx-dev -Source https://www.myget.org/F/docfx-dev/api/v2
   - nuget restore
 
 configuration:
