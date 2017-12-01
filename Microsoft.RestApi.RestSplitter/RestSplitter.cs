@@ -19,15 +19,15 @@
         protected const string TocFileName = "toc.md";
         protected static readonly Regex TocRegex = new Regex(@"^(?<headerLevel>#+)(( |\t)*)\[(?<tocTitle>.+)\]\((?<tocLink>(?!http[s]?://).*?)\)( |\t)*#*( |\t)*(\n|$)", RegexOptions.Compiled);
 
-        public RestSplitter(string sourceRootDir, string targetRootDir, string mappingFilePath)
+        public RestSplitter(string sourceRootDir, string targetRootDir, OrgsMappingFile mappingFile)
         {
             Guard.ArgumentNotNullOrEmpty(sourceRootDir, nameof(sourceRootDir));
             Guard.ArgumentNotNullOrEmpty(targetRootDir, nameof(targetRootDir));
-            Guard.ArgumentNotNullOrEmpty(mappingFilePath, nameof(mappingFilePath));
+            Guard.ArgumentNotNull(mappingFile, nameof(mappingFile));
 
             _sourceRootDir = sourceRootDir;
             _targetRootDir = targetRootDir;
-            _mappingFile = Utility.ReadFromFile<OrgsMappingFile>(mappingFilePath);
+            _mappingFile = mappingFile;
             _restFileInfos = new List<RestFileInfo>();
         }
 

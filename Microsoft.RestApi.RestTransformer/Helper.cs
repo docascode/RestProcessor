@@ -26,7 +26,7 @@
             var matchResults = regex.Matches(pathContent);
             for (int i = 0; i < matchResults.Count; i++)
             {
-                var parameter = parameters.SingleOrDefault(p => $"{{{p.Name}}}" == matchResults[i].Value);
+                var parameter = parameters.FirstOrDefault(p => $"{{{p.Name}}}" == matchResults[i].Value);
                 if (parameter != null)
                 {
                     sortedParameters.Add(parameter);

@@ -14,7 +14,7 @@
 
         public static void Process(string filePath, SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel, string folder)
         {
-            if(viewModel.Metadata.TryGetValue("x-internal-split-type", out var fileType))
+            if (viewModel.Metadata.TryGetValue("x-internal-split-type", out var fileType))
             {
                 string currentFileType = (string)fileType;
                 if (currentFileType == "OperationGroup")

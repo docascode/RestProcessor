@@ -95,7 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
-    <Compile Include="RestCIConfig.cs" />
+    <Compile Include="YamlConverter.cs" />
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>

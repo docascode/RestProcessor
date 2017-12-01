@@ -184,6 +184,17 @@
                         };
                         types.Add(parameterTypeEntity);
                     }
+                    else if (property.DefinitionObjectType == DefinitionObjectType.Enum && string.IsNullOrEmpty(property.Type))
+                    {
+                        typesTitle = "enum";
+                        foreach (var enumValue in property.EnumValues)
+                        {
+                            types.Add(new BaseParameterTypeEntity
+                            {
+                                Id = enumValue.Value
+                            });
+                        }
+                    }
                     else
                     {
                         types.Add(parameterTypeEntity);
@@ -544,7 +555,6 @@
             }
             return pathContent;
         }
-
 
         private static IList<ExampleRequestHeaderEntity> GetExampleRequestHeader(Dictionary<string, object> msExampleParameters, IList<ParameterEntity> headerParameters)
         {
@@ -946,10 +956,13 @@
                             items.Add(item);
                         }
                     }
-
                     foreach (var item in propertyItem.PropertyItems)
                     {
                         items.Add(item);
+                    }
+                    foreach (var allOf in propertyItem.AllOfs)
+                    {
+                        definitionObject.AllOfs.Add(allOf);
                     }
                     definitionObject.PropertyItems = items;
                     propertyItem.PropertyItems = new List<DefinitionObject>();
