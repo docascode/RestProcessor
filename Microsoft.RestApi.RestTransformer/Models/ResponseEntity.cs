@@ -13,15 +13,4 @@
         [JsonProperty("headers")]
         public IList<ResponseHeader> ResponseHeaders { get; set; }
     }
-
-    public class ResponseHeader
-    {
-        [YamlMember(Alias = "name")]
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [YamlMember(Alias = "value")]
-        [JsonProperty("value")]
-        public string Value { get; set; }
-    }
 }

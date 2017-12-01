@@ -7,10 +7,7 @@
     public class ExampleEntity : NamedEntity
     {
         [YamlMember(Alias = "request")]
-        public string Request { get; set; }
-
-        [YamlMember(Alias = "requestBody")]
-        public string RequestBody { get; set; }
+        public ExampleRequestEntity ExampleRequest { get; set; }
 
         [YamlMember(Alias = "responses")]
         public IList<ExampleResponseEntity> ExampleResponses { get; set; }

@@ -12,6 +12,7 @@
     using Microsoft.RestApi.RestTransformer;
 
     using Newtonsoft.Json;
+    using System.Threading.Tasks;
 
     public class Program
     {
@@ -75,52 +76,38 @@
 
         public static void RestProcessor(IList<RestFileInfo> restFileInfos)
         {
-            foreach(var restFileInfo in restFileInfos)
-            {
-                foreach(var fileInfo in restFileInfo.FileNameInfos)
-                {
+            Parallel.ForEach(restFileInfos, new ParallelOptions { MaxDegreeOfParallelism = 8 }, restFileInfo => {
+                Parallel.ForEach(restFileInfo.FileNameInfos, new ParallelOptions { MaxDegreeOfParallelism = 8 }, fileInfo => {
                     RestTransformerWrapper(fileInfo);
-                }
-            }
+                });
+            });
         }
 
         private static void RestTransformerWrapper(FileNameInfo fileNameInfo)
         {
             if(fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath) && File.Exists(fileNameInfo.FilePath))
             {
-                //if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure-docs-rest-apis\\docs-ref-autogen\\monitor\\AlertRules\\CreateOrUpdate.json")
+                var folder = Path.GetDirectoryName(fileNameInfo.FilePath);
+
+                var swaggerModel = SwaggerJsonParser.Parse(fileNameInfo.FilePath);
+                var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
+
+                var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.yml");
+                try
                 {
-                    var folder = Path.GetDirectoryName(fileNameInfo.FilePath);
-
-                    var swaggerModel = SwaggerJsonParser.Parse(fileNameInfo.FilePath);
-                    var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
-
-                    //var fileName = $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.raw.json";
-                    //using (var sw = new StreamWriter(Path.Combine(folder, fileName)))
-                    //using (var writer = new JsonTextWriter(sw))
-                    //{
-                    //    JsonSerializer.Serialize(writer, viewModel);
-                    //}
-                    //Console.WriteLine($"Done generate view model for {fileName}");
-
-                    var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.yml");
-                    try
-                    {
-                        RestTransformer.Process(ymlPath, swaggerModel, viewModel, folder);
-                        Console.WriteLine($"Done generate yml model for {ymlPath}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error generate yml files for {fileNameInfo.FilePath}, details: {ex}");
-                    }
+                    RestTransformer.Process(ymlPath, swaggerModel, viewModel, folder);
+                    Console.WriteLine($"Done generate yml model for {ymlPath}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error generate yml files for {fileNameInfo.FilePath}, details: {ex}");
                 }
 
                 if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
                 {
-                    foreach(var info in fileNameInfo.ChildrenFileNameInfo)
-                    {
+                    Parallel.ForEach(fileNameInfo.ChildrenFileNameInfo, new ParallelOptions { MaxDegreeOfParallelism = 8 }, info => {
                         RestTransformerWrapper(info);
-                    }
+                    });
                 }
             }
         }

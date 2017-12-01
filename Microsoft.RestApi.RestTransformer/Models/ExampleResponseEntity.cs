@@ -15,10 +15,4 @@
         [YamlMember(Alias = "body")]
         public string Body { get; set; }
     }
-
-    public class ExampleResponseHeaderEntity : NamedEntity
-    {
-        [YamlMember(Alias = "value")]
-        public string Value { get; set; }
-    }
 }

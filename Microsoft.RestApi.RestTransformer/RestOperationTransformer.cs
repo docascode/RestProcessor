@@ -457,6 +457,7 @@
         #endregion
 
         #region Responses
+
         private static IList<ResponseEntity> TransformResponses(RestApiChildItemViewModel child, ref List<DefinitionObject> definitionObjects)
         {
             var responses = new List<ResponseEntity>();
@@ -513,11 +514,12 @@
             }
             return responses;
         }
+
         #endregion
 
         #region Example
 
-        private static string GetExampleRequest(IList<PathEntity> paths, Dictionary<string, object> parameters)
+        private static string GetExampleRequestUri(IList<PathEntity> paths, Dictionary<string, object> parameters)
         {
             var pathContent = Helper.GetOptionalFullPath(paths);
             if (parameters != null)
@@ -541,6 +543,62 @@
                 pathContent = string.Join("?", contents);
             }
             return pathContent;
+        }
+
+
+        private static IList<ExampleRequestHeaderEntity> GetExampleRequestHeader(Dictionary<string, object> msExampleParameters, IList<ParameterEntity> headerParameters)
+        {
+            var exampleRequestHeaders = new List<ExampleRequestHeaderEntity>();
+
+            foreach (var headerParameter in headerParameters)
+            {
+                if (msExampleParameters != null)
+                {
+                    foreach (var msExampleParameter in msExampleParameters)
+                    {
+                        if (msExampleParameter.Key == headerParameter.Name)
+                        {
+                            exampleRequestHeaders.Add(new ExampleRequestHeaderEntity
+                            {
+                                Name = msExampleParameter.Key,
+                                Value = (string)msExampleParameter.Value
+                            });
+                        }
+                    }
+                }
+            }
+
+            return exampleRequestHeaders.Count > 0 ? exampleRequestHeaders : null;
+        }
+
+        private static string GetExampleRequestBody(Dictionary<string, object> msExampleParameters, IList<ParameterEntity> bodyParameters, DefinitionObject parameterDefinitionObject)
+        {
+            if (msExampleParameters != null)
+            {
+                foreach (var msExampleParameter in msExampleParameters)
+                {
+                    if (msExampleParameter.Key == parameterDefinitionObject.Name)
+                    {
+                        return JsonUtility.ToJsonString(msExampleParameter.Value);
+                    }
+                }
+            }
+
+            foreach (var bodyParameter in bodyParameters)
+            {
+                if (msExampleParameters != null)
+                {
+                    foreach (var msExampleParameter in msExampleParameters)
+                    {
+                        if (msExampleParameter.Key == bodyParameter.Name || msExampleParameter.Key == "parameters")
+                        {
+                            return JsonUtility.ToJsonString(msExampleParameter.Value);
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         private static List<ExampleResponseEntity> GetExampleResponses(Dictionary<string, object> msExampleResponses)
@@ -577,41 +635,11 @@
                 {
                     StatusCode = msExampleResponse.Key,
                     Body = string.IsNullOrEmpty(body) ? null : body,
-                    Headers = headers.Count> 0 ? headers : null
+                    Headers = headers.Count > 0 ? headers : null
                 };
                 exampleResponses.Add(exampleResponse);
             }
             return exampleResponses;
-        }
-
-        private static string GetExampleRequestBody(Dictionary<string, object> msExampleParameters, IList<ParameterEntity> bodyParameters, DefinitionObject parameterDefinitionObject)
-        {
-            if (msExampleParameters != null)
-            {
-                foreach (var msExampleParameter in msExampleParameters)
-                {
-                    if (msExampleParameter.Key == parameterDefinitionObject.Name)
-                    {
-                        return JsonUtility.ToJsonString(msExampleParameter.Value);
-                    }
-                }
-            }
-
-            foreach (var bodyParameter in bodyParameters)
-            {
-                if (msExampleParameters != null)
-                {
-                    foreach (var msExampleParameter in msExampleParameters)
-                    {
-                        if (msExampleParameter.Key == bodyParameter.Name || msExampleParameter.Key == "parameters")
-                        {
-                            return JsonUtility.ToJsonString(msExampleParameter.Value);
-                        }
-                    }
-                }
-            }
-
-            return null;
         }
 
         private static IList<ExampleEntity> TransformExamples(RestApiChildItemViewModel viewModel, IList<PathEntity> paths, IList<ParameterEntity> parameters, DefinitionObject parameterDefinitionObject)
@@ -629,11 +657,14 @@
                     var example = new ExampleEntity
                     {
                         Name = msExample.Key,
-                        Request = GetExampleRequest(paths, msExampleParameters),
-                        RequestBody = GetExampleRequestBody(msExampleParameters, parameters.Where(p => p.In == "body").ToList(), parameterDefinitionObject),
+                        ExampleRequest = new ExampleRequestEntity
+                        {
+                            RequestUri = GetExampleRequestUri(paths, msExampleParameters),
+                            Headers = GetExampleRequestHeader(msExampleParameters, parameters.Where(p => p.In == "header").ToList()),
+                            RequestBody = GetExampleRequestBody(msExampleParameters, parameters.Where(p => p.In == "body").ToList(), parameterDefinitionObject),
+                        },
                         ExampleResponses = GetExampleResponses(msExampleResponses)
                     };
-
                     examples.Add(example);
                 }
             }

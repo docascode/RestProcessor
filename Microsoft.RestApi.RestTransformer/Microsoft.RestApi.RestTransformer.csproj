@@ -93,10 +93,16 @@
   <ItemGroup>
     <Compile Include="Helper.cs" />
     <Compile Include="Models\BaseParameterEntity.cs" />
+    <Compile Include="Models\BaseParameterTypeEntity.cs" />
     <Compile Include="Models\DefinitionEntity.cs" />
     <Compile Include="Models\DefinitionObject.cs" />
+    <Compile Include="Models\DefinitionParameterEntity.cs" />
     <Compile Include="Models\ExampleEntity.cs" />
+    <Compile Include="Models\ExampleHeaderEntity.cs" />
+    <Compile Include="Models\ExampleRequestEntity.cs" />
+    <Compile Include="Models\ExampleRequestHeaderEntity.cs" />
     <Compile Include="Models\ExampleResponseEntity.cs" />
+    <Compile Include="Models\ExampleResponseHeaderEntity.cs" />
     <Compile Include="Models\IdentifiableEntity.cs" />
     <Compile Include="Models\NamedEntity.cs" />
     <Compile Include="Models\OperationEntity.cs" />
@@ -104,6 +110,7 @@
     <Compile Include="Models\ParameterEntity.cs" />
     <Compile Include="Models\PathEntity.cs" />
     <Compile Include="Models\ResponseEntity.cs" />
+    <Compile Include="Models\ResponseHeader.cs" />
     <Compile Include="Models\SecurityEntity.cs" />
     <Compile Include="RestOperationGroupTransformer.cs" />
     <Compile Include="RestOperationTransformer.cs" />

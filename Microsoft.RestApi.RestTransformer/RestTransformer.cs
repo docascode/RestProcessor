@@ -7,6 +7,7 @@
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
     using Microsoft.DocAsCode.DataContracts.RestApi;
     using Microsoft.DocAsCode.YamlSerialization;
+
     public class RestTransformer
     {
         public static readonly YamlSerializer YamlSerializer = new YamlSerializer();
@@ -38,7 +39,7 @@
                     }
                     else
                     {
-                        Console.WriteLine($"There is a duplicate operation group");
+                        Console.WriteLine($"Warining: There is a duplicate operation group: {folder}");
                     }
                 }
                 else if (currentFileType == "Operation")
@@ -52,11 +53,11 @@
                         }
                         if (File.Exists(Path.ChangeExtension(filePath, ".json")))
                         {
-                            //File.Delete(Path.ChangeExtension(filePath, ".json"));
+                            File.Delete(Path.ChangeExtension(filePath, ".json"));
                         }
                         else
                         {
-                            Console.WriteLine($"There is a duplicate operation");
+                            Console.WriteLine($"Warining: There is a duplicate operation: {filePath}");
                         }
                     }
                     else
