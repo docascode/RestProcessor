@@ -12,3 +12,4 @@ artifacts:
   - path: Microsoft.RestApi.RestCI\bin\$(configuration)
     name: RestProcessorArtifacts
     type: zip
+
