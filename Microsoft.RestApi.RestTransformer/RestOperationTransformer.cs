@@ -48,6 +48,8 @@
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
             var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
 
+            var requestBodies = TransformRequestBodies(parameters.Where(p => p.ParameterEntityType == ParameterEntityType.Body).ToList());
+
             return new OperationEntity
             {
                 Id = Utility.TrimWhiteSpace($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
@@ -60,7 +62,7 @@
                 IsPreview = swaggerModel.Metadata.GetValueFromMetaData<bool>("x-ms-preview"),
                 Responses = responses,
                 Parameters = Helper.SortParameters(paths, parameters.Where(p => p.ParameterEntityType == ParameterEntityType.Query || p.ParameterEntityType == ParameterEntityType.Path).ToList()),
-                RequestBodies = parameters.Where(p => p.ParameterEntityType == ParameterEntityType.Body).ToList(),
+                RequestBodies = requestBodies,
                 RequestHeaders = parameters.Where(p => p.ParameterEntityType == ParameterEntityType.Header).ToList(),
                 Paths = Helper.HandlePathsDefaultValues(paths, apiVersion),
                 Produces = viewModel.Metadata.GetArrayFromMetaData<string>("produces"),
@@ -105,7 +107,7 @@
             return foundDefinitionObjects.Select(p => p.Type).ToList();
         }
 
-        private static string FindDiscriminatorDefinitionEntity(string discriminatorKey)
+        private static DefinitionObject FindDiscriminatorDefinitionEntity(string discriminatorKey)
         {
             var foundDefinitionObject = _allDefinitionObjects.FirstOrDefault(d => !string.IsNullOrEmpty(d.DiscriminatorValue) && string.Equals(d.DiscriminatorValue, discriminatorKey));
             if (foundDefinitionObject != null)
@@ -116,9 +118,8 @@
                     _resolvedTypes.Add(foundDefinitionObject.Type);
                 }
             }
-            return foundDefinitionObject?.Type;
+            return foundDefinitionObject;
         }
-
        
         private static IList<ParameterEntity> GetDefinitionParameters(DefinitionObject definitionObject, bool filterReadOnly = true)
         {
@@ -128,6 +129,7 @@
                 if (!filterReadOnly || (filterReadOnly == true && property.IsReadOnly == false))
                 {
                     string typesTitle = null;
+                    bool hasDiscriminatorKey = false;
                     var types = new List<BaseParameterTypeEntity>();
                     var parameterTypeEntity = new BaseParameterTypeEntity
                     {
@@ -150,15 +152,12 @@
                             typesTitle = "enum";
                             foreach (var enumValue in property.EnumValues)
                             {
-                                var foundValue = FindDiscriminatorDefinitionEntity(enumValue.Value);
-                                if (!string.IsNullOrEmpty(foundValue))
+                                types.Add(new BaseParameterTypeEntity
                                 {
-                                    types.Add(new BaseParameterTypeEntity
-                                    {
-                                        Id = foundValue // resolve the x-ms-discriminator-value
-                                    });
-                                }
+                                    Id = enumValue.Value
+                                });
                             }
+                            hasDiscriminatorKey = true;
                         }
                         else
                         {
@@ -213,7 +212,8 @@
                             In = "body",
                             ParameterEntityType = ParameterEntityType.Body,
                             Pattern = property.Pattern,
-                            Format = property.Format
+                            Format = property.Format,
+                            HasDiscriminatorKey = hasDiscriminatorKey
                         });
                     }
                 }
@@ -374,6 +374,7 @@
         #endregion
 
         #region Parameters
+
         private static IList<ParameterEntity> TransformParameters(List<ParameterEntity> hostParameters, RestApiChildItemViewModel viewModel, ref DefinitionObject definitionObject)
         {
             var parameters = hostParameters == null ? new List<ParameterEntity>() : new List<ParameterEntity>(hostParameters);
@@ -404,7 +405,7 @@
                             Format = parameter.Metadata.GetValueFromMetaData<string>("format"),
                             In = inType,
                             ParameterEntityType = parameterEntityType,
-                            Types = types,
+                            Types = types
                         };
                         parameters.Add(parameterEntity);
                     }
@@ -418,6 +419,7 @@
             }
             return parameters;
         }
+        
         #endregion
 
         #region Paths
@@ -466,6 +468,68 @@
         }
 
         #endregion
+
+        #region Requestbody
+
+        public static IList<RequestBody> TransformRequestBodies(IList<ParameterEntity> bodyParameters)
+        {
+            var bodies = new List<RequestBody>();
+            if (bodyParameters.Any(p => p.HasDiscriminatorKey))
+            {
+                var bodyParameter = bodyParameters.First(p => p.HasDiscriminatorKey);
+                foreach(var type in bodyParameter.Types)
+                {
+                    var parameters = new List<ParameterEntity>();
+                    foreach (var parameter in bodyParameters)
+                    {
+                        if (!parameter.HasDiscriminatorKey)
+                        {
+                            parameters.Add(Utility.Clone(parameter));
+                        }
+                    }
+                    var foundDefinitionEntity = FindDiscriminatorDefinitionEntity(type.Id);
+                    if (!string.IsNullOrEmpty(foundDefinitionEntity?.Type))
+                    {
+                        parameters.Add(new ParameterEntity
+                        {
+                            Name = bodyParameter.Name,
+                            Description = bodyParameter.Description,
+                            IsRequired = bodyParameter.IsRequired,
+                            IsReadOnly = bodyParameter.IsReadOnly,
+                            Types = new List<BaseParameterTypeEntity>
+                            {
+                                new BaseParameterTypeEntity
+                                {
+                                    Id = type.Id
+                                }
+                            },
+                            TypesTitle = bodyParameter.TypesTitle,
+                            In = "body",
+                            ParameterEntityType = ParameterEntityType.Body,
+                            Pattern = bodyParameter.Pattern,
+                            Format = bodyParameter.Format
+                        });
+                        bodies.Add(new RequestBody
+                        {
+                            Name = foundDefinitionEntity?.Type,
+                            Description = foundDefinitionEntity?.Description,
+                            RequestBodyParameters = parameters
+                        });
+                    }
+                }
+            }
+            else
+            {
+                bodies.Add(new RequestBody
+                {
+                    RequestBodyParameters = bodyParameters
+                });
+            }
+
+            return bodies;
+        }
+
+        #endregion RequestBody
 
         #region Responses
 

@@ -109,6 +109,7 @@
     <Compile Include="Models\OperationGroupEntity.cs" />
     <Compile Include="Models\ParameterEntity.cs" />
     <Compile Include="Models\PathEntity.cs" />
+    <Compile Include="Models\RequestBody.cs" />
     <Compile Include="Models\ResponseEntity.cs" />
     <Compile Include="Models\ResponseHeader.cs" />
     <Compile Include="Models\SecurityEntity.cs" />

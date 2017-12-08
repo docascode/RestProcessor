@@ -12,10 +12,13 @@
 
     public class TagsGenerator : BaseGenerator
     {
+        protected OperationGroupMapping OperationGroupMapping { get; }
+
         #region Constructors
 
-        public TagsGenerator(JObject rootJObj, string targetDir, string filePath, MappingConfig mappingConfig) : base(rootJObj, targetDir, filePath, mappingConfig)
+        public TagsGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig) : base(rootJObj, targetDir, filePath, mappingConfig)
         {
+            OperationGroupMapping = operationGroupMapping;
         }
 
         #endregion
@@ -45,7 +48,15 @@
                     {
                         TocName = tag
                     };
-                   
+
+                    // Get file name from operation group mapping
+                    string newTagName;
+                    if (OperationGroupMapping != null && OperationGroupMapping.TryGetValue(tag, out newTagName))
+                    {
+                        fileNameInfo.TocName = newTagName;
+                        RootJObj["x-internal-operation-group-name"] = newTagName;
+                    }
+
                     // Reset paths to filtered paths
                     RootJObj["paths"] = filteredPaths;
                     RootJObj["x-internal-toc-name"] = fileNameInfo.TocName;

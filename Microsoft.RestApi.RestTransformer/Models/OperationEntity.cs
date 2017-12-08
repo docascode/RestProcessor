@@ -43,7 +43,7 @@
         public IList<ResponseEntity> Responses { get; set; }
 
         [YamlMember(Alias = "requestBody")]
-        public IList<ParameterEntity> RequestBodies { get; set; }
+        public IList<RequestBody> RequestBodies { get; set; }
 
         [YamlMember(Alias = "requestHeader")]
         public IList<ParameterEntity> RequestHeaders { get; set; }

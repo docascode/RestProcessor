@@ -7,6 +7,7 @@
     using Microsoft.RestApi.Common;
     using Microsoft.RestApi.RestTransformer.Models;
 
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     public static class Utility
@@ -180,6 +181,12 @@
                 return host;
             }
             return $"{host}.{basePath}";
+        }
+
+        public static T Clone<T>(T source)
+        {
+            var serialized = JsonConvert.SerializeObject(source);
+            return JsonConvert.DeserializeObject<T>(serialized);
         }
     }
 }

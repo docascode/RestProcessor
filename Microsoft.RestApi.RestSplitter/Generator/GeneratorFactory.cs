@@ -10,7 +10,7 @@
         {
             if (mappingConfig.IsGroupedByTag)
             {
-                return new TagsGenerator(rootJObj, targetDir, filePath, mappingConfig);
+                return new TagsGenerator(rootJObj, targetDir, filePath, operationGroupMapping, mappingConfig);
             }
             return new OperationGroupGenerator(rootJObj, targetDir, filePath, operationGroupMapping, mappingConfig);
         }
