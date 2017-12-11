@@ -29,9 +29,5 @@
         [YamlMember(Alias = "format")]
         [JsonProperty("format")]
         public string Format { get; set; }
-
-        [YamlIgnore]
-        [JsonIgnore]
-        public bool HasDiscriminatorKey { get; set; } = false;
     }
 }
