@@ -254,7 +254,6 @@
                 }
             }
 
-
             return parameters;
         }
 
@@ -488,8 +487,26 @@
                 if (polymorphicDefinitions == null  || polymorphicDefinitions.Count == 0)
                 {
                     var selfDefinition = GetSelfDefinition(allDefinitions, bodyDefinitionObject.Type);
-                    var parameterEntities = GetDefinitionParameters(allDefinitions, selfDefinition, true);
-                    bodyParameters.AddRange(parameterEntities);
+                    if (selfDefinition != null)
+                    {
+                        var parameterEntities = GetDefinitionParameters(allDefinitions, selfDefinition, true);
+                        bodyParameters.AddRange(parameterEntities);
+                    }
+                    else
+                    {
+                        bodyParameters.Add(new ParameterEntity
+                        {
+                            Name = bodyDefinitionObject.Name,
+                            Description = bodyDefinitionObject.Description,
+                            IsRequired = bodyDefinitionObject.IsRequired,
+                            IsReadOnly = bodyDefinitionObject.IsReadOnly,
+                            In = "body",
+                            ParameterEntityType = ParameterEntityType.Body,
+                            Pattern = bodyDefinitionObject.Pattern,
+                            Format = bodyDefinitionObject.Format,
+                            Types = new List<BaseParameterTypeEntity> { new BaseParameterTypeEntity { Id = bodyDefinitionObject.Type } }
+                        });
+                    }
                     
                     if (bodyParameters.Count > 0)
                     {
@@ -672,7 +689,7 @@
                 {
                     if (msExampleParameter.Key == bodyDefinitionObject.Name)
                     {
-                        return JsonUtility.ToJsonString(msExampleParameter.Value);
+                        return JsonUtility.ToIndentedJsonString(msExampleParameter.Value);
                     }
                 }
             }
@@ -685,7 +702,7 @@
                     {
                         if (msExampleParameter.Key == bodyParameter.Name || msExampleParameter.Key == "parameters")
                         {
-                            return JsonUtility.ToJsonString(msExampleParameter.Value);
+                            return JsonUtility.ToIndentedJsonString(msExampleParameter.Value);
                         }
                     }
                 }
@@ -703,11 +720,11 @@
                 string body = null;
                 if (msExampleResponseValue.TryGetValue("body", out var msBody) && msBody != null)
                 {
-                    body = JsonUtility.ToJsonString(msBody);
+                    body = JsonUtility.ToIndentedJsonString(msBody);
                 }
                 else if (msExampleResponseValue.TryGetValue("value", out var msValue) && msValue != null)
                 {
-                    body = JsonUtility.ToJsonString(msExampleResponseValue);
+                    body = JsonUtility.ToIndentedJsonString(msExampleResponseValue);
                 }
 
                 var headers = new List<ExampleResponseHeaderEntity>();
