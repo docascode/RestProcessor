@@ -96,7 +96,7 @@
                 var parameterizedHost = ((JObject)jHost).ToObject<Dictionary<string, object>>();
                 host = parameterizedHost.GetValueFromMetaData<string>("hostTemplate");
                 var hostParameters = parameterizedHost.GetValueFromMetaData<JArray>("parameters");
-                if(hostParameters != null)
+                if (hostParameters != null)
                 {
                     foreach (var hostParameter in hostParameters.ToObject<JObject[]>())
                     {
@@ -105,8 +105,7 @@
                         {
                             new BaseParameterTypeEntity
                             {
-                                Id = (string)hostParameter.GetValue("type"),
-
+                                Id = (string)hostParameter.GetValue("type")
                             }
                         };
                         hostParameterEntities.Add(entity);

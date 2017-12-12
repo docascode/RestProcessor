@@ -63,4 +63,55 @@
         Enum,
         Simple
     }
+
+    public class Definition
+    {
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        public string Type { get; set; }
+
+        public DefinitionObjectType DefinitionObjectType { get; set; }
+
+        public IList<string> AllOfTypes { get; set; }
+
+        public IList<DefinitionProperty> DefinitionProperties { get; set; }
+
+        public IList<EnumValue> EnumValues { get; set; }
+
+        public string DiscriminatorValue { get; set; }
+    }
+
+    public class DefinitionProperty
+    {
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        public string SubDescription { get; set; }
+
+        public string Type { get; set; }
+
+        public string AdditionalType { get; set; }
+
+        public bool IsReadOnly { get; set; }
+
+        public bool IsRequired { get; set; }
+
+        public bool IsFlatten { get; set; }
+
+        public string DiscriminatorKey { get; set; }
+
+        public string DiscriminatorValue { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public DefinitionObjectType DefinitionObjectType { get; set; }
+
+        public IList<EnumValue> EnumValues { get; set; }
+
+        public string Pattern { get; set; }
+
+        public string Format { get; set; }
+    }
 }

@@ -86,7 +86,7 @@
         {
             if(fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath) && File.Exists(fileNameInfo.FilePath))
             {
-                //if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure-docs-rest-apis\\docs-ref-autogen\\servicefabric\\UpdateService\\UpdateService.json")
+                //if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure-docs-rest-apis\\docs-ref-autogen\\time-series-insights-management\\EventSources\\CreateOrUpdate.json")
                 {
                     var folder = Path.GetDirectoryName(fileNameInfo.FilePath);
 
