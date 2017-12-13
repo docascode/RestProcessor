@@ -17,9 +17,10 @@
             if (viewModel.Metadata.TryGetValue("x-internal-split-type", out var fileType))
             {
                 string currentFileType = (string)fileType;
-                if (currentFileType == "OperationGroup")
+                if (currentFileType == "OperationGroup" || currentFileType == "TagGroup")
                 {
-                    var groupInfo = RestOperationGroupTransformer.Transform(swaggerModel, viewModel, folder);
+                    var restGroupTransformer = RestGroupTransformerFactory.CreateRestGroupTransformer(currentFileType);
+                    var groupInfo = restGroupTransformer.Transform(swaggerModel, viewModel, folder);
                     if (groupInfo != null)
                     {
                         using (var writer = new StreamWriter(filePath))

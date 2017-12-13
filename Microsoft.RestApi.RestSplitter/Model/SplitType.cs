@@ -4,6 +4,7 @@
     {
         None,
         Operation,
-        OperationGroup
+        OperationGroup,
+        TagGroup
     }
 }

@@ -113,6 +113,9 @@
     <Compile Include="Models\ResponseEntity.cs" />
     <Compile Include="Models\ResponseHeader.cs" />
     <Compile Include="Models\SecurityEntity.cs" />
+    <Compile Include="RestGroupTransformer.cs" />
+    <Compile Include="RestGroupTransformerFactory.cs" />
+    <Compile Include="RestTagGroupTransformer.cs" />
     <Compile Include="RestOperationGroupTransformer.cs" />
     <Compile Include="RestOperationTransformer.cs" />
     <Compile Include="RestTransformer.cs" />

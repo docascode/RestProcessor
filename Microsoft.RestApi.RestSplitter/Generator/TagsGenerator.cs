@@ -93,7 +93,7 @@
                             });
                         }
                         RootJObj["x-internal-split-members"] = splitMembers;
-                        RootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
+                        RootJObj["x-internal-split-type"] = MappingConfig.UseYamlSchema ? SplitType.TagGroup.ToString() : SplitType.OperationGroup.ToString();
                     }
 
                     var file = Utility.Serialize(TargetDir, tag, RootJObj);
