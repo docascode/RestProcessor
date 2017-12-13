@@ -38,14 +38,14 @@
                         var operationName = childSwaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
                         var operation = new Operation
                         {
-                            Id = Utility.TrimWhiteSpace($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
+                            Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
                             Summary = Utility.GetSummary(model?.Summary, model?.Description)
                         };
                         operations.Add(operation);
                     }
                     return new OperationGroupEntity
                     {
-                        Id = Utility.TrimWhiteSpace($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}")?.ToLower(),
+                        Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}")?.ToLower(),
                         ApiVersion = apiVersion,
                         Name = groupName,
                         Operations = operations,

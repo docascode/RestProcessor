@@ -144,13 +144,13 @@
             }
         }
 
-        public static string TrimWhiteSpace(this string value)
+        public static string TrimUId(this string value)
         {
             if(value == null)
             {
                 return null;
             }
-            return value.Replace(" ", "");
+            return value.Replace(" ", "").Trim('.');
         }
 
         public static string FirstLetterToUpper(this string str)

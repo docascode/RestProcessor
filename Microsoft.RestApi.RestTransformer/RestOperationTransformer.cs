@@ -46,7 +46,7 @@
 
             return new OperationEntity
             {
-                Id = Utility.TrimWhiteSpace($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
+                Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
                 Name = operationName,
                 Service = serviceName,
                 Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description),

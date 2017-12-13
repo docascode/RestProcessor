@@ -30,6 +30,6 @@
         public bool UseYamlSchema { get; set; } = false;
 
         [JsonProperty("convert_yaml_to_json")]
-        public bool ConvertYamlToJson { get; set; } = false;
+        public bool ConvertYamlToJson { get; set; } = true;
     }
 }
