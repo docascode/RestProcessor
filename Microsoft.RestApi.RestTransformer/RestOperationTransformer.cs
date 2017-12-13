@@ -261,7 +261,7 @@
         {
             var definitions = new List<DefinitionEntity>();
             var typesDictionary = new Dictionary<string, bool>();
-            var typesQueue = new Queue<Tuple<string, bool>>();
+            var typesQueue = new Queue<string>();
             if (!string.IsNullOrEmpty(bodyDefinitionObject.Type))
             {
                 var polymorphicDefinitions = GetPolymorphicDefinitions(allDefinitions, bodyDefinitionObject.Type);
@@ -271,7 +271,7 @@
                     {
                         if (!string.IsNullOrEmpty(polymorphicDefinition.Type))
                         {
-                            typesQueue.Enqueue(Tuple.Create(polymorphicDefinition.Type, false));
+                            typesQueue.Enqueue(polymorphicDefinition.Type);
                         }
                     }
                 }
@@ -281,44 +281,43 @@
             {
                 if (!string.IsNullOrEmpty(bodyProperty.Type) 
                     && (bodyProperty.DefinitionObjectType == DefinitionObjectType.Object || bodyProperty.DefinitionObjectType == DefinitionObjectType.Array)
-                    && !typesQueue.Any(t => t.Item1 == bodyProperty.Type))
+                    && !typesQueue.Any(t => t == bodyProperty.Type))
                 {
-                    typesQueue.Enqueue(Tuple.Create(bodyProperty.Type, false));
+                    typesQueue.Enqueue(bodyProperty.Type);
                 }
             }
             foreach (var responseDefinitionObject in responseDefinitionObjects)
             {
                 if (!string.IsNullOrEmpty(responseDefinitionObject.Type)
                     && (responseDefinitionObject.DefinitionObjectType == DefinitionObjectType.Object || responseDefinitionObject.DefinitionObjectType == DefinitionObjectType.Array) 
-                    && !typesQueue.Any(t => t.Item1 == responseDefinitionObject.Type))
+                    && !typesQueue.Any(t => t == responseDefinitionObject.Type))
                 {
-                    typesQueue.Enqueue(Tuple.Create(responseDefinitionObject.Type, true));
+                    typesQueue.Enqueue(responseDefinitionObject.Type);
                 }
             }
 
             while (typesQueue.Count > 0)
             {
                 var type = typesQueue.Dequeue();
-                if (typesDictionary.TryGetValue(type.Item1, out var typeValue))
+                if (typesDictionary.TryGetValue(type, out var typeValue))
                 {
                     continue;
                 }
-                typesDictionary[type.Item1] = true;
-                var polymorphicDefinitions = GetPolymorphicDefinitions(allDefinitions, type.Item1);
+                typesDictionary[type] = true;
+                var polymorphicDefinitions = GetPolymorphicDefinitions(allDefinitions, type);
                 if (polymorphicDefinitions?.Count > 0)
                 {
                     foreach (var polymorphicDefinition in polymorphicDefinitions)
                     {
                         if (!string.IsNullOrEmpty(polymorphicDefinition.Type))
                         {
-                            typesQueue.Enqueue(Tuple.Create(polymorphicDefinition.Type, false));
+                            typesQueue.Enqueue(polymorphicDefinition.Type);
                         }
                     }
                 }
-
-                if((polymorphicDefinitions?.Count > 0 && type.Item2) || (polymorphicDefinitions == null || polymorphicDefinitions?.Count == 0))
+                else
                 {
-                    var selfDefinition = GetSelfDefinition(allDefinitions, type.Item1);
+                    var selfDefinition = GetSelfDefinition(allDefinitions, type);
                     if (selfDefinition != null)
                     {
                         if (selfDefinition.DefinitionObjectType == DefinitionObjectType.Enum)
@@ -367,7 +366,7 @@
                             {
                                 if (!string.IsNullOrEmpty(definitionProperty.Type))
                                 {
-                                    typesQueue.Enqueue(Tuple.Create(definitionProperty.Type, false));
+                                    typesQueue.Enqueue(definitionProperty.Type);
                                 }
                             }
                         }
