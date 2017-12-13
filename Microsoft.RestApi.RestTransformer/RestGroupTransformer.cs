@@ -22,6 +22,13 @@
             var basePath = swaggerModel.BasePath;
             var apiVersion = swaggerModel.Info.Version;
 
+            using (var writer = new StreamWriter("C:\\1.txt", true))
+            {
+                var uid = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}")?.ToLower();
+                writer.WriteLine($"{uid}\t{viewModel.Uid}");
+            }
+            return new OperationGroupEntity { };
+
             var members = swaggerModel.Metadata.GetArrayFromMetaData<JObject>("x-internal-split-members");
             if (members != null && members.Count() > 0)
             {

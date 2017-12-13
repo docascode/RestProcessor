@@ -23,6 +23,16 @@
 
         public static OperationEntity Transform(SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel)
         {
+            var basePath = swaggerModel.BasePath;
+            var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
+            var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
+            var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
+            using (var writer = new StreamWriter("C:\\1.txt", true))
+            {
+                var uid = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower();
+                writer.WriteLine($"{uid}\t{viewModel.Uid}");
+            }
+            return new OperationEntity { };
             var scheme = Utility.GetScheme(swaggerModel.Metadata);
             var hostWithParameters = Utility.GetHostWithParameters(swaggerModel.Host, swaggerModel.Metadata);
             var host = hostWithParameters.Item1;
@@ -38,11 +48,7 @@
             var responseDefinitionObjects = new List<DefinitionObject>();
             var responses = TransformResponses(viewModel, allDefinitions, ref responseDefinitionObjects);
 
-            var basePath = swaggerModel.BasePath;
             var paths = TransformPaths(viewModel, scheme, host, basePath, apiVersion, allSimpleParameters);
-            var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
-            var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
-            var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
 
             return new OperationEntity
             {
