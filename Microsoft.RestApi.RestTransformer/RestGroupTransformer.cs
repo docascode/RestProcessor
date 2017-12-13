@@ -41,7 +41,6 @@
                         var operation = new Operation
                         {
                             Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
-                            Name = operationName,
                             Summary = Utility.GetSummary(model?.Summary, model?.Description)
                         };
                         operations.Add(operation);
