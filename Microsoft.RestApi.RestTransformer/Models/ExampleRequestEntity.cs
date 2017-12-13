@@ -9,7 +9,7 @@
         [YamlMember(Alias = "uri")]
         public string RequestUri { get; set; }
 
-        [YamlMember(Alias = "requestBody")]
+        [YamlMember(Alias = "body")]
         public string RequestBody { get; set; }
 
         [YamlMember(Alias = "headers")]

@@ -19,7 +19,7 @@
         public IList<Operation> Operations { get; set; }
     }
 
-    public class Operation : IdentifiableEntity
+    public class Operation : NamedEntity
     {
         [YamlMember(Alias = "summary")]
         public string Summary { get; set; }

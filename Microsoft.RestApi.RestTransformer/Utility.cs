@@ -182,6 +182,22 @@
             return $"{host}.{basePath}";
         }
 
+        public static string FormatJsonString(object jsonValue)
+        {
+            if (jsonValue == null)
+            {
+                return null;
+            }
+            try
+            {
+                return JsonUtility.ToIndentedJsonString(jsonValue).Replace("\r\n", "\n");
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public static T Clone<T>(T source)
         {
             var serialized = JsonConvert.SerializeObject(source);

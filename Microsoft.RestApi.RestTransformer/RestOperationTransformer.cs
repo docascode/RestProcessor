@@ -339,6 +339,7 @@
             }
             return allDefinitions;
         }
+
         private static IList<DefinitionEntity> TransformDefinitions(IList<Definition> allDefinitions, DefinitionObject bodyDefinitionObject, IList<DefinitionObject> responseDefinitionObjects)
         {
             allDefinitions = ResolveAllDefinitions(allDefinitions, bodyDefinitionObject, responseDefinitionObjects);
@@ -633,6 +634,7 @@
             foreach (var response in child.Responses)
             {
                 var typesName = new List<BaseParameterTypeEntity>();
+                string typesTitle = null;
                 var schema = response.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("schema");
                 if (schema != null)
                 {
@@ -649,7 +651,8 @@
                     else if (!string.IsNullOrEmpty(definitionObject.DiscriminatorKey) && !string.IsNullOrEmpty(definitionObject.Type))
                     {
                         var polymorphicDefinitions = GetPolymorphicDefinitions(definitions, definitionObject.Type);
-                        if(polymorphicDefinitions?.Count > 0)
+                        typesTitle = definitionObject.Type;
+                        if (polymorphicDefinitions?.Count > 0)
                         {
                             foreach (var polymorphicDefinition in polymorphicDefinitions)
                             {
@@ -678,32 +681,15 @@
                     }
                 }
 
-                if (typesName.Count > 0)
+                responses.Add(new ResponseEntity
                 {
-                    foreach (var typeName in typesName)
-                    {
-                        responses.Add(new ResponseEntity
-                        {
-                            Name = Utility.GetStatusCodeString(response.HttpStatusCode),
-                            Description = response.Description,
-                            Types = new List<BaseParameterTypeEntity> { typeName },
-                            ResponseHeaders = headerList.Count == 0 ? null : headerList
-                        });
-                    }
-                }
-                else
-                {
-                    responses.Add(new ResponseEntity
-                    {
-                        Name = Utility.GetStatusCodeString(response.HttpStatusCode),
-                        Description = response.Description,
-                        Types = typesName.Count == 0 ? null : typesName,
-                        ResponseHeaders = headerList.Count == 0 ? null : headerList
-                    });
-                }
-                
+                    Name = Utility.GetStatusCodeString(response.HttpStatusCode),
+                    Description = response.Description,
+                    Types = typesName.Count == 0 ? null : typesName,
+                    TypesTitle = typesTitle,
+                    ResponseHeaders = headerList.Count == 0 ? null : headerList
+                });
             }
-
 
             return responses;
         }
@@ -771,7 +757,7 @@
                 {
                     if (msExampleParameter.Key == bodyDefinitionObject.Name)
                     {
-                        return JsonUtility.ToIndentedJsonString(msExampleParameter.Value);
+                        return Utility.FormatJsonString(msExampleParameter.Value);
                     }
                 }
             }
@@ -784,7 +770,7 @@
                     {
                         if (msExampleParameter.Key == bodyParameter.Name || msExampleParameter.Key == "parameters")
                         {
-                            return JsonUtility.ToIndentedJsonString(msExampleParameter.Value);
+                            return Utility.FormatJsonString(msExampleParameter.Value);
                         }
                     }
                 }
@@ -802,11 +788,11 @@
                 string body = null;
                 if (msExampleResponseValue.TryGetValue("body", out var msBody) && msBody != null)
                 {
-                    body = JsonUtility.ToIndentedJsonString(msBody);
+                    body = Utility.FormatJsonString(msBody);
                 }
                 else if (msExampleResponseValue.TryGetValue("value", out var msValue) && msValue != null)
                 {
-                    body = JsonUtility.ToIndentedJsonString(msExampleResponseValue);
+                    body = Utility.FormatJsonString(msExampleResponseValue);
                 }
 
                 var headers = new List<ExampleResponseHeaderEntity>();

@@ -19,7 +19,7 @@
         {
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
-            var basePath = swaggerModel.Metadata.GetValueFromMetaData<string>("basePath");
+            var basePath = swaggerModel.BasePath;
             var apiVersion = swaggerModel.Info.Version;
 
             var members = swaggerModel.Metadata.GetArrayFromMetaData<JObject>("x-internal-split-members");
@@ -41,6 +41,7 @@
                         var operation = new Operation
                         {
                             Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
+                            Name = operationName,
                             Summary = Utility.GetSummary(model?.Summary, model?.Description)
                         };
                         operations.Add(operation);
