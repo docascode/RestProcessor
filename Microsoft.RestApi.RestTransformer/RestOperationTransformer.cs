@@ -65,7 +65,6 @@
                 Definitions = TransformDefinitions(allDefinitions, bodyDefinitionObject, responseDefinitionObjects),
                 Securities = TransformSecurities(swaggerModel)
             };
-
         }
 
         #region Definitions
@@ -81,7 +80,20 @@
                     var definitionObject = ResolveSchema(definition.Value);
                     definitionObject.Name = definition.Key;
                     definitionObject.Type = definition.Key;
-                    allDefinitionObjects.Add(definitionObject);
+                    var flattenDefinitionObjects = FlattenDefinitionObject(definitionObject);
+                    foreach(var flattenDefinitionObject in flattenDefinitionObjects)
+                    {
+                        if(!string.IsNullOrEmpty(flattenDefinitionObject.Type)
+                            && string.IsNullOrEmpty(flattenDefinitionObject.DiscriminatorKey)
+                            && (flattenDefinitionObject.DefinitionObjectType == DefinitionObjectType.Object
+                            || flattenDefinitionObject.DefinitionObjectType == DefinitionObjectType.Enum
+                            || (flattenDefinitionObject.DefinitionObjectType == DefinitionObjectType.Array && flattenDefinitionObject.PropertyItems?.Count > 0)
+                            || (flattenDefinitionObject.DefinitionObjectType == DefinitionObjectType.Array && flattenDefinitionObject.AllOfs?.Count > 0))
+                            && !allDefinitionObjects.Any(d => d.Type == flattenDefinitionObject.Type))
+                        {
+                            allDefinitionObjects.Add(flattenDefinitionObject);
+                        }
+                    }
                 }
             }
 
@@ -257,8 +269,79 @@
             return parameters;
         }
 
+        private static IList<DefinitionObject> FlattenDefinitionObject(DefinitionObject definitionObject)
+        {
+            var definitionObjects = new List<DefinitionObject>() { definitionObject };
+            foreach (var item in definitionObject.PropertyItems)
+            {
+                if (definitionObjects.Any(d => d.Type == item.Type))
+                {
+                    continue;
+                }
+                if (item.DefinitionObjectType != DefinitionObjectType.Simple)
+                {
+                    definitionObjects.Add(item);
+
+                    var tmpDefinitions = FlattenDefinitionObject(item);
+                    foreach (var tmpDefinition in tmpDefinitions)
+                    {
+                        if (!definitionObjects.Any(d => d.Type == tmpDefinition.Type))
+                        {
+                            definitionObjects.Add(tmpDefinition);
+                        }
+                    }
+                }
+            }
+            foreach (var allOf in definitionObject.AllOfs)
+            {
+                var tmpDefinitions = FlattenDefinitionObject(allOf);
+                foreach (var tmpDefinition in tmpDefinitions)
+                {
+                    if (!definitionObjects.Any(d => d.Type == tmpDefinition.Type))
+                    {
+                        definitionObjects.Add(tmpDefinition);
+                    }
+                }
+            }
+            return definitionObjects;
+        }
+
+        private static IList<Definition> ResolveAllDefinitions(IList<Definition> allDefinitions, DefinitionObject bodyDefinitionObject, IList<DefinitionObject> responseDefinitionObjects)
+        {
+            var definitionObjects = new List<DefinitionObject>();
+            responseDefinitionObjects.Add(bodyDefinitionObject);
+            
+            foreach(var responseDefinitionObject in responseDefinitionObjects)
+            {
+                var flattenDefinitionObjects = FlattenDefinitionObject(bodyDefinitionObject);
+                foreach(var flattenDefinitionObject in flattenDefinitionObjects)
+                {
+                    if (!string.IsNullOrEmpty(flattenDefinitionObject.Type)
+                    && string.IsNullOrEmpty(flattenDefinitionObject.DiscriminatorKey)
+                    && (flattenDefinitionObject.DefinitionObjectType == DefinitionObjectType.Object
+                    || flattenDefinitionObject.DefinitionObjectType == DefinitionObjectType.Enum
+                    || (flattenDefinitionObject.DefinitionObjectType == DefinitionObjectType.Array && flattenDefinitionObject.PropertyItems?.Count > 0)
+                    || (flattenDefinitionObject.DefinitionObjectType == DefinitionObjectType.Array && flattenDefinitionObject.AllOfs?.Count > 0))
+                    && !definitionObjects.Any(d => d.Type == flattenDefinitionObject.Type))
+                    {
+                        definitionObjects.Add(flattenDefinitionObject);
+                    }
+                }
+            }
+
+            var resolvedDefinitions = GetAllDefinitions(definitionObjects);
+            foreach(var resolvedDefinition in resolvedDefinitions)
+            {
+                if(!allDefinitions.Any(d => d.Type == resolvedDefinition.Type))
+                {
+                    allDefinitions.Add(resolvedDefinition);
+                }
+            }
+            return allDefinitions;
+        }
         private static IList<DefinitionEntity> TransformDefinitions(IList<Definition> allDefinitions, DefinitionObject bodyDefinitionObject, IList<DefinitionObject> responseDefinitionObjects)
         {
+            allDefinitions = ResolveAllDefinitions(allDefinitions, bodyDefinitionObject, responseDefinitionObjects);
             var definitions = new List<DefinitionEntity>();
             var typesDictionary = new Dictionary<string, bool>();
             var typesQueue = new Queue<string>();
