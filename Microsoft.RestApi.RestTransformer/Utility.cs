@@ -88,7 +88,7 @@
             return defaultScheme;
         }
 
-        public static Tuple<string, List<ParameterEntity>> GetHostWithParameters(string host, Dictionary<string, object> metadata)
+        public static Tuple<string, List<ParameterEntity>> GetHostWithParameters(string host, Dictionary<string, object> metadata, Dictionary<string, object> pathMetadata)
         {
             var hostParameterEntities = new List<ParameterEntity>();
             if (metadata.TryGetValue("x-ms-parameterized-host", out var jHost))
@@ -111,6 +111,11 @@
                         hostParameterEntities.Add(entity);
                     }
                 }
+            }
+            if (pathMetadata.TryGetValue("x-ms-parameterized-host", out var pHost))
+            {
+                var parameterizedHost = ((JObject)pHost).ToObject<Dictionary<string, object>>();
+                host = parameterizedHost.GetValueFromMetaData<string>("hostTemplate");
             }
             return Tuple.Create(string.IsNullOrEmpty(host) ? string.Empty : host, hostParameterEntities);
         }

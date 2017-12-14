@@ -11,7 +11,11 @@
         {
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
             var tag = viewModel.Tags?.FirstOrDefault(t => t.Name == groupName);
-            return tag?.Description;
+            if (!string.IsNullOrEmpty(tag?.Description))
+            {
+                return tag?.Description;
+            }
+            return Utility.GetSummary(viewModel.Summary, viewModel.Description);
         }
     }
 }
