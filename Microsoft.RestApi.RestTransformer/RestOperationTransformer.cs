@@ -627,7 +627,7 @@
                             {
                                 types.Add(new BaseParameterTypeEntity
                                 {
-                                    Id = property.Type + (property.DefinitionObjectType == DefinitionObjectType.Array ? "[]" : string.Empty),
+                                    Id = property.Type,
                                     IsArray = property.DefinitionObjectType == DefinitionObjectType.Array
                                 });
                             }
