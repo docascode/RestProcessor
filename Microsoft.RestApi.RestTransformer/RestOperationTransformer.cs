@@ -800,7 +800,7 @@
                             definitions.Add(new DefinitionEntity
                             {
                                 Name = selfDefinition.Name,
-                                Description = string.IsNullOrEmpty(selfDefinition.Title) ? selfDefinition.Description : selfDefinition.Title,
+                                Description = Utility.GetDescription(selfDefinition),
                                 Kind = "enum",
                                 ParameterItems = selfDefinition.EnumValues.Select(p => new DefinitionParameterEntity
                                 {
