@@ -9,6 +9,7 @@
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using System.Text;
 
     public static class Utility
     {
@@ -128,6 +129,30 @@
                 content = string.IsNullOrEmpty(summary) ? description : $"{summary} {description}";
             }
             return content;
+        }
+
+        public static string ContactDescription(string str1, string str2)
+        {
+            var description = string.Concat(str1, "\n", str2);
+            return description.Trim('\n').Replace("\r\n", "\n");
+        }
+
+        public static string GetDescription(DefinitionProperty definitionProperty)
+        {
+            string description = ContactDescription(definitionProperty.Title, definitionProperty.Description);
+            if (definitionProperty.DefinitionObjectType != DefinitionObjectType.Array)
+            {
+                return description;
+            }
+            else
+            {
+                var subDescription = ContactDescription(definitionProperty.SubTitle, definitionProperty.SubDescription);
+                if (string.IsNullOrEmpty(subDescription))
+                {
+                    return description;
+                }
+                return subDescription;
+            }
         }
 
         public static string GetStatusCodeString(string statusCode)

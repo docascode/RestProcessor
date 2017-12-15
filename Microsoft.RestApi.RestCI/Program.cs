@@ -86,7 +86,7 @@
         {
             if(fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath) && File.Exists(fileNameInfo.FilePath))
             {
-                //if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\kaizala-docs-rest-apis\\docs-ref-autogen\\kaizala.microsoft.com\\Group Management APIs\\CreateGroup.json")
+                // if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure-docs-rest-apis\\docs-ref-autogen\\batchservice\\Pool\\Add.json")
                 {
                     var folder = Path.GetDirectoryName(fileNameInfo.FilePath);
 

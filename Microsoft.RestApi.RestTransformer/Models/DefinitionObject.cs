@@ -15,6 +15,10 @@
 
         public string Name { get; set; }
 
+        public string Title { get; set; }
+
+        public string SubTitle { get; set; }
+
         public string Description { get; set; }
 
         public string SubDescription { get; set; }
@@ -68,7 +72,13 @@
     {
         public string Name { get; set; }
 
+        public string Title { get; set; }
+
+        public string SubTitle { get; set; }
+
         public string Description { get; set; }
+
+        public string SubDescription { get; set; }
 
         public string Type { get; set; }
 
@@ -86,6 +96,10 @@
     public class DefinitionProperty
     {
         public string Name { get; set; }
+
+        public string Title { get; set; }
+
+        public string SubTitle { get; set; }
 
         public string Description { get; set; }
 

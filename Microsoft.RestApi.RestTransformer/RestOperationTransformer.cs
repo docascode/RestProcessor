@@ -487,7 +487,10 @@
                 var definition = new Definition
                 {
                     Name = definitionObject.Type,
+                    Title = definitionObject.Title,
+                    SubTitle = definitionObject.SubTitle,
                     Description = definitionObject.Description,
+                    SubDescription = definitionObject.SubDescription,
                     Type = definitionObject.Type,
                     DefinitionObjectType = definitionObject.DefinitionObjectType,
                     DefinitionProperties = GetDefinitionProperties(definitionObject),
@@ -512,6 +515,8 @@
                     var definitionProperty = new DefinitionProperty
                     {
                         Name = property.Name,
+                        Title = property.Title,
+                        SubTitle = property.SubTitle,
                         Description = property.Description,
                         SubDescription = property.SubDescription,
                         Type = property.Type,
@@ -620,7 +625,11 @@
                             }
                             else
                             {
-                                types.Add(parameterTypeEntity);
+                                types.Add(new BaseParameterTypeEntity
+                                {
+                                    Id = property.Type + (property.DefinitionObjectType == DefinitionObjectType.Array ? "[]" : string.Empty),
+                                    IsArray = property.DefinitionObjectType == DefinitionObjectType.Array
+                                });
                             }
                         }
                         else
@@ -632,7 +641,7 @@
                     parameters.Add(new ParameterEntity
                     {
                         Name = property.Name,
-                        Description = property.Description,
+                        Description = Utility.GetDescription(property),
                         IsRequired = property.IsRequired,
                         IsReadOnly = property.IsReadOnly,
                         Types = types,
@@ -788,7 +797,7 @@
                             definitions.Add(new DefinitionEntity
                             {
                                 Name = selfDefinition.Name,
-                                Description = selfDefinition.Description,
+                                Description = string.IsNullOrEmpty(selfDefinition.Title) ? selfDefinition.Description : selfDefinition.Title,
                                 Kind = "enum",
                                 ParameterItems = selfDefinition.EnumValues.Select(p => new DefinitionParameterEntity
                                 {
@@ -810,7 +819,7 @@
                             definitions.Add(new DefinitionEntity
                             {
                                 Name = selfDefinition.Name,
-                                Description = selfDefinition.Description,
+                                Description = string.IsNullOrEmpty(selfDefinition.Title) ? selfDefinition.Description : selfDefinition.Title,
                                 Kind = "object",
                                 ParameterItems = parameters?.Select(p => new DefinitionParameterEntity
                                 {
@@ -930,10 +939,8 @@
                 definitionObject.Name = key ?? refName;
                 definitionObject.Type = refName;
                 definitionObject.Description = nodeObjectDict.GetValueFromMetaData<string>("description");
-                if (string.IsNullOrEmpty(definitionObject.Description))
-                {
-                    definitionObject.Description = nodeObjectDict.GetValueFromMetaData<string>("title");
-                }
+                definitionObject.Title = nodeObjectDict.GetValueFromMetaData<string>("title");
+               
                 definitionObject.IsReadOnly = nodeObjectDict.GetValueFromMetaData<bool>("readOnly");
                 definitionObject.IsFlatten = definitionObject.IsFlatten ? true : nodeObjectDict.GetValueFromMetaData<bool>("x-ms-client-flatten");
 
@@ -1007,9 +1014,9 @@
                     {
                         definitionObject.SubDescription = (string)subDescription;
                     }
-                    else if (itemsDefine.TryGetValue("title", out var title))
+                    if (itemsDefine.TryGetValue("title", out var title))
                     {
-                        definitionObject.SubDescription = (string)title;
+                        definitionObject.SubTitle = (string)title;
                     }
 
                     if (itemsDefine.TryGetValue("x-ms-discriminator-value", out var innerDiscriminatorValue))
