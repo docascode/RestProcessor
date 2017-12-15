@@ -155,6 +155,11 @@
             }
         }
 
+        public static string GetDescription(Definition definition)
+        {
+           return ContactDescription(definition.Title, definition.Description);
+        }
+
         public static string GetStatusCodeString(string statusCode)
         {
             switch (statusCode)

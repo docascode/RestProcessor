@@ -63,41 +63,44 @@
         private static IList<ParameterEntity> TransformAllSimpleParameters(List<ParameterEntity> hostParameters, RestApiChildItemViewModel viewModel, ref DefinitionObject definitionObject)
         {
             var parameters = hostParameters == null ? new List<ParameterEntity>() : new List<ParameterEntity>(hostParameters);
-            foreach (var parameter in viewModel.Parameters)
+            if (viewModel?.Parameters != null)
             {
-                var inType = parameter.Metadata.GetValueFromMetaData<string>("in");
-                if (inType != null && Enum.TryParse<ParameterEntityType>(inType, true, out var parameterEntityType))
+                foreach (var parameter in viewModel.Parameters)
                 {
-                    var isRequired = parameter.Metadata.GetValueFromMetaData<bool>("required");
-                    if (parameter.Metadata.TryGetValue("x-ms-required", out var msRequired))
+                    var inType = parameter.Metadata.GetValueFromMetaData<string>("in");
+                    if (inType != null && Enum.TryParse<ParameterEntityType>(inType, true, out var parameterEntityType))
                     {
-                        isRequired = (bool)msRequired;
-                    }
-                    var types = new List<BaseParameterTypeEntity>();
-                    if (parameter.Metadata.TryGetValue("type", out var type))
-                    {
-                        types.Add(new BaseParameterTypeEntity
+                        var isRequired = parameter.Metadata.GetValueFromMetaData<bool>("required");
+                        if (parameter.Metadata.TryGetValue("x-ms-required", out var msRequired))
                         {
-                            Id = (string)type
-                        });
+                            isRequired = (bool)msRequired;
+                        }
+                        var types = new List<BaseParameterTypeEntity>();
+                        if (parameter.Metadata.TryGetValue("type", out var type))
+                        {
+                            types.Add(new BaseParameterTypeEntity
+                            {
+                                Id = (string)type
+                            });
 
-                        var parameterEntity = new ParameterEntity
+                            var parameterEntity = new ParameterEntity
+                            {
+                                Name = parameter.Name,
+                                Description = parameter.Description,
+                                IsRequired = isRequired,
+                                Pattern = parameter.Metadata.GetValueFromMetaData<string>("pattern"),
+                                Format = parameter.Metadata.GetValueFromMetaData<string>("format"),
+                                In = inType,
+                                ParameterEntityType = parameterEntityType,
+                                Types = types
+                            };
+                            parameters.Add(parameterEntity);
+                        }
+                        else if (parameter.Metadata.TryGetValue("schema", out var schema))
                         {
-                            Name = parameter.Name,
-                            Description = parameter.Description,
-                            IsRequired = isRequired,
-                            Pattern = parameter.Metadata.GetValueFromMetaData<string>("pattern"),
-                            Format = parameter.Metadata.GetValueFromMetaData<string>("format"),
-                            In = inType,
-                            ParameterEntityType = parameterEntityType,
-                            Types = types
-                        };
-                        parameters.Add(parameterEntity);
-                    }
-                    else if (parameter.Metadata.TryGetValue("schema", out var schema))
-                    {
-                        definitionObject = ResolveSchema((JObject)schema);
-                        definitionObject.Name = parameter.Name;
+                            definitionObject = ResolveSchema((JObject)schema);
+                            definitionObject.Name = parameter.Name;
+                        }
                     }
                 }
             }
@@ -819,7 +822,7 @@
                             definitions.Add(new DefinitionEntity
                             {
                                 Name = selfDefinition.Name,
-                                Description = string.IsNullOrEmpty(selfDefinition.Title) ? selfDefinition.Description : selfDefinition.Title,
+                                Description = Utility.GetDescription(selfDefinition),
                                 Kind = "object",
                                 ParameterItems = parameters?.Select(p => new DefinitionParameterEntity
                                 {
@@ -935,6 +938,10 @@
             {
                 var nodeObjectDict = nodeObject.ToObject<Dictionary<string, object>>();
                 var refName = nodeObjectDict.GetValueFromMetaData<string>("x-internal-ref-name");
+                if (string.IsNullOrEmpty(refName))
+                {
+                    refName = nodeObjectDict.GetValueFromMetaData<string>("x-internal-loop-ref-name");
+                }
                 var currentType = nodeObjectDict.GetValueFromMetaData<string>("type");
                 definitionObject.Name = key ?? refName;
                 definitionObject.Type = refName;
@@ -1010,6 +1017,11 @@
                     {
                         definitionObject.Type = (string)type;
                     }
+                    else if (itemsDefine.TryGetValue("x-internal-loop-ref-name", out var loopType))
+                    {
+                        definitionObject.Type = (string)loopType;
+                    }
+
                     if (itemsDefine.TryGetValue("description", out var subDescription))
                     {
                         definitionObject.SubDescription = (string)subDescription;
