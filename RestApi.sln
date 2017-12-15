@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.RestApi.RestSplitter", "Microsoft.RestApi.RestSplitter\Microsoft.RestApi.RestSplitter.csproj", "{38C000D2-A748-4FD4-89FB-F64AB89ECA9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.RestApi.RestCI", "Microsoft.RestApi.RestCI\Microsoft.RestApi.RestCI.csproj", "{42D7A942-10CB-4E3A-BC01-CE045860CDF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestProcessor", "RestProcessor\RestProcessor.csproj", "{42D7A942-10CB-4E3A-BC01-CE045860CDF8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.RestApi.Common", "Microsoft.RestApi.Common\Microsoft.RestApi.Common.csproj", "{D8163382-1574-4C41-AA06-B2C450AEB13B}"
 EndProject
