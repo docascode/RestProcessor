@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{42D7A942-10CB-4E3A-BC01-CE045860CDF8}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Microsoft.RestApi.RestCI</RootNamespace>
-    <AssemblyName>Microsoft.RestApi.RestCI</AssemblyName>
+    <RootNamespace>RestProcessor</RootNamespace>
+    <AssemblyName>RestProcessor</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
