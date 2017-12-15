@@ -47,11 +47,16 @@
                 {
                     if (viewModel.Children?.Count == 1)
                     {
-                        using (var writer = new StreamWriter(filePath))
+                        var operationInfo = RestOperationTransformer.Transform(swaggerModel, viewModel.Children.First());
+                        if (operationInfo != null)
                         {
-                            writer.WriteLine("### YamlMime:RESTOperation");
-                            YamlSerializer.Serialize(writer, RestOperationTransformer.Transform(swaggerModel, viewModel.Children.First()));
+                            using (var writer = new StreamWriter(filePath))
+                            {
+                                writer.WriteLine("### YamlMime:RESTOperation");
+                                YamlSerializer.Serialize(writer, operationInfo);
+                            }
                         }
+                        
                         if (File.Exists(Path.ChangeExtension(filePath, ".json")))
                         {
                             File.Delete(Path.ChangeExtension(filePath, ".json"));
