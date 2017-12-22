@@ -85,7 +85,7 @@
                     };
 
                     rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
-                    rootJObj["x-internal-operation-name"] = operationName;
+                    rootJObj["x-internal-operation-name"] = Utility.ExtractPascalNameByRegex(operationName);
                     var operationFile = Utility.Serialize(Path.Combine(targetDir, groupName), operationName, rootJObj);
                     ClearKey(rootJObj, "x-internal-split-type");
                     ClearKey(rootJObj, "x-internal-operation-name");
