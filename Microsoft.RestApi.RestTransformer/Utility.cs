@@ -9,7 +9,6 @@
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using System.Text;
 
     public static class Utility
     {

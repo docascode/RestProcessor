@@ -720,6 +720,7 @@
                 }
             }
 
+            // may be there should be change.
             var resolvedDefinitions = GetAllDefinitions(definitionObjects);
             foreach (var resolvedDefinition in resolvedDefinitions)
             {

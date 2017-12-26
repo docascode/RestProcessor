@@ -8,7 +8,7 @@
     [Serializable]
     public class IdentifiableEntity
     {
-        [YamlMember(Alias = "uid")]
+        [YamlMember(Alias = "uid", Order = -10)]
         [JsonProperty("id")]
         public string Id { get; set; }
     }

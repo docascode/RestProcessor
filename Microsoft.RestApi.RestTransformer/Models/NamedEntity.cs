@@ -9,7 +9,7 @@
 
     public class NamedEntity : IdentifiableEntity
     {
-        [YamlMember(Alias = "name")]
+        [YamlMember(Alias = "name", Order = -9)]
         [JsonProperty("name")]
         public string Name { get; set; }
     }

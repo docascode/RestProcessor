@@ -6,17 +6,17 @@
 
     public class OperationEntity : NamedEntity
     {
-        [YamlMember(Alias = "summary")]
-        public string Summary { get; set; }
-
-        [YamlMember(Alias = "service")]
+        [YamlMember(Alias = "service", Order = -8)]
         public string Service { get; set; }
 
-        [YamlMember(Alias = "apiVersion")]
+        [YamlMember(Alias = "groupName", Order = -7)]
+        public string GroupName { get; set; }
+
+        [YamlMember(Alias = "apiVersion", Order = -6)]
         public string ApiVersion { get; set; }
 
-        [YamlMember(Alias = "groupName")]
-        public string GroupName { get; set; }
+        [YamlMember(Alias = "summary")]
+        public string Summary { get; set; }
 
         [YamlMember(Alias = "remarks")]
         public string Remarks { get; set; }
