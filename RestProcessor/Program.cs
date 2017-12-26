@@ -86,7 +86,7 @@
         {
             if(fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath) && File.Exists(fileNameInfo.FilePath))
             {
-                if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure\\docs-ref-autogen\\site-recovery\\RecoveryPoints\\ListByReplicationProtectedItems.json")
+                //if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure\\docs-ref-autogen\\site-recovery\\RecoveryPoints\\ListByReplicationProtectedItems.json")
                 {
                     var folder = Path.GetDirectoryName(fileNameInfo.FilePath);
 
