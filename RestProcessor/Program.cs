@@ -73,7 +73,7 @@
 
         public static void RestProcessor(IList<RestFileInfo> restFileInfos)
         {
-            foreach(var restFileInfo in restFileInfos)
+            foreach (var restFileInfo in restFileInfos)
             {
                 foreach(var fileInfo in restFileInfo.FileNameInfos)
                 {
@@ -86,7 +86,7 @@
         {
             if(fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath) && File.Exists(fileNameInfo.FilePath))
             {
-                //if (fileNameInfo.FilePath == "C:\\Code\\RestRepos\\azure\\docs-ref-autogen\\site-recovery\\RecoveryPoints\\ListByReplicationProtectedItems.json")
+                //if (fileNameInfo.FilePath .StartsWith("C:\\Code\\RestRepos\\azure\\docs-ref-autogen\\site-recovery\\RecoveryPoints\\"))
                 {
                     var folder = Path.GetDirectoryName(fileNameInfo.FilePath);
 
@@ -116,6 +116,17 @@
                 if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
                 {
                     foreach(var info in fileNameInfo.ChildrenFileNameInfo)
+                    {
+                        RestTransformerWrapper(info);
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Warning: Can not find the file {fileNameInfo.FilePath}, please take attention!");
+                if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
+                {
+                    foreach (var info in fileNameInfo.ChildrenFileNameInfo)
                     {
                         RestTransformerWrapper(info);
                     }
