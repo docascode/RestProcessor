@@ -18,7 +18,7 @@
         public List<OrgInfo> OrgInfos { get; set; }
 
         [JsonProperty("is_operation_level")]
-        public bool IsOperationLevel { get; set; }
+        public bool IsOperationLevel { get; set; } = true;
 
         [JsonProperty("is_grouped_by_tag")]
         public bool IsGroupdedByTag { get; set; }
