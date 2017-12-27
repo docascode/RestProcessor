@@ -42,7 +42,7 @@
         public abstract IEnumerable<FileNameInfo> Generate();
 
         protected abstract string GetOperationName(JObject operation);
-        
+
         #endregion
 
         #region Protected Methods
@@ -85,7 +85,7 @@
                     };
 
                     rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
-                    rootJObj["x-internal-operation-name"] = Utility.ExtractPascalNameByRegex(operationName);
+                    rootJObj["x-internal-operation-name"] = RemoveTagFromOperationId(operationName, groupName);
                     var operationFile = Utility.Serialize(Path.Combine(targetDir, groupName), operationName, rootJObj);
                     ClearKey(rootJObj, "x-internal-split-type");
                     ClearKey(rootJObj, "x-internal-operation-name");
@@ -138,7 +138,7 @@
 
             return distinctedParameters;
         }
-    
+
         private bool IsParameterEquals(JToken left, JToken right)
         {
             if (left["$ref"] != null && right["$ref"] != null)
@@ -146,12 +146,29 @@
                 return string.Equals(left["$ref"].ToString(), right["$ref"].ToString());
             }
 
-            if(left["name"] != null && right["name"] != null && left["in"] != null && right["in"] != null)
+            if (left["name"] != null && right["name"] != null && left["in"] != null && right["in"] != null)
             {
                 return string.Equals(left["name"].ToString(), right["name"].ToString())
                     && string.Equals(left["in"].ToString(), right["in"].ToString());
             }
             return false;
+        }
+
+        private string RemoveTagFromOperationId(string operationName, string groupName)
+        {
+            Guard.ArgumentNotNullOrEmpty(operationName, nameof(operationName));
+            Guard.ArgumentNotNullOrEmpty(groupName, nameof(groupName));
+
+            var internalOperationName = operationName;
+            if (MappingConfig.IsGroupedByTag && MappingConfig.RemoveTagFromOperationId)
+            {
+                if (operationName.StartsWith(groupName))
+                {
+                    internalOperationName = operationName.TrimStart(groupName.ToCharArray());
+                }
+                internalOperationName = internalOperationName.Trim('_').Trim(' ');
+            }
+            return Utility.ExtractPascalNameByRegex(internalOperationName);
         }
 
         #endregion

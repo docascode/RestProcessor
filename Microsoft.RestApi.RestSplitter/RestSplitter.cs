@@ -122,7 +122,8 @@
                 IsOperationLevel = orgsMappingFile.IsOperationLevel,
                 IsGroupedByTag = orgsMappingFile.IsGroupdedByTag,
                 SplitOperationCountGreaterThan = orgsMappingFile.SplitOperationCountGreaterThan,
-                UseYamlSchema = orgsMappingFile.UseYamlSchema
+                UseYamlSchema = orgsMappingFile.UseYamlSchema,
+                RemoveTagFromOperationId = orgsMappingFile.RemoveTagFromOperationId
             };
 
             using (var writer = new StreamWriter(targetTocPath))

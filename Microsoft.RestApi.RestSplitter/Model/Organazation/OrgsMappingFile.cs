@@ -31,5 +31,8 @@
 
         [JsonProperty("convert_yaml_to_json")]
         public bool ConvertYamlToJson { get; set; } = true;
+
+        [JsonProperty("remove_tag_from_operationId")]
+        public bool RemoveTagFromOperationId { get; set; }
     }
 }

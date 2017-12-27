@@ -9,5 +9,7 @@
         public int SplitOperationCountGreaterThan { get; set; }
 
         public bool UseYamlSchema { get; set; }
+
+        public bool RemoveTagFromOperationId { get; set; }
     }
 }
