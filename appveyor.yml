@@ -1,4 +1,7 @@
 image: Visual Studio 2017
+before_build:
+  - nuget sources add -Name docfx -Source https://www.myget.org/F/docfx/api/v2
+  - nuget restore
 
 configuration:
   - Release
