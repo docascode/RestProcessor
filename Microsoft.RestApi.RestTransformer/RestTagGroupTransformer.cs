@@ -15,7 +15,7 @@
             {
                 return tag?.Description;
             }
-            return swaggerModel.Info?.PatternedObjects?.GetValueFromMetaData<string>("description");
+            return Utility.GetSummary(viewModel.Summary, viewModel.Description);
         }
     }
 }

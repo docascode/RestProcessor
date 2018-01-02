@@ -7,7 +7,7 @@
     {
         protected override string GetSummary(SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel)
         {
-            return swaggerModel.Info?.PatternedObjects?.GetValueFromMetaData<string>("description");
+            return Utility.GetSummary(viewModel.Summary, viewModel.Description);
         }
     }
 }
