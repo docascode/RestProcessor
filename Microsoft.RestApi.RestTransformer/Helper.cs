@@ -35,12 +35,21 @@
             return sortedParameters;
         }
 
-        public static IList<PathEntity> HandlePathsDefaultValues(IList<PathEntity> paths, string apiVersion)
+        public static IList<PathEntity> HandlePathsDefaultValues(IList<PathEntity> paths, string apiVersion, IList<ParameterEntity> parameters)
         {
             foreach (var path in paths)
             {
                 path.Content = path.Content.Replace("{api-version}", apiVersion);
+                foreach (var parameter in parameters)
+                {
+                    if(parameter.EnumValues?.Count() == 1)
+                    {
+                        path.Content = path.Content.Replace($"{{{parameter.Name}}}", parameter.EnumValues[0]);
+                    }
+                   
+                }
             }
+            
             return paths;
         }
     }

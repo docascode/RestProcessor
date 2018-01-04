@@ -50,7 +50,7 @@
                 Parameters = Helper.SortParameters(paths, allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Query || p.ParameterEntityType == ParameterEntityType.Path).ToList()),
                 RequestHeaders = allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Header).ToList(),
                 RequestBodies = TransformRequestBodies(allDefinitions, allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Body).ToList(), bodyDefinitionObject),
-                Paths = Helper.HandlePathsDefaultValues(paths, apiVersion),
+                Paths = Helper.HandlePathsDefaultValues(paths, apiVersion, allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Query || p.ParameterEntityType == ParameterEntityType.Path).ToList()),
                 Produces = viewModel.Metadata.GetArrayFromMetaData<string>("produces"),
                 Consumes = viewModel.Metadata.GetArrayFromMetaData<string>("consumes"),
                 Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
@@ -168,10 +168,6 @@
         {
             var queryStrings = queryParameters.Select(p =>
             {
-                if(p.EnumValues?.Count() == 1)
-                {
-                    return $"{p.Name}={p.EnumValues[0]}";
-                }
                 return $"{p.Name}={{{p.Name}}}";
             });
             return string.Join("&", queryStrings);
@@ -436,41 +432,45 @@
         private static List<ExampleResponseEntity> GetExampleResponses(Dictionary<string, object> msExampleResponses)
         {
             var exampleResponses = new List<ExampleResponseEntity>();
-            foreach (var msExampleResponse in msExampleResponses)
+            if (msExampleResponses != null)
             {
-                var msExampleResponseValue = ((JObject)msExampleResponse.Value).ToObject<Dictionary<string, object>>();
-                string body = null;
-                if (msExampleResponseValue.TryGetValue("body", out var msBody) && msBody != null)
+                foreach (var msExampleResponse in msExampleResponses)
                 {
-                    body = Utility.FormatJsonString(msBody);
-                }
-                else if (msExampleResponseValue.TryGetValue("value", out var msValue) && msValue != null)
-                {
-                    body = Utility.FormatJsonString(msExampleResponseValue);
-                }
-
-                var headers = new List<ExampleResponseHeaderEntity>();
-                if (msExampleResponseValue.TryGetValue("headers", out var msHeader) && msHeader != null)
-                {
-                    var msHeaderDict = ((JObject)msHeader).ToObject<Dictionary<string, string>>();
-                    foreach (var header in msHeaderDict)
+                    var msExampleResponseValue = ((JObject)msExampleResponse.Value).ToObject<Dictionary<string, object>>();
+                    string body = null;
+                    if (msExampleResponseValue.TryGetValue("body", out var msBody) && msBody != null)
                     {
-                        headers.Add(new ExampleResponseHeaderEntity
-                        {
-                            Name = header.Key,
-                            Value = header.Value
-                        });
+                        body = Utility.FormatJsonString(msBody);
                     }
-                }
+                    else if (msExampleResponseValue.TryGetValue("value", out var msValue) && msValue != null)
+                    {
+                        body = Utility.FormatJsonString(msExampleResponseValue);
+                    }
 
-                var exampleResponse = new ExampleResponseEntity
-                {
-                    StatusCode = msExampleResponse.Key,
-                    Body = string.IsNullOrEmpty(body) ? null : body,
-                    Headers = headers.Count > 0 ? headers : null
-                };
-                exampleResponses.Add(exampleResponse);
+                    var headers = new List<ExampleResponseHeaderEntity>();
+                    if (msExampleResponseValue.TryGetValue("headers", out var msHeader) && msHeader != null)
+                    {
+                        var msHeaderDict = ((JObject)msHeader).ToObject<Dictionary<string, string>>();
+                        foreach (var header in msHeaderDict)
+                        {
+                            headers.Add(new ExampleResponseHeaderEntity
+                            {
+                                Name = header.Key,
+                                Value = header.Value
+                            });
+                        }
+                    }
+
+                    var exampleResponse = new ExampleResponseEntity
+                    {
+                        StatusCode = msExampleResponse.Key,
+                        Body = string.IsNullOrEmpty(body) ? null : body,
+                        Headers = headers.Count > 0 ? headers : null
+                    };
+                    exampleResponses.Add(exampleResponse);
+                }
             }
+
             return exampleResponses;
         }
 
