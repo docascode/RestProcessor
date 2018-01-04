@@ -164,24 +164,40 @@
 
         #region Paths
 
-        private static string FormatPathQueryStrings(IEnumerable<ParameterEntity> queryParameters)
+        private static string FormatPathQueryStrings(string initParameters, IEnumerable<ParameterEntity> queryParameters)
         {
+            var queries = new List<string>();
+            if (!string.IsNullOrEmpty(initParameters))
+            {
+                var initStrings = initParameters.Split('&').Select(p =>
+                {
+                    if (!queryParameters.Any(q => q.Name == p?.Split('=')[0]))
+                    {
+                        return p;
+                    }
+                    return null;
+                });
+                queries.AddRange(initStrings.Where(s => !string.IsNullOrEmpty(s)));
+            }
             var queryStrings = queryParameters.Select(p =>
             {
                 return $"{p.Name}={{{p.Name}}}";
             });
-            return string.Join("&", queryStrings);
+            queries.AddRange(queryStrings);
+            return string.Join("&", queries);
         }
 
         private static IList<PathEntity> TransformPaths(RestApiChildItemViewModel viewModel, string scheme, string host, string basePath, string apiVersion, IList<ParameterEntity> parameters)
         {
             var pathEntities = new List<PathEntity>();
 
+            var paths = viewModel.Path?.Split('?');
             var requiredQueryStrings = parameters.Where(p => p.IsRequired && p.In == "query");
-            var requiredPath = viewModel.Path?.Split('?')[0];
+            var requiredPath = paths[0];
+
             if (requiredQueryStrings.Any())
             {
-                requiredPath = requiredPath + "?" + FormatPathQueryStrings(requiredQueryStrings);
+                requiredPath = requiredPath + "?" + FormatPathQueryStrings(paths.Count() > 1 ? paths[1] : null, requiredQueryStrings);
             }
 
             pathEntities.Add(new PathEntity
@@ -190,12 +206,11 @@
                 IsOptional = false
             });
 
-
             var allQueryStrings = parameters.Where(p => p.In == "query");
-            var optionPath = viewModel.Path;
+            var optionPath = paths[0];
             if (!allQueryStrings.All(p => p.IsRequired))
             {
-                optionPath = optionPath + "?" + FormatPathQueryStrings(allQueryStrings);
+                optionPath = optionPath + "?" + FormatPathQueryStrings(paths.Count() > 1 ? paths[1] : null, allQueryStrings);
 
                 pathEntities.Add(new PathEntity
                 {
