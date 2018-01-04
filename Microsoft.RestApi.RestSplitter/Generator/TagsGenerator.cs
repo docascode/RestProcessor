@@ -46,14 +46,15 @@
 
                     var fileNameInfo = new FileNameInfo
                     {
-                        TocName = tag
+                        TocName = Utility.ExtractPascalNameByRegex(tag)
                     };
+                    RootJObj["x-internal-operation-group-name"] = tag;
 
                     // Get file name from operation group mapping
                     string newTagName;
                     if (OperationGroupMapping != null && OperationGroupMapping.TryGetValue(tag, out newTagName))
                     {
-                        fileNameInfo.TocName = newTagName;
+                        fileNameInfo.TocName = Utility.ExtractPascalNameByRegex(newTagName);
                         RootJObj["x-internal-operation-group-name"] = newTagName;
                     }
 

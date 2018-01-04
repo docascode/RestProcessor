@@ -70,7 +70,7 @@
 
                     var operationObj = (JObject)item.Value;
                     var operationName = GetOperationName(operationObj);
-                    var operationTocName = Utility.ExtractPascalNameByRegex(operationName);
+                    var operationTocName = Utility.ExtractPascalNameByRegex(RemoveTagFromOperationId(operationName, groupName));
                     operationObj["x-internal-toc-name"] = operationTocName;
 
                     // Reuse the root object, to reuse the other properties
@@ -85,8 +85,8 @@
                     };
 
                     rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
-                    rootJObj["x-internal-operation-name"] = RemoveTagFromOperationId(operationName, groupName);
-                    var operationFile = Utility.Serialize(Path.Combine(targetDir, groupName), operationName, rootJObj);
+                    rootJObj["x-internal-operation-name"] = operationTocName;
+                    var operationFile = Utility.Serialize(Path.Combine(targetDir, groupName), RemoveTagFromOperationId(operationName, groupName), rootJObj);
                     ClearKey(rootJObj, "x-internal-split-type");
                     ClearKey(rootJObj, "x-internal-operation-name");
 
@@ -168,7 +168,7 @@
                 }
                 internalOperationName = internalOperationName.Trim('_').Trim(' ');
             }
-            return Utility.ExtractPascalNameByRegex(internalOperationName);
+            return internalOperationName;
         }
 
         #endregion
