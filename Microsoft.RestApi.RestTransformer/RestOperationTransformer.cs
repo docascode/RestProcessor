@@ -93,6 +93,7 @@
                                 var definition = new Definition
                                 {
                                     DefinitionObjectType = DefinitionObjectType.Enum,
+                                    Description = parameter.Description,
                                     EnumValues = enumObjects
                                 };
 
