@@ -123,7 +123,8 @@
                 IsGroupedByTag = orgsMappingFile.IsGroupdedByTag,
                 SplitOperationCountGreaterThan = orgsMappingFile.SplitOperationCountGreaterThan,
                 UseYamlSchema = orgsMappingFile.UseYamlSchema,
-                RemoveTagFromOperationId = orgsMappingFile.RemoveTagFromOperationId
+                RemoveTagFromOperationId = orgsMappingFile.RemoveTagFromOperationId,
+                NeedResolveXMsPaths = orgsMappingFile.NeedResolveXMsPaths
             };
 
             using (var writer = new StreamWriter(targetTocPath))

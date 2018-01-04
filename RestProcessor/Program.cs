@@ -40,7 +40,7 @@
                 }
 
                 var restFileInfos = RestSpliter(args[0], args[1], mappingFile);
-               
+
                 if (mappingFile.UseYamlSchema)
                 {
                     RestProcessor(restFileInfos);

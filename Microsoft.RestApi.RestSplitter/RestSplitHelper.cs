@@ -34,6 +34,12 @@
                 var refResolver = new RefResolver(rootJObj, filePath);
                 refResolver.Resolve();
 
+                if (mappingConfig.NeedResolveXMsPaths)
+                {
+                    var xMsPathsResolver = new XMsPathsResolver(rootJObj);
+                    xMsPathsResolver.Resolve();
+                }
+
                 rootJObj["x-internal-service-name"] = serviceName;
                 var generator = GeneratorFactory.CreateGenerator(rootJObj, targetDir, filePath, operationGroupMapping, mappingConfig);
                 var fileNameInfos = generator.Generate().ToList();

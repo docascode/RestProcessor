@@ -11,5 +11,7 @@
         public bool UseYamlSchema { get; set; }
 
         public bool RemoveTagFromOperationId { get; set; }
+
+        public bool NeedResolveXMsPaths { get; set; }
     }
 }

@@ -34,5 +34,8 @@
 
         [JsonProperty("remove_tag_from_operationId")]
         public bool RemoveTagFromOperationId { get; set; }
+
+        [JsonProperty("need_resolve_x_ms_paths")]
+        public bool NeedResolveXMsPaths { get; set; } = true;
     }
 }

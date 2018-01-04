@@ -122,6 +122,7 @@
     <Compile Include="RestSplitHelper.cs" />
     <Compile Include="Model\SplitType.cs" />
     <Compile Include="Utility.cs" />
+    <Compile Include="XMsPathsResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
