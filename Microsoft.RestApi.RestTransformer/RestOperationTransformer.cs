@@ -24,7 +24,8 @@
             var allDefinitions = GetAllDefinitions(allDefinitionObjects);
 
             var bodyDefinitionObject = new DefinitionObject();
-            var allSimpleParameters = TransformAllSimpleParameters(hostParameters, viewModel, ref bodyDefinitionObject);
+            var parametersDefinitions = new List<Definition>();
+            var allSimpleParameters = TransformAllSimpleParameters(hostParameters, viewModel, ref bodyDefinitionObject, ref parametersDefinitions);
 
             var responseDefinitionObjects = new List<DefinitionObject>();
             var responses = TransformResponses(viewModel, allDefinitions, ref responseDefinitionObjects);
@@ -53,14 +54,14 @@
                 Produces = viewModel.Metadata.GetArrayFromMetaData<string>("produces"),
                 Consumes = viewModel.Metadata.GetArrayFromMetaData<string>("consumes"),
                 Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
-                Definitions = TransformDefinitions(allDefinitions, bodyDefinitionObject, responseDefinitionObjects),
+                Definitions = TransformDefinitions(allDefinitions, parametersDefinitions, bodyDefinitionObject, responseDefinitionObjects),
                 Securities = TransformSecurities(swaggerModel)
             };
         }
 
         #region Parameters
 
-        private static IList<ParameterEntity> TransformAllSimpleParameters(List<ParameterEntity> hostParameters, RestApiChildItemViewModel viewModel, ref DefinitionObject definitionObject)
+        private static IList<ParameterEntity> TransformAllSimpleParameters(List<ParameterEntity> hostParameters, RestApiChildItemViewModel viewModel, ref DefinitionObject definitionObject, ref List<Definition> definitions)
         {
             var parameters = hostParameters == null ? new List<ParameterEntity>() : new List<ParameterEntity>(hostParameters);
             if (viewModel?.Parameters != null)
@@ -76,12 +77,62 @@
                             isRequired = (bool)msRequired;
                         }
                         var types = new List<BaseParameterTypeEntity>();
+                       
                         if (parameter.Metadata.TryGetValue("type", out var type))
                         {
-                            types.Add(new BaseParameterTypeEntity
+                            var enumValues = parameter.Metadata.GetArrayFromMetaData<string>("enum");
+                            var enumNode = parameter.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("x-ms-enum");
+                            if (enumValues != null && enumNode != null)
                             {
-                                Id = (string)type
-                            });
+                                var enumObjects = new List<EnumValue>();
+                                foreach (var v in enumValues)
+                                {
+                                    enumObjects.Add(new EnumValue { Value = v });
+                                }
+
+                                var definition = new Definition
+                                {
+                                    DefinitionObjectType = DefinitionObjectType.Enum,
+                                    EnumValues = enumObjects
+                                };
+
+                                if (enumNode.TryGetValue("name", out var enumName))
+                                {
+                                    types.Add(new BaseParameterTypeEntity
+                                    {
+                                        Id = (string)enumName
+                                    });
+                                    definition.Name = (string)enumName;
+                                    definition.Type = (string)enumName;
+                                }
+
+                                if (enumNode.TryGetValue("values", out var enumValue))
+                                {
+                                    var values = (JArray)enumValue;
+                                    if (values != null)
+                                    {
+                                        foreach (var v in values)
+                                        {
+                                            var keyValueEnum = v.ToObject<Dictionary<string, object>>();
+                                            var enumV = keyValueEnum.GetValueFromMetaData<string>("value");
+                                            var enumObject = enumObjects.FirstOrDefault(q => q.Value == enumV);
+                                            if (enumV != null && enumObject != null)
+                                            {
+                                                enumObject.Description = keyValueEnum.GetValueFromMetaData<string>("description");
+                                                enumObject.Name = keyValueEnum.GetValueFromMetaData<string>("name");
+                                            }
+                                        }
+                                    }
+                                }
+                                definitions.Add(definition);
+                            }
+                            else
+                            {
+                                types.Add(new BaseParameterTypeEntity
+                                {
+                                    Id = (string)type
+                                });
+                            }
 
                             var parameterEntity = new ParameterEntity
                             {
@@ -92,7 +143,8 @@
                                 Format = parameter.Metadata.GetValueFromMetaData<string>("format"),
                                 In = inType,
                                 ParameterEntityType = parameterEntityType,
-                                Types = types
+                                Types = types,
+                                EnumValues = enumValues
                             };
                             parameters.Add(parameterEntity);
                         }
@@ -115,6 +167,10 @@
         {
             var queryStrings = queryParameters.Select(p =>
             {
+                if(p.EnumValues?.Count() == 1)
+                {
+                    return $"{p.Name}={p.EnumValues[0]}";
+                }
                 return $"{p.Name}={{{p.Name}}}";
             });
             return string.Join("&", queryStrings);
@@ -124,9 +180,8 @@
         {
             var pathEntities = new List<PathEntity>();
 
-            // todo: do the enum, if the parameter is enum and the enum value only have one.
             var requiredQueryStrings = parameters.Where(p => p.IsRequired && p.In == "query");
-            var requiredPath = viewModel.Path;
+            var requiredPath = viewModel.Path?.Split('?')[0];
             if (requiredQueryStrings.Any())
             {
                 requiredPath = requiredPath + "?" + FormatPathQueryStrings(requiredQueryStrings);
@@ -732,7 +787,7 @@
             return allDefinitions;
         }
 
-        private static IList<DefinitionEntity> TransformDefinitions(IList<Definition> allDefinitions, DefinitionObject bodyDefinitionObject, IList<DefinitionObject> responseDefinitionObjects)
+        private static IList<DefinitionEntity> TransformDefinitions(IList<Definition> allDefinitions, List<Definition> parametersDefinitions, DefinitionObject bodyDefinitionObject, IList<DefinitionObject> responseDefinitionObjects)
         {
             allDefinitions = ResolveAllDefinitions(allDefinitions, bodyDefinitionObject, responseDefinitionObjects);
             var definitions = new List<DefinitionEntity>();
@@ -753,6 +808,11 @@
                 }
             }
             var bodyProperties = GetDefinitionProperties(bodyDefinitionObject);
+            foreach(var parametersDefinition in parametersDefinitions)
+            {
+                allDefinitions.Add(parametersDefinition);
+                typesQueue.Enqueue(parametersDefinition.Type);
+            }
             foreach (var bodyProperty in bodyProperties)
             {
                 if (!string.IsNullOrEmpty(bodyProperty.Type)

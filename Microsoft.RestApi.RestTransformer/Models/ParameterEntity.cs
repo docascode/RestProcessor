@@ -17,6 +17,9 @@
         public bool IsRequired { get; set; }
 
         [YamlIgnore]
+        public string[] EnumValues { get; set; }
+
+        [YamlIgnore]
         public ParameterEntityType ParameterEntityType { get; set; }
     }
 
