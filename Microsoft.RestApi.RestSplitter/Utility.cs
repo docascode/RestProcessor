@@ -119,9 +119,13 @@
 
         public static string ExtractPascalNameByRegex(string name)
         {
-            if (name.Contains(" ") || name.Contains("_"))
+            if (name.Contains(" "))
             {
                 return name;
+            }
+            if (name.Contains("_") || name.Contains("-"))
+            {
+                return name.Replace('_', ' ').Replace('-', ' ');
             }
 
             var result = new List<string>();

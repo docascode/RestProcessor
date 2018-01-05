@@ -54,7 +54,7 @@
                     string newTagName;
                     if (OperationGroupMapping != null && OperationGroupMapping.TryGetValue(tag, out newTagName))
                     {
-                        fileNameInfo.TocName = Utility.ExtractPascalNameByRegex(newTagName);
+                        fileNameInfo.TocName = newTagName;
                         RootJObj["x-internal-operation-group-name"] = newTagName;
                     }
 
