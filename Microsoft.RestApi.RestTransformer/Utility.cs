@@ -132,11 +132,11 @@
 
         public static string ContactDescription(string str1, string str2)
         {
-            var description = string.Concat(str1, "\n", str2);
+            var description = string.Concat(str1, "\n\n", str2);
             return description.Trim('\n').Replace("\r\n", "\n");
         }
 
-        public static string GetDescription(DefinitionProperty definitionProperty)
+        public static string GetDefinitionPropertyDescription(DefinitionProperty definitionProperty)
         {
             string description = ContactDescription(definitionProperty.Title, definitionProperty.Description);
             if (definitionProperty.DefinitionObjectType != DefinitionObjectType.Array)
@@ -154,9 +154,13 @@
             }
         }
 
-        public static string GetDescription(Definition definition)
+        public static string GetDefinitionDescription(Definition definition)
         {
-           return ContactDescription(definition.Title, definition.Description);
+            if (string.IsNullOrEmpty(definition.Title))
+            {
+                return definition.Description;
+            }
+            return definition.Title;
         }
 
         public static string GetStatusCodeString(string statusCode)

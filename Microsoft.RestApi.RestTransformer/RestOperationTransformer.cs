@@ -715,7 +715,7 @@
                     parameters.Add(new ParameterEntity
                     {
                         Name = property.Name,
-                        Description = Utility.GetDescription(property),
+                        Description = Utility.GetDefinitionPropertyDescription(property),
                         IsRequired = property.IsRequired,
                         IsReadOnly = property.IsReadOnly,
                         Types = types,
@@ -877,7 +877,7 @@
                             definitions.Add(new DefinitionEntity
                             {
                                 Name = selfDefinition.Name,
-                                Description = Utility.GetDescription(selfDefinition),
+                                Description = Utility.GetDefinitionDescription(selfDefinition),
                                 Kind = "enum",
                                 ParameterItems = selfDefinition.EnumValues.Select(p => new DefinitionParameterEntity
                                 {
@@ -899,7 +899,7 @@
                             definitions.Add(new DefinitionEntity
                             {
                                 Name = selfDefinition.Name,
-                                Description = Utility.GetDescription(selfDefinition),
+                                Description = Utility.GetDefinitionDescription(selfDefinition),
                                 Kind = "object",
                                 ParameterItems = parameters?.Select(p => new DefinitionParameterEntity
                                 {
