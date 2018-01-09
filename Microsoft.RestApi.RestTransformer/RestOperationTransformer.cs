@@ -202,7 +202,7 @@
 
             pathEntities.Add(new PathEntity
             {
-                Content = $"{viewModel.OperationName.ToUpper()} {scheme}://{Utility.GetHostWithBasePath(host, basePath)}{requiredPath}",
+                Content = $"{viewModel.OperationName.ToUpper()} {Utility.ResolveScheme(scheme)}{Utility.GetHostWithBasePath(host, basePath)}{requiredPath}",
                 IsOptional = false
             });
 
@@ -214,7 +214,7 @@
 
                 pathEntities.Add(new PathEntity
                 {
-                    Content = $"{viewModel.OperationName.ToUpper()} {scheme}://{Utility.GetHostWithBasePath(host, basePath)}{optionPath}",
+                    Content = $"{viewModel.OperationName.ToUpper()} {Utility.ResolveScheme(scheme)}{Utility.GetHostWithBasePath(host, basePath)}{optionPath}",
                     IsOptional = true
                 });
             }

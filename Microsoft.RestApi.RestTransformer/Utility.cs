@@ -211,6 +211,15 @@
             return $"{host}/{basePath}";
         }
 
+        public static string ResolveScheme(string scheme)
+        {
+            if (string.IsNullOrEmpty(scheme))
+            {
+                return $"{scheme://}";
+            }
+            return string.Empty;
+        }
+
         public static string GetHostWithBasePathUId(string host, string basePath)
         {
             basePath = basePath?.Trim('/');
