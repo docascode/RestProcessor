@@ -215,7 +215,7 @@
         {
             if (!string.IsNullOrEmpty(scheme))
             {
-                return $"{scheme://}";
+                return $"{scheme}://";
             }
             return string.Empty;
         }
