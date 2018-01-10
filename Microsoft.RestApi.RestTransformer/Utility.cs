@@ -213,7 +213,7 @@
 
         public static string ResolveScheme(string scheme)
         {
-            if (string.IsNullOrEmpty(scheme))
+            if (!string.IsNullOrEmpty(scheme))
             {
                 return $"{scheme://}";
             }
