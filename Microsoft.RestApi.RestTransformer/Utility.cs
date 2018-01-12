@@ -74,7 +74,7 @@
 
         public static string GetScheme(Dictionary<string, object> metadata)
         {
-            var defaultScheme = "https";
+            var defaultScheme = string.Empty;
             var schemes = metadata.GetValueFromMetaData<JArray>("schemes");
             if(schemes != null)
             {
