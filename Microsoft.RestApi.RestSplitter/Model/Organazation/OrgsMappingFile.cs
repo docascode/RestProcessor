@@ -27,7 +27,7 @@
         public int SplitOperationCountGreaterThan { get; set; }
 
         [JsonProperty("use_yaml_schema")]
-        public bool UseYamlSchema { get; set; } = false;
+        public bool UseYamlSchema { get; set; } = true;
 
         [JsonProperty("convert_yaml_to_json")]
         public bool ConvertYamlToJson { get; set; } = true;
