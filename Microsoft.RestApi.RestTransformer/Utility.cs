@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using Microsoft.DocAsCode.DataContracts.RestApi;
     using Microsoft.RestApi.Common;
     using Microsoft.RestApi.RestTransformer.Models;
 
@@ -86,6 +87,12 @@
                 
             }
             return defaultScheme;
+        }
+
+        public static string GetApiVersion(RestApiChildItemViewModel child, string defaultApiVersion)
+        {
+            string apiVersion = child.Metadata.GetValueFromMetaData<string>("x-ms-version");
+            return string.IsNullOrEmpty(apiVersion) ? defaultApiVersion : apiVersion;
         }
 
         public static Tuple<string, List<ParameterEntity>> GetHostWithParameters(string host, Dictionary<string, object> metadata, Dictionary<string, object> pathMetadata)

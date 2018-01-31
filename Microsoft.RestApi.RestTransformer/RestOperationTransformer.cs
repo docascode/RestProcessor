@@ -18,7 +18,7 @@
             var hostWithParameters = Utility.GetHostWithParameters(swaggerModel.Host, swaggerModel.Metadata, viewModel.Metadata);
             var host = hostWithParameters.Item1;
             var hostParameters = hostWithParameters.Item2;
-            var apiVersion = swaggerModel.Info.Version;
+            var apiVersion = Utility.GetApiVersion(viewModel, swaggerModel.Info.Version);
 
             var allDefinitionObjects = GetAllDefinitionObjects(swaggerModel);
             var allDefinitions = GetAllDefinitions(allDefinitionObjects);
