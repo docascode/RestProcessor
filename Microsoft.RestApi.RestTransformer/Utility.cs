@@ -139,9 +139,22 @@
 
         public static string ContactDescription(string str1, string str2)
         {
-            // two whitespaces and one enter, will parse to <br>
-            var description = string.Concat(str1, "  \n", str2);
-            return description.Trim('\n').Replace("\r\n", "\n");
+            var description = string.Empty;
+            if (string.IsNullOrEmpty(str1))
+            {
+                description = str2;
+            }
+            else if (string.IsNullOrEmpty(str2))
+            {
+                description = str1;
+            }
+            else
+            {
+                // two whitespaces and one enter, will parse to <br>
+                description = string.IsNullOrEmpty(str1) ? str2 : string.Concat(str1, "  \n", str2);
+            }
+           
+            return description?.Trim('\n')?.Replace("\r\n", "\n");
         }
 
         public static string GetDefinitionPropertyDescription(DefinitionProperty definitionProperty)
