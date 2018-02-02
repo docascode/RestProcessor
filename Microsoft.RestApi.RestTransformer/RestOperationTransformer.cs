@@ -547,6 +547,11 @@
                             allDefinitionObjects.Add(flattenDefinitionObject);
                         }
                     }
+                    var indexOfDefinitionObject = allDefinitionObjects.FindIndex(d => d.Type == definitionObject.Type);
+                    if (indexOfDefinitionObject > -1)
+                    {
+                        allDefinitionObjects[indexOfDefinitionObject] = definitionObject;
+                    }
                 }
             }
 
@@ -791,7 +796,6 @@
                 }
             }
 
-            // may be there should be change.
             var resolvedDefinitions = GetAllDefinitions(definitionObjects);
             foreach (var resolvedDefinition in resolvedDefinitions)
             {
