@@ -363,16 +363,26 @@
 
         #region Example
 
-        private static string GetExampleRequestUri(IList<PathEntity> paths, Dictionary<string, object> parameters)
+        private static string GetExampleRequestUri(IList<PathEntity> paths, Dictionary<string, object> msExampleParameters, IList<ParameterEntity> parameters)
         {
             var pathContent = Helper.GetOptionalFullPath(paths);
-            if (parameters != null)
+            if (msExampleParameters != null)
             {
-                foreach (var parameter in parameters)
+                foreach (var parameter in msExampleParameters)
                 {
                     if (pathContent != null && pathContent.Contains($"{{{parameter.Key}}}"))
                     {
                         pathContent = pathContent?.Replace($"{{{parameter.Key}}}", Convert.ToString(parameter.Value));
+                    }
+                }
+            }
+            if (parameters != null)
+            {
+                foreach (var parameter in parameters)
+                {
+                    if (!parameter.IsRequired && pathContent != null && pathContent.Contains($"{{{parameter.Name}}}"))
+                    {
+                        pathContent = pathContent?.Replace($"/{{{parameter.Name}}}", string.Empty);
                     }
                 }
             }
@@ -386,6 +396,7 @@
                 }
                 pathContent = string.Join("?", contents);
             }
+
             return pathContent;
         }
 
@@ -506,7 +517,7 @@
                         Name = msExample.Key,
                         ExampleRequest = new ExampleRequestEntity
                         {
-                            RequestUri = GetExampleRequestUri(paths, msExampleParameters),
+                            RequestUri = GetExampleRequestUri(paths, msExampleParameters, parameters),
                             Headers = GetExampleRequestHeader(msExampleParameters, parameters.Where(p => p.In == "header").ToList()),
                             RequestBody = GetExampleRequestBody(msExampleParameters, parameters.Where(p => p.In == "body").ToList(), bodyDefinitionObject),
                         },
