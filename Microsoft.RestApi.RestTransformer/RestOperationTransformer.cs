@@ -517,7 +517,7 @@
                         Name = msExample.Key,
                         ExampleRequest = new ExampleRequestEntity
                         {
-                            RequestUri = GetExampleRequestUri(paths, msExampleParameters, parameters),
+                            RequestUri = GetExampleRequestUri(paths, msExampleParameters, parameters.Where(p => p.In == "path").ToList()),
                             Headers = GetExampleRequestHeader(msExampleParameters, parameters.Where(p => p.In == "header").ToList()),
                             RequestBody = GetExampleRequestBody(msExampleParameters, parameters.Where(p => p.In == "body").ToList(), bodyDefinitionObject),
                         },
