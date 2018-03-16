@@ -15,5 +15,8 @@
 
         [JsonProperty("operation_group_mapping")]
         public OperationGroupMapping OperationGroupMapping { get; set; }
+
+        [JsonProperty("version")]
+        public string Version { get; set; }
     }
 }

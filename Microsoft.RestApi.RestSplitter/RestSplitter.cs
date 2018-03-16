@@ -40,7 +40,26 @@
             GenerateAutoPage(_targetRootDir, _mappingFile);
 
             // Write toc structure from OrgsMappingFile
-            WriteToc(_sourceRootDir, _targetRootDir, _mappingFile);
+            var targetApiDir = GetApiDirectory(_targetRootDir, _mappingFile.TargetApiRootDir);
+            if (_mappingFile.VersionList != null)
+            {
+                // Generate with version infos
+                foreach (var version in _mappingFile.VersionList)
+                {
+                    var targetApiVersionDir = Path.Combine(targetApiDir, version);
+                    Directory.CreateDirectory(targetApiVersionDir);
+                    if (!targetApiVersionDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
+                    {
+                        targetApiVersionDir = targetApiVersionDir + Path.DirectorySeparatorChar;
+                    }
+                    WriteToc(_sourceRootDir, _targetRootDir, _mappingFile, targetApiVersionDir, version);
+                }
+            }
+            else
+            {
+                // Generate with no version info
+                WriteToc(_sourceRootDir, _targetRootDir, _mappingFile, targetApiDir, null);
+            }
 
             return _restFileInfos;
         }
@@ -113,10 +132,10 @@
             }
         }
 
-        private static void WriteToc(string sourceRootDir, string targetRootDir, OrgsMappingFile orgsMappingFile)
+        private static void WriteToc(string sourceRootDir, string targetRootDir, OrgsMappingFile orgsMappingFile, string targetApiVersionDir, string version)
         {
-            var targetApiDir = GetApiDirectory(targetRootDir, orgsMappingFile.TargetApiRootDir);
-            var targetTocPath = Path.Combine(targetApiDir, TocFileName);
+            var targetTocPath = Path.Combine(targetApiVersionDir, TocFileName);
+
             var mappingConfig = new MappingConfig
             {
                 IsOperationLevel = orgsMappingFile.IsOperationLevel,
@@ -137,7 +156,7 @@
                         throw new InvalidOperationException("Target file of apis page options should not be null or empty.");
                     }
                     var targetIndexPath = Path.Combine(targetRootDir, orgsMappingFile.ApisPageOptions.TargetFile);
-                    writer.WriteLine($"# [{orgsMappingFile.ApisPageOptions.TocTitle}]({FileUtility.GetRelativePath(targetIndexPath, targetApiDir)})");
+                    writer.WriteLine($"# [{orgsMappingFile.ApisPageOptions.TocTitle}]({FileUtility.GetRelativePath(targetIndexPath, targetApiVersionDir)})");
                 }
 
                 // Write organization info
@@ -149,13 +168,13 @@
                     {
                         // Write index
                         writer.WriteLine(!string.IsNullOrEmpty(orgInfo.OrgIndex)
-                            ? $"# [{orgInfo.OrgName}]({GenerateIndexHRef(targetRootDir, orgInfo.OrgIndex, targetApiDir)})"
+                            ? $"# [{orgInfo.OrgName}]({GenerateIndexHRef(targetRootDir, orgInfo.OrgIndex, targetApiVersionDir)})"
                             : $"# {orgInfo.OrgName}");
                         subTocPrefix = "#";
                     }
                     else if (orgsMappingFile.ApisPageOptions?.EnableAutoGenerate != true && !string.IsNullOrEmpty(orgInfo.DefaultTocTitle) && !string.IsNullOrEmpty(orgInfo.OrgIndex))
                     {
-                        writer.WriteLine($"# [{orgInfo.DefaultTocTitle}]({GenerateIndexHRef(targetRootDir, orgInfo.OrgIndex, targetApiDir)})");
+                        writer.WriteLine($"# [{orgInfo.DefaultTocTitle}]({GenerateIndexHRef(targetRootDir, orgInfo.OrgIndex, targetApiVersionDir)})");
                     }
 
                     // Sort by service name
@@ -167,21 +186,21 @@
                         // 1. Top toc
                         Console.WriteLine($"Created conceptual toc item '{service.TocTitle}'");
                         writer.WriteLine(!string.IsNullOrEmpty(service.IndexFile)
-                            ? $"{subTocPrefix}# [{service.TocTitle}]({GenerateIndexHRef(targetRootDir, service.IndexFile, targetApiDir)})"
+                            ? $"{subTocPrefix}# [{service.TocTitle}]({GenerateIndexHRef(targetRootDir, service.IndexFile, targetApiVersionDir)})"
                             : $"{subTocPrefix}# {service.TocTitle}");
 
                         // 2. Parse and split REST swaggers
                         var subTocDict = new SortedDictionary<string, List<SwaggerToc>>();
                         if (service.SwaggerInfo != null)
                         {
-                            subTocDict = SplitSwaggers(sourceRootDir, targetApiDir, service, mappingConfig);
+                            subTocDict = SplitSwaggers(sourceRootDir, targetApiVersionDir, service, mappingConfig, version);
                         }
 
                         // 3. Conceptual toc
                         List<string> tocLines = null;
                         if (!string.IsNullOrEmpty(service.TocFile))
                         {
-                            tocLines = GenerateDocTocItems(targetRootDir, service.TocFile, targetApiDir).Where(i => !string.IsNullOrEmpty(i)).ToList();
+                            tocLines = GenerateDocTocItems(targetRootDir, service.TocFile, targetApiVersionDir).Where(i => !string.IsNullOrEmpty(i)).ToList();
                             if (tocLines.Any())
                             {
                                 foreach (var tocLine in tocLines)
@@ -231,55 +250,58 @@
             }
         }
 
-        private static SortedDictionary<string, List<SwaggerToc>> SplitSwaggers(string sourceRootDir, string targetApiDir, ServiceInfo service, MappingConfig mappingConfig)
+        private static SortedDictionary<string, List<SwaggerToc>> SplitSwaggers(string sourceRootDir, string targetApiVersionDir, ServiceInfo service, MappingConfig mappingConfig, string version)
         {
             var subTocDict = new SortedDictionary<string, List<SwaggerToc>>();
 
             foreach (var swagger in service.SwaggerInfo)
             {
-                var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiDir, service.UrlGroup));
-                var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
-
-                var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, service.TocTitle, swagger.OperationGroupMapping, mappingConfig);
-
-                if (restFileInfo == null)
+                if (version == null || string.Equals(swagger.Version, version))
                 {
-                    continue;
-                }
-                _restFileInfos.Add(restFileInfo);
+                    var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiVersionDir, service.UrlGroup));
+                    var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
 
-                var tocTitle = Utility.ExtractPascalNameByRegex(restFileInfo.TocTitle);
+                    var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, service.TocTitle, swagger.OperationGroupMapping, mappingConfig);
 
-                var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;
-                List<SwaggerToc> subTocList;
-                if (!subTocDict.TryGetValue(subGroupName, out subTocList))
-                {
-                    subTocList = new List<SwaggerToc>();
-                    subTocDict.Add(subGroupName, subTocList);
-                }
-
-                foreach (var fileNameInfo in restFileInfo.FileNameInfos)
-                {
-                    var subTocTitle = fileNameInfo.TocName;
-                    var filePath = FileUtility.NormalizePath(Path.Combine(service.UrlGroup, fileNameInfo.FileName));
-
-                    if (subTocList.Any(toc => toc.Title == subTocTitle))
+                    if (restFileInfo == null)
                     {
-                        throw new InvalidOperationException($"Sub toc '{subTocTitle}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{swagger.Source}' to avoid conflicting");
+                        continue;
+                    }
+                    _restFileInfos.Add(restFileInfo);
+
+                    var tocTitle = Utility.ExtractPascalNameByRegex(restFileInfo.TocTitle);
+
+                    var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;
+                    List<SwaggerToc> subTocList;
+                    if (!subTocDict.TryGetValue(subGroupName, out subTocList))
+                    {
+                        subTocList = new List<SwaggerToc>();
+                        subTocDict.Add(subGroupName, subTocList);
                     }
 
-                    var childrenToc = new List<SwaggerToc>();
-                    if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
+                    foreach (var fileNameInfo in restFileInfo.FileNameInfos)
                     {
-                        foreach (var nameInfo in fileNameInfo.ChildrenFileNameInfo)
+                        var subTocTitle = fileNameInfo.TocName;
+                        var filePath = FileUtility.NormalizePath(Path.Combine(service.UrlGroup, fileNameInfo.FileName));
+
+                        if (subTocList.Any(toc => toc.Title == subTocTitle))
                         {
-                            childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, nameInfo.FileName))));
+                            throw new InvalidOperationException($"Sub toc '{subTocTitle}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{swagger.Source}' to avoid conflicting");
                         }
-                    }
 
-                    subTocList.Add(new SwaggerToc(subTocTitle, filePath, childrenToc));
+                        var childrenToc = new List<SwaggerToc>();
+                        if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
+                        {
+                            foreach (var nameInfo in fileNameInfo.ChildrenFileNameInfo)
+                            {
+                                childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, nameInfo.FileName))));
+                            }
+                        }
+
+                        subTocList.Add(new SwaggerToc(subTocTitle, filePath, childrenToc));
+                    }
+                    Console.WriteLine($"Done splitting swagger file from '{swagger.Source}' to '{service.UrlGroup}'");
                 }
-                Console.WriteLine($"Done splitting swagger file from '{swagger.Source}' to '{service.UrlGroup}'");
             }
 
             return subTocDict;
@@ -302,7 +324,7 @@
             return targetApiDir;
         }
 
-        private static IEnumerable<string> GenerateDocTocItems(string targetRootDir, string tocRelativePath, string targetApiDir)
+        private static IEnumerable<string> GenerateDocTocItems(string targetRootDir, string tocRelativePath, string targetApiVersionDir)
         {
             var tocPath = Path.Combine(targetRootDir, tocRelativePath);
             if (!File.Exists(tocPath))
@@ -314,7 +336,7 @@
             {
                 throw new InvalidOperationException($"Currently only '{TocFileName}' is supported as conceptual toc, please update the toc path '{tocRelativePath}'.");
             }
-            var tocRelativeDirectoryToApi = FileUtility.GetRelativePath(Path.GetDirectoryName(tocPath), targetApiDir);
+            var tocRelativeDirectoryToApi = FileUtility.GetRelativePath(Path.GetDirectoryName(tocPath), targetApiVersionDir);
 
             foreach (var tocLine in File.ReadLines(tocPath))
             {
@@ -332,10 +354,10 @@
                         var tocTitle = match.Groups["tocTitle"].Value;
                         var headerLevel = match.Groups["headerLevel"].Value.Length;
                         var tocLinkRelativePath = tocRelativeDirectoryToApi + "/" + tocLink;
-                        var linkPath = Path.Combine(targetApiDir, tocLinkRelativePath);
+                        var linkPath = Path.Combine(targetApiVersionDir, tocLinkRelativePath);
                         if (!File.Exists(linkPath))
                         {
-                            throw new FileNotFoundException($"Link '{tocLinkRelativePath}' not exist in '{tocRelativePath}', when merging into '{TocFileName}' of '{targetApiDir}'");
+                            throw new FileNotFoundException($"Link '{tocLinkRelativePath}' not exist in '{tocRelativePath}', when merging into '{TocFileName}' of '{targetApiVersionDir}'");
                         }
                         yield return $"{new string('#', headerLevel)} [{tocTitle}]({tocLinkRelativePath})";
                     }
@@ -347,14 +369,14 @@
             }
         }
 
-        private static string GenerateIndexHRef(string targetRootDir, string indexRelativePath, string targetApiDir)
+        private static string GenerateIndexHRef(string targetRootDir, string indexRelativePath, string targetApiVersionDir)
         {
             var indexPath = Path.Combine(targetRootDir, indexRelativePath);
             if (!File.Exists(indexPath))
             {
                 throw new FileNotFoundException($"Index file '{indexPath}' not exists.");
             }
-            return FileUtility.GetRelativePath(indexPath, targetApiDir);
+            return FileUtility.GetRelativePath(indexPath, targetApiVersionDir);
         }
 
         private static string IncreaseSharpCharacter(string str)
