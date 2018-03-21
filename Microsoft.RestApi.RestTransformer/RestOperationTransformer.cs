@@ -1235,7 +1235,7 @@
                     var items = new List<DefinitionObject>();
                     foreach (var item in definitionObject.PropertyItems)
                     {
-                        if (!item.IsFlatten)
+                        if (!item.IsFlatten || (item.DefinitionObjectType == DefinitionObjectType.Simple && !string.IsNullOrEmpty(item.AdditionalType)))
                         {
                             items.Add(item);
                         }
