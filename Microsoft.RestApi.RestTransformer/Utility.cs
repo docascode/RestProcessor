@@ -91,7 +91,7 @@
 
         public static string GetApiVersion(RestApiChildItemViewModel child, string defaultApiVersion)
         {
-            string apiVersion = child.Metadata.GetValueFromMetaData<string>("x-ms-version");
+            string apiVersion = child.Metadata.GetValueFromMetaData<string>("x-ms-docs-override-version");
             return string.IsNullOrEmpty(apiVersion) ? defaultApiVersion : apiVersion;
         }
 
