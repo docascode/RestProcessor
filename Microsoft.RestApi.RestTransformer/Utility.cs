@@ -209,7 +209,7 @@
             {
                 return null;
             }
-            return value.Replace(" ", "").Trim('.');
+            return value.Replace("/", ".").Replace("\\", ".").Replace(" ", "").Trim('.');
         }
 
         public static string FirstLetterToUpper(this string str)
@@ -240,9 +240,13 @@
             return string.Empty;
         }
 
-        public static string GetHostWithBasePathUId(string host, string basePath)
+        public static string GetHostWithBasePathUId(string host, string productId, string basePath)
         {
             basePath = basePath?.Trim('/');
+            if (!string.IsNullOrEmpty(productId))
+            {
+                host = productId;
+            }
             if (string.IsNullOrEmpty(basePath))
             {
                 return host;

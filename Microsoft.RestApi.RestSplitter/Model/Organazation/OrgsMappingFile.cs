@@ -40,5 +40,8 @@
 
         [JsonProperty("version_list")]
         public List<string> VersionList { get; set; }
+
+        [JsonProperty("uid_product_name")]
+        public string ProductUid { get; set; }
     }
 }

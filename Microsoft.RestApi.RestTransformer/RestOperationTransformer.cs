@@ -12,7 +12,7 @@
 
     public class RestOperationTransformer
     {
-        public static OperationEntity Transform(SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel)
+        public static OperationEntity Transform(SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel, string productUid)
         {
             var scheme = Utility.GetScheme(swaggerModel.Metadata);
             var hostWithParameters = Utility.GetHostWithParameters(swaggerModel.Host, swaggerModel.Metadata, viewModel.Metadata);
@@ -38,7 +38,7 @@
 
             return new OperationEntity
             {
-                Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
+                Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
                 Name = operationName,
                 Service = serviceName,
                 Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description),
@@ -1235,7 +1235,7 @@
                     var items = new List<DefinitionObject>();
                     foreach (var item in definitionObject.PropertyItems)
                     {
-                        if (!item.IsFlatten)
+                        if (!item.IsFlatten || (item.DefinitionObjectType == DefinitionObjectType.Simple && !string.IsNullOrEmpty(item.AdditionalType)))
                         {
                             items.Add(item);
                         }
