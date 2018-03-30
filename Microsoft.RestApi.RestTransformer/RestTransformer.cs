@@ -12,7 +12,7 @@
     {
         public static readonly YamlSerializer YamlSerializer = new YamlSerializer();
 
-        public static void Process(string filePath, SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel, string folder)
+        public static void Process(string filePath, SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel, string folder, string productUid = null)
         {
             if (viewModel.Metadata.TryGetValue("x-internal-split-type", out var fileType))
             {
@@ -20,7 +20,7 @@
                 if (currentFileType == "OperationGroup" || currentFileType == "TagGroup")
                 {
                     var restGroupTransformer = RestGroupTransformerFactory.CreateRestGroupTransformer(currentFileType);
-                    var groupInfo = restGroupTransformer.Transform(swaggerModel, viewModel, folder);
+                    var groupInfo = restGroupTransformer.Transform(swaggerModel, viewModel, folder, productUid);
                     if (groupInfo != null)
                     {
                         using (var writer = new StreamWriter(filePath))
@@ -47,7 +47,7 @@
                 {
                     if (viewModel.Children?.Count == 1)
                     {
-                        var operationInfo = RestOperationTransformer.Transform(swaggerModel, viewModel.Children.First());
+                        var operationInfo = RestOperationTransformer.Transform(swaggerModel, viewModel.Children.First(), productUid);
                         if (operationInfo != null)
                         {
                             using (var writer = new StreamWriter(filePath))
