@@ -19,6 +19,8 @@
             NullValueHandling = NullValueHandling.Ignore,
             Formatting = Formatting.Indented
         };
+        private static OrgsMappingFile MappingFile;
+
 
         static int Main(string[] args)
         {
@@ -33,15 +35,15 @@
                 {
                     throw new ArgumentException($"mappingFilePath '{ args[2]}' should exist.");
                 }
-                var mappingFile = JsonUtility.ReadFromFile<OrgsMappingFile>(args[2]);
-                if (mappingFile.ConvertYamlToJson)
+                MappingFile = JsonUtility.ReadFromFile<OrgsMappingFile>(args[2]);
+                if (MappingFile.ConvertYamlToJson)
                 {
-                    mappingFile = YamlConverter.ConvertYamls(args[0], mappingFile);
+                    MappingFile = YamlConverter.ConvertYamls(args[0], MappingFile);
                 }
 
-                var restFileInfos = RestSpliter(args[0], args[1], mappingFile);
+                var restFileInfos = RestSpliter(args[0], args[1], MappingFile);
 
-                if (mappingFile.UseYamlSchema)
+                if (MappingFile.UseYamlSchema)
                 {
                     RestProcessor(restFileInfos);
                 }
@@ -104,7 +106,7 @@
                     var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.yml");
                     try
                     {
-                        RestTransformer.Process(ymlPath, swaggerModel, viewModel, folder);
+                        RestTransformer.Process(ymlPath, swaggerModel, viewModel, folder, MappingFile.ProductUid);
                         Console.WriteLine($"Done generate yml model for {ymlPath}");
                     }
                     catch (Exception ex)
