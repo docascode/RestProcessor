@@ -19,5 +19,8 @@
 
         [JsonProperty("services")]
         public List<ServiceInfo> Services { get; set; }
+
+        [JsonProperty("version")]
+        public string Version { get; set; }
     }
 }
