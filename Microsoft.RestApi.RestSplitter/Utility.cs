@@ -186,6 +186,15 @@
             return result.ToString();
         }
 
+        public static string TrimSubGroupName(this string groupName)
+        {
+            if (string.IsNullOrEmpty(groupName))
+            {
+                return string.Empty;
+            }
+            return groupName.Replace(" ", "").Trim().ToLower();
+        }
+
         private static string GetClosestUpperCaseWord(string word, int index)
         {
             var result = new StringBuilder();
