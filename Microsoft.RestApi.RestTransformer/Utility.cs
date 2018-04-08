@@ -132,7 +132,7 @@
             var content = summary;
             if (!string.IsNullOrEmpty(description) && summary != description)
             {
-                content = string.IsNullOrEmpty(summary) ? description : $"{summary} {description}";
+                content = string.IsNullOrEmpty(summary) ? description : $"{summary} <br/> {description}";
             }
             return content;
         }
