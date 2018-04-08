@@ -259,7 +259,8 @@
 
             foreach (var swagger in service.SwaggerInfo)
             {
-                var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiVersionDir, service.UrlGroup));
+                var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;
+                var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiVersionDir, service.UrlGroup, subGroupName.TrimSubGroupName()));
                 var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
 
                 var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, service.TocTitle, swagger.OperationGroupMapping, mappingConfig);
@@ -271,8 +272,6 @@
                 _restFileInfos.Add(restFileInfo);
 
                 var tocTitle = Utility.ExtractPascalNameByRegex(restFileInfo.TocTitle);
-
-                var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;
                 List<SwaggerToc> subTocList;
                 if (!subTocDict.TryGetValue(subGroupName, out subTocList))
                 {
