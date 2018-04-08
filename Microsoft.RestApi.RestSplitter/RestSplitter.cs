@@ -282,7 +282,7 @@
                 foreach (var fileNameInfo in restFileInfo.FileNameInfos)
                 {
                     var subTocTitle = fileNameInfo.TocName;
-                    var filePath = FileUtility.NormalizePath(Path.Combine(service.UrlGroup, fileNameInfo.FileName));
+                    var filePath = FileUtility.NormalizePath(Path.Combine(service.UrlGroup, subGroupName.TrimSubGroupName(), fileNameInfo.FileName));
 
                     if (subTocList.Any(toc => toc.Title == subTocTitle))
                     {
@@ -294,7 +294,7 @@
                     {
                         foreach (var nameInfo in fileNameInfo.ChildrenFileNameInfo)
                         {
-                            childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, nameInfo.FileName))));
+                            childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, subGroupName.TrimSubGroupName(), nameInfo.FileName))));
                         }
                     }
 
