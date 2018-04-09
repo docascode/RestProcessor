@@ -160,19 +160,19 @@
         public static string GetDefinitionPropertyDescription(DefinitionProperty definitionProperty)
         {
             string description = ContactDescription(definitionProperty.Title, definitionProperty.Description);
-            if (definitionProperty.DefinitionObjectType != DefinitionObjectType.Array)
+            if (!string.IsNullOrEmpty(description))
             {
                 return description;
             }
-            else
+            else if (definitionProperty.DefinitionObjectType == DefinitionObjectType.Array)
             {
                 var subDescription = ContactDescription(definitionProperty.SubTitle, definitionProperty.SubDescription);
-                if (string.IsNullOrEmpty(subDescription))
+                if (!string.IsNullOrEmpty(subDescription))
                 {
-                    return description;
+                    return subDescription;
                 }
-                return subDescription;
             }
+            return string.Empty;
         }
 
         public static string GetDefinitionDescription(Definition definition)
