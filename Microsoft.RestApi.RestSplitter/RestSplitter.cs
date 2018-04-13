@@ -215,10 +215,10 @@
                             }
 
                             // 4. Write REST toc
-                            if (service.SwaggerInfo != null)
+                            if (service.SwaggerInfo?.Count > 0)
                             {
                                 var subRefTocPrefix = string.Empty;
-                                if (tocLines != null && tocLines.Count > 0)
+                                if (tocLines?.Count > 0)
                                 {
                                     subRefTocPrefix = IncreaseSharpCharacter(subRefTocPrefix);
                                     writer.WriteLine($"{subTocPrefix}#{subRefTocPrefix} Reference");
