@@ -500,6 +500,12 @@
             return exampleResponses;
         }
 
+        private static string GetRequestUrl(Dictionary<string, object> msExampleValue)
+        {
+            return msExampleValue.GetValueFromMetaData<string>("x-ms-vss-request-url");
+        }
+      
+
         private static IList<ExampleEntity> TransformExamples(RestApiChildItemViewModel viewModel, IList<PathEntity> paths, IList<ParameterEntity> parameters, DefinitionObject bodyDefinitionObject)
         {
             var examples = new List<ExampleEntity>();
@@ -512,12 +518,13 @@
                     var msExampleParameters = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("parameters");
                     var msExampleResponses = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("responses");
 
+                    var requestUri = GetRequestUrl(msExampleValue);
                     var example = new ExampleEntity
                     {
                         Name = msExample.Key,
                         ExampleRequest = new ExampleRequestEntity
                         {
-                            RequestUri = GetExampleRequestUri(paths, msExampleParameters, parameters.Where(p => p.In == "path").ToList()),
+                            RequestUri = !string.IsNullOrEmpty(requestUri) ? requestUri : GetExampleRequestUri(paths, msExampleParameters, parameters.Where(p => p.In == "path").ToList()),
                             Headers = GetExampleRequestHeader(msExampleParameters, parameters.Where(p => p.In == "header").ToList()),
                             RequestBody = GetExampleRequestBody(msExampleParameters, parameters.Where(p => p.In == "body").ToList(), bodyDefinitionObject),
                         },
