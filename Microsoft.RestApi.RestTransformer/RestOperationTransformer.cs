@@ -120,7 +120,15 @@
                                             if (enumV != null && enumObject != null)
                                             {
                                                 enumObject.Description = keyValueEnum.GetValueFromMetaData<string>("description");
-                                                enumObject.Name = keyValueEnum.GetValueFromMetaData<string>("name");
+                                                var name = keyValueEnum.GetValueFromMetaData<string>("name");
+                                                if (string.IsNullOrEmpty(name))
+                                                {
+                                                    enumObject.Name = enumV;
+                                                }
+                                                else
+                                                {
+                                                    enumObject.Name = name;
+                                                }
                                             }
                                         }
                                     }
@@ -365,14 +373,14 @@
 
         private static string GetExampleRequestUri(IList<PathEntity> paths, Dictionary<string, object> msExampleParameters, IList<ParameterEntity> parameters)
         {
-            var pathContent = Helper.GetOptionalFullPath(paths);
+            var pathContent = Helper.GetOptionalFullPath(paths)?.ToLower();
             if (msExampleParameters != null)
             {
                 foreach (var parameter in msExampleParameters)
                 {
-                    if (pathContent != null && pathContent.Contains($"{{{parameter.Key}}}"))
+                    if (pathContent != null && pathContent.Contains($"{{{parameter.Key.ToLower()}}}"))
                     {
-                        pathContent = pathContent?.Replace($"{{{parameter.Key}}}", Convert.ToString(parameter.Value));
+                        pathContent = pathContent?.Replace($"{{{parameter.Key.ToLower()}}}", Convert.ToString(parameter.Value));
                     }
                 }
             }
@@ -380,9 +388,9 @@
             {
                 foreach (var parameter in parameters)
                 {
-                    if (!parameter.IsRequired && pathContent != null && pathContent.Contains($"{{{parameter.Name}}}"))
+                    if (!parameter.IsRequired && pathContent != null && pathContent.Contains($"{{{parameter.Name.ToLower()}}}"))
                     {
-                        pathContent = pathContent?.Replace($"/{{{parameter.Name}}}", string.Empty);
+                        pathContent = pathContent?.Replace($"/{{{parameter.Name.ToLower()}}}", string.Empty);
                     }
                 }
             }
@@ -1202,7 +1210,15 @@
                                     if (enumV != null && enumObject != null)
                                     {
                                         enumObject.Description = keyValueEnum.GetValueFromMetaData<string>("description");
-                                        enumObject.Name = keyValueEnum.GetValueFromMetaData<string>("name");
+                                        var name = keyValueEnum.GetValueFromMetaData<string>("name");
+                                        if (string.IsNullOrEmpty(name))
+                                        {
+                                            enumObject.Name = enumV;
+                                        }
+                                        else
+                                        {
+                                            enumObject.Name = name;
+                                        }
                                     }
                                 }
                             }
