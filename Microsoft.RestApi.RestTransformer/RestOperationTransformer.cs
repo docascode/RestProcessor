@@ -120,7 +120,8 @@
                                             if (enumV != null && enumObject != null)
                                             {
                                                 enumObject.Description = keyValueEnum.GetValueFromMetaData<string>("description");
-                                                enumObject.Name = keyValueEnum.GetValueFromMetaData<string>("name");
+                                                var name = keyValueEnum.GetValueFromMetaData<string>("name");
+                                                enumObject.Name = string.IsNullOrEmpty(name) ? enumV : name;
                                             }
                                         }
                                     }
@@ -1195,7 +1196,8 @@
                                     if (enumV != null && enumObject != null)
                                     {
                                         enumObject.Description = keyValueEnum.GetValueFromMetaData<string>("description");
-                                        enumObject.Name = keyValueEnum.GetValueFromMetaData<string>("name");
+                                        var name = keyValueEnum.GetValueFromMetaData<string>("name");
+                                        enumObject.Name = string.IsNullOrEmpty(name) ? enumV : name;
                                     }
                                 }
                             }
