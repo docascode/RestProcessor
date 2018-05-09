@@ -143,7 +143,8 @@
                 SplitOperationCountGreaterThan = orgsMappingFile.SplitOperationCountGreaterThan,
                 UseYamlSchema = orgsMappingFile.UseYamlSchema,
                 RemoveTagFromOperationId = orgsMappingFile.RemoveTagFromOperationId,
-                NeedResolveXMsPaths = orgsMappingFile.NeedResolveXMsPaths
+                NeedResolveXMsPaths = orgsMappingFile.NeedResolveXMsPaths,
+                UseServiceUrlGroup = orgsMappingFile.UseServiceUrlGroup
             };
 
             using (var writer = new StreamWriter(targetTocPath))
@@ -263,7 +264,7 @@
                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiVersionDir, service.UrlGroup, subGroupName.TrimSubGroupName()));
                 var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
 
-                var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, service.TocTitle, swagger.OperationGroupMapping, mappingConfig);
+                var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, mappingConfig.UseServiceUrlGroup ? service.UrlGroup : service.TocTitle, swagger.OperationGroupMapping, mappingConfig);
 
                 if (restFileInfo == null)
                 {

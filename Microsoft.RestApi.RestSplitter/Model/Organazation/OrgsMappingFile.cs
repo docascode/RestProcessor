@@ -43,5 +43,8 @@
 
         [JsonProperty("uid_product_name")]
         public string ProductUid { get; set; }
+
+        [JsonProperty("use_service_url_group")]
+        public bool UseServiceUrlGroup { get; set; }
     }
 }

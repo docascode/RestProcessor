@@ -13,5 +13,7 @@
         public bool RemoveTagFromOperationId { get; set; }
 
         public bool NeedResolveXMsPaths { get; set; }
+
+        public bool UseServiceUrlGroup { get; set; }
     }
 }
