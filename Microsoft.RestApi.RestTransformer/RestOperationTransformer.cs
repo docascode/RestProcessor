@@ -32,13 +32,14 @@
 
             var basePath = swaggerModel.BasePath;
             var paths = TransformPaths(viewModel, scheme, host, basePath, apiVersion, allSimpleParameters);
+            var serviceId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-id");
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
             var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
 
             return new OperationEntity
             {
-                Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
+                Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}.{operationName}")?.ToLower(),
                 Name = operationName,
                 Service = serviceName,
                 Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description),

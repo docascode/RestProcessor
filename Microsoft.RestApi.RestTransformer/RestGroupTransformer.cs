@@ -17,6 +17,7 @@
         
         public OperationGroupEntity Transform(SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel, string folder, string productUid = null)
         {
+            var serviceId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-id");
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
             var basePath = swaggerModel.BasePath;
@@ -40,14 +41,14 @@
                         var operationName = childSwaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
                         var operation = new Operation
                         {
-                            Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceName}.{groupName}.{operationName}")?.ToLower(),
+                            Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}.{operationName}")?.ToLower(),
                             Summary = Utility.GetSummary(model?.Summary, model?.Description)
                         };
                         operations.Add(operation);
                     }
                     return new OperationGroupEntity
                     {
-                        Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceName}.{groupName}")?.ToLower(),
+                        Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}")?.ToLower(),
                         ApiVersion = apiVersion,
                         Name = groupName,
                         Operations = operations,
