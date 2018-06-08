@@ -396,7 +396,14 @@
                     var queries = contents[1].Split('&');
                     contents[1] = string.Join("&", queries.Where(q => !q.Contains("={")));
                 }
-                pathContent = string.Join("?", contents);
+                if (string.IsNullOrEmpty(contents[1]))
+                {
+                    pathContent = contents[0];
+                }
+                else
+                {
+                    pathContent = string.Join("?", contents);
+                }
             }
 
             return pathContent;
