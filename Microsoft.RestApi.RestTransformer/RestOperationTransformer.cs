@@ -656,7 +656,7 @@
 
         private static IList<Definition> GetPolymorphicDefinitions(IList<Definition> allDefinitions, string baseType)
         {
-            return allDefinitions?.Where(d => d.AllOfTypes != null && d.AllOfTypes.Any(t => t == baseType)).ToList();
+            return allDefinitions?.Where(d => !string.IsNullOrEmpty(d.DiscriminatorValue) && d.AllOfTypes != null && d.AllOfTypes.Any(t => t == baseType)).ToList();
         }
 
         private static IList<ParameterEntity> GetDefinitionParameters(IList<Definition> allDefinitions, Definition definition, bool filterReadOnly = true)
