@@ -173,7 +173,6 @@
                             writer.WriteLine(!string.IsNullOrEmpty(orgInfo.OrgIndex)
                                 ? $"# [{orgInfo.OrgName}]({GenerateIndexHRef(targetRootDir, orgInfo.OrgIndex, targetApiVersionDir)})"
                                 : $"# {orgInfo.OrgName}");
-                            subTocPrefix = "#";
                         }
                         else if (orgsMappingFile.ApisPageOptions?.EnableAutoGenerate != true && !string.IsNullOrEmpty(orgInfo.DefaultTocTitle) && !string.IsNullOrEmpty(orgInfo.OrgIndex))
                         {
