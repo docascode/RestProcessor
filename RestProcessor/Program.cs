@@ -41,7 +41,7 @@
                     MappingFile = YamlConverter.ConvertYamls(args[0], MappingFile);
                 }
 
-                var restFileInfos = RestSpliter(args[0], args[1], MappingFile);
+                var restFileInfos = RestSpliter(args[0], args[1], MappingFile, args[2]);
 
                 if (MappingFile.UseYamlSchema)
                 {
@@ -56,7 +56,7 @@
             }
         }
 
-        public static IList<RestFileInfo> RestSpliter(string sourceRootDir, string targetRootDir, OrgsMappingFile mappingFile)
+        public static IList<RestFileInfo> RestSpliter(string sourceRootDir, string targetRootDir, OrgsMappingFile mappingFile, string outputDir)
         {
             if (!Directory.Exists(sourceRootDir))
             {
@@ -67,7 +67,7 @@
                 throw new ArgumentException($"{nameof(targetRootDir)} should not be null or empty.");
             }
 
-            var splitter = new RestSplitter(sourceRootDir, targetRootDir, mappingFile);
+            var splitter = new RestSplitter(sourceRootDir, targetRootDir, mappingFile, outputDir);
             var restFileInfos = splitter.Process();
             Console.WriteLine("Done processing all swagger files");
             return restFileInfos;
