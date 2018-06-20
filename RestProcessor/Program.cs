@@ -26,11 +26,12 @@
         {
             try
             {
-                if (args.Length != 3)
+                if (args.Length < 3)
                 {
-                    Console.WriteLine($"Usage: {AppDomain.CurrentDomain.FriendlyName} [source_root_directory] [target_root_directory] [mappingfile.json]");
+                    Console.WriteLine($"Usage: {AppDomain.CurrentDomain.FriendlyName} [source_root_directory] [target_root_directory] [mappingfile.json] [output_directory]");
                     return 1;
                 }
+
                 if (!File.Exists(args[2]))
                 {
                     throw new ArgumentException($"mappingFilePath '{ args[2]}' should exist.");
@@ -40,8 +41,8 @@
                 {
                     MappingFile = YamlConverter.ConvertYamls(args[0], MappingFile);
                 }
-
-                var restFileInfos = RestSpliter(args[0], args[1], MappingFile, args[2]);
+                var outputDir = args.Length < 4 ? Path.Combine(args[1], MappingFile.TargetApiRootDir) : args[3];
+                var restFileInfos = RestSpliter(args[0], args[1], MappingFile, outputDir);
 
                 if (MappingFile.UseYamlSchema)
                 {
