@@ -13,21 +13,24 @@
     {
         private readonly string _sourceRootDir;
         private readonly string _targetRootDir;
+        private readonly string _outputDir;
         private readonly OrgsMappingFile _mappingFile;
         private static IList<RestFileInfo> _restFileInfos;
 
         protected const string TocFileName = "toc.md";
         protected static readonly Regex TocRegex = new Regex(@"^(?<headerLevel>#+)(( |\t)*)\[(?<tocTitle>.+)\]\((?<tocLink>(?!http[s]?://).*?)\)( |\t)*#*( |\t)*(\n|$)", RegexOptions.Compiled);
 
-        public RestSplitter(string sourceRootDir, string targetRootDir, OrgsMappingFile mappingFile)
+        public RestSplitter(string sourceRootDir, string targetRootDir, OrgsMappingFile mappingFile, string outputDir)
         {
             Guard.ArgumentNotNullOrEmpty(sourceRootDir, nameof(sourceRootDir));
             Guard.ArgumentNotNullOrEmpty(targetRootDir, nameof(targetRootDir));
             Guard.ArgumentNotNull(mappingFile, nameof(mappingFile));
+            Guard.ArgumentNotNullOrEmpty(outputDir, nameof(outputDir));
 
             _sourceRootDir = sourceRootDir;
             _targetRootDir = targetRootDir;
             _mappingFile = mappingFile;
+            _outputDir = outputDir;
             _restFileInfos = new List<RestFileInfo>();
         }
 
@@ -40,7 +43,8 @@
             GenerateAutoPage(_targetRootDir, _mappingFile);
 
             // Write toc structure from OrgsMappingFile
-            var targetApiDir = GetApiDirectory(_targetRootDir, _mappingFile.TargetApiRootDir);
+            var targetApiDir = GetOutputDirectory(_outputDir);
+
             if (_mappingFile.VersionList != null)
             {
                 // Generate with version infos
@@ -173,6 +177,7 @@
                             writer.WriteLine(!string.IsNullOrEmpty(orgInfo.OrgIndex)
                                 ? $"# [{orgInfo.OrgName}]({GenerateIndexHRef(targetRootDir, orgInfo.OrgIndex, targetApiVersionDir)})"
                                 : $"# {orgInfo.OrgName}");
+                            subTocPrefix = "#";
                         }
                         else if (orgsMappingFile.ApisPageOptions?.EnableAutoGenerate != true && !string.IsNullOrEmpty(orgInfo.DefaultTocTitle) && !string.IsNullOrEmpty(orgInfo.OrgIndex))
                         {
@@ -306,21 +311,22 @@
             return subTocDict;
         }
 
-        private static string GetApiDirectory(string rootDirectory, string targetApiRootDir)
+        private static string GetOutputDirectory(string outputRootDir)
         {
-            var targetApiDir = Path.Combine(rootDirectory, targetApiRootDir);
-            if (Directory.Exists(targetApiDir))
+            Guard.ArgumentNotNullOrEmpty(outputRootDir, nameof(outputRootDir));
+
+            if (Directory.Exists(outputRootDir))
             {
-                // Clear last built target api folder
-                Directory.Delete(targetApiDir, true);
-                Console.WriteLine($"Done cleaning previous existing {targetApiDir}");
+                // Clear last built output folder
+                Directory.Delete(outputRootDir, true);
+                Console.WriteLine($"Done cleaning previous existing {outputRootDir}");
             }
-            Directory.CreateDirectory(targetApiDir);
-            if (!targetApiDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            Directory.CreateDirectory(outputRootDir);
+            if (!outputRootDir.EndsWith(Path.DirectorySeparatorChar.ToString()))
             {
-                targetApiDir = targetApiDir + Path.DirectorySeparatorChar;
+                outputRootDir = outputRootDir + Path.DirectorySeparatorChar;
             }
-            return targetApiDir;
+            return outputRootDir;
         }
 
         private static IEnumerable<string> GenerateDocTocItems(string targetRootDir, string tocRelativePath, string targetApiVersionDir)
