@@ -66,6 +66,10 @@
             {
                 throw new ArgumentException($"{nameof(targetRootDir)} should not be null or empty.");
             }
+            if (string.IsNullOrEmpty(outputDir))
+            {
+                throw new ArgumentException($"{nameof(outputDir)} should not be null or empty.");
+            }
 
             var splitter = new RestSplitter(sourceRootDir, targetRootDir, mappingFile, outputDir);
             var restFileInfos = splitter.Process();

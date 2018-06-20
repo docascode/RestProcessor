@@ -25,6 +25,7 @@
             Guard.ArgumentNotNullOrEmpty(sourceRootDir, nameof(sourceRootDir));
             Guard.ArgumentNotNullOrEmpty(targetRootDir, nameof(targetRootDir));
             Guard.ArgumentNotNull(mappingFile, nameof(mappingFile));
+            Guard.ArgumentNotNullOrEmpty(outputDir, nameof(outputDir));
 
             _sourceRootDir = sourceRootDir;
             _targetRootDir = targetRootDir;
