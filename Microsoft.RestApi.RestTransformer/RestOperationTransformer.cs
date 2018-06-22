@@ -1097,7 +1097,7 @@
                     var additionalType = additionalProperties.GetValueFromMetaData<string>("type");
                     var additionalPropertyProperties = additionalProperties.GetDictionaryFromMetaData<Dictionary<string, object>>("properties");
 
-                    if (additionalType == "object" && additionalPropertyProperties != null)
+                    if (additionalPropertyProperties != null)
                     {
                         var childDefinitionObject = new DefinitionObject();
                         definitionObject.AdditionalType = additionalProperties.GetValueFromMetaData<string>("x-internal-ref-name");
