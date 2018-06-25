@@ -855,20 +855,34 @@
             }
             foreach (var bodyProperty in bodyProperties)
             {
-                if (!string.IsNullOrEmpty(bodyProperty.Type)
+                if ((!string.IsNullOrEmpty(bodyProperty.Type) || !string.IsNullOrEmpty(bodyProperty.AdditionalType))
                     && (bodyProperty.DefinitionObjectType == DefinitionObjectType.Object || bodyProperty.DefinitionObjectType == DefinitionObjectType.Array)
                     && !typesQueue.Any(t => t == bodyProperty.Type))
                 {
-                    typesQueue.Enqueue(bodyProperty.Type);
+                    if (!string.IsNullOrEmpty(bodyProperty.AdditionalType))
+                    {
+                        typesQueue.Enqueue(bodyProperty.AdditionalType);
+                    }
+                    else
+                    {
+                        typesQueue.Enqueue(bodyProperty.Type);
+                    }
                 }
             }
             foreach (var responseDefinitionObject in responseDefinitionObjects)
             {
-                if (!string.IsNullOrEmpty(responseDefinitionObject.Type)
+                if ((!string.IsNullOrEmpty(responseDefinitionObject.Type) || !string.IsNullOrEmpty(responseDefinitionObject.AdditionalType))
                     && (responseDefinitionObject.DefinitionObjectType == DefinitionObjectType.Object || responseDefinitionObject.DefinitionObjectType == DefinitionObjectType.Array)
                     && !typesQueue.Any(t => t == responseDefinitionObject.Type))
                 {
-                    typesQueue.Enqueue(responseDefinitionObject.Type);
+                    if (!string.IsNullOrEmpty(responseDefinitionObject.AdditionalType))
+                    {
+                        typesQueue.Enqueue(responseDefinitionObject.AdditionalType);
+                    }
+                    else
+                    {
+                        typesQueue.Enqueue(responseDefinitionObject.Type);
+                    }
                 }
             }
 
@@ -940,7 +954,11 @@
 
                             foreach (var definitionProperty in selfDefinition.DefinitionProperties)
                             {
-                                if (!string.IsNullOrEmpty(definitionProperty.Type))
+                                if (!string.IsNullOrEmpty(definitionProperty.AdditionalType))
+                                {
+                                    typesQueue.Enqueue(definitionProperty.AdditionalType);
+                                }
+                                else if (!string.IsNullOrEmpty(definitionProperty.Type))
                                 {
                                     typesQueue.Enqueue(definitionProperty.Type);
                                 }
