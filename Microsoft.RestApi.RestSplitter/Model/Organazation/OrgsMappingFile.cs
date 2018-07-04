@@ -45,6 +45,6 @@
         public string ProductUid { get; set; }
 
         [JsonProperty("use_service_url_group")]
-        public bool UseServiceUrlGroup { get; set; }
+        public bool UseServiceUrlGroup { get; set; } = true;
     }
 }
