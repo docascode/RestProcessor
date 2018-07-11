@@ -262,6 +262,7 @@
                     {
                         bodies.Add(new RequestBody
                         {
+                            Name = "default",
                             RequestBodyParameters = bodyParameters
                         });
                     }
