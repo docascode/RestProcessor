@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper.cs" />
+    <Compile Include="InternalModels\ParameterizedHost.cs" />
     <Compile Include="Models\BaseParameterEntity.cs" />
     <Compile Include="Models\BaseParameterTypeEntity.cs" />
     <Compile Include="Models\DefinitionEntity.cs" />
