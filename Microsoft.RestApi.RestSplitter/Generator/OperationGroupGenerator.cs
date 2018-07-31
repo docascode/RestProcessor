@@ -51,17 +51,18 @@
 
                     // Get file name from operation group mapping
                     var fileNameInfo = new FileNameInfo();
-                    var fileName = operationGroup;
-                    string newOperationGourpName;
-                    if (OperationGroupMapping != null && OperationGroupMapping.TryGetValue(operationGroup, out newOperationGourpName))
+                    var newOperationGroupName = Utility.TrimSpacesInPath(operationGroup);
+                    
+                    if (OperationGroupMapping != null && OperationGroupMapping.TryGetValueOrDefault(operationGroup, out newOperationGroupName, Utility.TrimSpacesInPath(operationGroup)))
                     {
-                        fileName = newOperationGourpName;
-                        fileNameInfo.TocName = newOperationGourpName;
-                        RootJObj["x-internal-operation-group-name"] = newOperationGourpName;
+                        // Trim space in new operation group name
+                        newOperationGroupName = Utility.TrimSpacesInPath(newOperationGroupName);
+                        fileNameInfo.TocName = newOperationGroupName;
+                        RootJObj["x-internal-operation-group-name"] = newOperationGroupName;
                     }
                     else
                     {
-                        var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
+                        var fileNameWithoutExt = Path.GetFileNameWithoutExtension(newOperationGroupName);
                         fileNameInfo.TocName = Utility.ExtractPascalNameByRegex(fileNameWithoutExt);
                     }
 
@@ -73,7 +74,7 @@
                     if (MappingConfig.IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj, MappingConfig.SplitOperationCountGreaterThan))
                     {
                         // Split operation group to operation
-                        fileNameInfo.ChildrenFileNameInfo = new List<FileNameInfo>(GenerateOperations(RootJObj, (JObject)RootJObj["paths"], TargetDir, fileName));
+                        fileNameInfo.ChildrenFileNameInfo = new List<FileNameInfo>(GenerateOperations(RootJObj, (JObject)RootJObj["paths"], TargetDir, newOperationGroupName));
 
                         // Sort
                         fileNameInfo.ChildrenFileNameInfo.Sort((a, b) => string.CompareOrdinal(a.TocName, b.TocName));
@@ -102,7 +103,7 @@
                         RootJObj["x-internal-split-members"] = splitMembers;
                         RootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
                     }
-                    var file = Utility.Serialize(TargetDir, fileName, RootJObj);
+                    var file = Utility.Serialize(TargetDir, newOperationGroupName, RootJObj);
                     fileNameInfo.FileName = MappingConfig.UseYamlSchema ? Path.ChangeExtension(file.Item1, "yml") : file.Item1;
                     fileNameInfo.FilePath = file.Item2;
 

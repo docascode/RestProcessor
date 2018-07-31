@@ -15,5 +15,7 @@
         public bool NeedResolveXMsPaths { get; set; }
 
         public bool UseServiceUrlGroup { get; set; }
+
+        public bool TrimSpacesInUrl { get; set; }
     }
 }

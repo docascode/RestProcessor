@@ -46,5 +46,8 @@
 
         [JsonProperty("use_service_url_group")]
         public bool UseServiceUrlGroup { get; set; } = true;
+
+        [JsonProperty("trim_spaces_in_url")]
+        public bool TrimSpacesInUrl { get; set; }
     }
 }

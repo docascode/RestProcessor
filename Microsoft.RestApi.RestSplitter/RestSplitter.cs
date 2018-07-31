@@ -148,7 +148,8 @@
                 UseYamlSchema = orgsMappingFile.UseYamlSchema,
                 RemoveTagFromOperationId = orgsMappingFile.RemoveTagFromOperationId,
                 NeedResolveXMsPaths = orgsMappingFile.NeedResolveXMsPaths,
-                UseServiceUrlGroup = orgsMappingFile.UseServiceUrlGroup
+                UseServiceUrlGroup = orgsMappingFile.UseServiceUrlGroup,
+                TrimSpacesInUrl = orgsMappingFile.TrimSpacesInUrl
             };
 
             using (var writer = new StreamWriter(targetTocPath))
