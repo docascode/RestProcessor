@@ -22,7 +22,6 @@
             if (!hostWithParameters.UseSchemePrefix)
             {
                 scheme = string.Empty;
-
             }
             var apiVersion = Utility.GetApiVersion(viewModel, swaggerModel.Info.Version);
 

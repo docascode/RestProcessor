@@ -69,7 +69,7 @@
                     }
 
                     var operationObj = (JObject)item.Value;
-                    var operationName = GetOperationName(operationObj);
+                    var operationName = Utility.TrimSpacesInPath(GetOperationName(operationObj));
                     var operationTocName = Utility.ExtractPascalNameByRegex(RemoveTagFromOperationId(operationName, groupName));
                     operationObj["x-internal-toc-name"] = operationTocName;
 
