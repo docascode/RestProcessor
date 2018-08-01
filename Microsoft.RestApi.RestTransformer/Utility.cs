@@ -95,13 +95,15 @@
             return string.IsNullOrEmpty(apiVersion) ? defaultApiVersion : apiVersion;
         }
 
-        public static Tuple<string, List<ParameterEntity>> GetHostWithParameters(string host, Dictionary<string, object> metadata, Dictionary<string, object> pathMetadata)
+        public static ParameterizedHost GetHostWithParameters(string host, Dictionary<string, object> metadata, Dictionary<string, object> pathMetadata)
         {
             var hostParameterEntities = new List<ParameterEntity>();
+            var useSchemePrefix = true;
             if (metadata.TryGetValue("x-ms-parameterized-host", out var jHost))
             {
                 var parameterizedHost = ((JObject)jHost).ToObject<Dictionary<string, object>>();
                 host = parameterizedHost.GetValueFromMetaData<string>("hostTemplate");
+                useSchemePrefix = parameterizedHost.GetValueFromMetaData<bool>("useSchemaPrefix");
                 var hostParameters = parameterizedHost.GetValueFromMetaData<JArray>("parameters");
                 if (hostParameters != null)
                 {
@@ -124,7 +126,12 @@
                 var parameterizedHost = ((JObject)pHost).ToObject<Dictionary<string, object>>();
                 host = parameterizedHost.GetValueFromMetaData<string>("hostTemplate");
             }
-            return Tuple.Create(string.IsNullOrEmpty(host) ? string.Empty : host, hostParameterEntities);
+            return new ParameterizedHost
+            {
+                Host = string.IsNullOrEmpty(host) ? string.Empty : host,
+                Parameters = hostParameterEntities,
+                UseSchemePrefix = useSchemePrefix
+            };
         }
 
         public static string GetSummary(string summary, string description)

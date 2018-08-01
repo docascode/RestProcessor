@@ -16,8 +16,13 @@
         {
             var scheme = Utility.GetScheme(swaggerModel.Metadata);
             var hostWithParameters = Utility.GetHostWithParameters(swaggerModel.Host, swaggerModel.Metadata, viewModel.Metadata);
-            var host = hostWithParameters.Item1;
-            var hostParameters = hostWithParameters.Item2;
+
+            var host = hostWithParameters.Host;
+            var hostParameters = hostWithParameters.Parameters;
+            if (!hostWithParameters.UseSchemePrefix)
+            {
+                scheme = string.Empty;
+            }
             var apiVersion = Utility.GetApiVersion(viewModel, swaggerModel.Info.Version);
 
             var allDefinitionObjects = GetAllDefinitionObjects(swaggerModel);
