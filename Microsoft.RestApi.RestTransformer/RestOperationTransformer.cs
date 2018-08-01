@@ -19,7 +19,10 @@
 
             var host = hostWithParameters.Host;
             var hostParameters = hostWithParameters.Parameters;
-            if (!hostWithParameters.UseSchemePrefix) scheme = string.Empty; 
+            if (!hostWithParameters.UseSchemePrefix)
+            {
+                scheme = string.Empty;
+            }
             var apiVersion = Utility.GetApiVersion(viewModel, swaggerModel.Info.Version);
 
             var allDefinitionObjects = GetAllDefinitionObjects(swaggerModel);
