@@ -195,9 +195,20 @@
             return groupName.Replace(" ", "").Trim().ToLower();
         }
 
-        public static string TrimSpacesInPath(string path)
+        public static string FormalizeUrl(string path)
         {
-            return path.Replace(" ", "");
+            return path
+                .Replace("%", "")
+                .Replace("\\", "")
+                .Replace("\"", "")
+                .Replace("^", "")
+                .Replace("`", "")
+                .Replace('<', '(')
+                .Replace('>', ')')
+                .Replace("{", "((")
+                .Replace("}", "))")
+                .Replace('|', '_')
+                .Replace(' ', '-');
         }
 
         private static string GetClosestUpperCaseWord(string word, int index)

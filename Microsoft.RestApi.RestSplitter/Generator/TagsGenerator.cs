@@ -71,8 +71,7 @@
                                 RootJObj, 
                                 (JObject)RootJObj["paths"], 
                                 TargetDir, 
-                                /* Trim folder name */
-                                Utility.TrimSpacesInPath(newTagName)
+                                newTagName
                             )
                         );
 
@@ -105,7 +104,7 @@
                         RootJObj["x-internal-split-type"] = MappingConfig.UseYamlSchema ? SplitType.TagGroup.ToString() : SplitType.OperationGroup.ToString();
                     }
                     
-                    var file = Utility.Serialize(TargetDir, Utility.TrimSpacesInPath(newTagName), RootJObj);
+                    var file = Utility.Serialize(TargetDir, Utility.FormalizeUrl(newTagName), RootJObj);
                     fileNameInfo.FileName = MappingConfig.UseYamlSchema ? Path.ChangeExtension(file.Item1, "yml") : file.Item1;
                     fileNameInfo.FilePath = file.Item2;
 

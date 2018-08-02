@@ -149,7 +149,7 @@
                 RemoveTagFromOperationId = orgsMappingFile.RemoveTagFromOperationId,
                 NeedResolveXMsPaths = orgsMappingFile.NeedResolveXMsPaths,
                 UseServiceUrlGroup = orgsMappingFile.UseServiceUrlGroup,
-                TrimSpacesInUrl = orgsMappingFile.TrimSpacesInUrl
+                FormalizeUrl = orgsMappingFile.FormalizeUrl
             };
 
             using (var writer = new StreamWriter(targetTocPath))

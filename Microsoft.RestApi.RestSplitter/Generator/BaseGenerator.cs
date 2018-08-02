@@ -69,7 +69,7 @@
                     }
 
                     var operationObj = (JObject)item.Value;
-                    var operationName = Utility.TrimSpacesInPath(GetOperationName(operationObj));
+                    var operationName = GetOperationName(operationObj);
                     var operationTocName = Utility.ExtractPascalNameByRegex(RemoveTagFromOperationId(operationName, groupName));
                     operationObj["x-internal-toc-name"] = operationTocName;
 
@@ -86,11 +86,14 @@
 
                     rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
                     rootJObj["x-internal-operation-name"] = operationTocName;
-                    var operationFile = Utility.Serialize(Path.Combine(targetDir, groupName), RemoveTagFromOperationId(operationName, groupName), rootJObj);
+
+                    var groupNamePath = Utility.FormalizeUrl(groupName);
+                    var operationNamePath = Utility.FormalizeUrl(operationName);
+                    var operationFile = Utility.Serialize(Path.Combine(targetDir, groupNamePath), RemoveTagFromOperationId(operationNamePath, groupNamePath), rootJObj);
                     ClearKey(rootJObj, "x-internal-split-type");
                     ClearKey(rootJObj, "x-internal-operation-name");
 
-                    var fileName = Path.Combine(groupName, operationFile.Item1);
+                    var fileName = Path.Combine(groupNamePath, operationFile.Item1);
                     yield return new FileNameInfo
                     {
                         TocName = operationTocName,

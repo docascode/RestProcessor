@@ -16,6 +16,6 @@
 
         public bool UseServiceUrlGroup { get; set; }
 
-        public bool TrimSpacesInUrl { get; set; }
+        public bool FormalizeUrl { get; set; }
     }
 }
