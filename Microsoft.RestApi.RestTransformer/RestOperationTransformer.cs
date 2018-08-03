@@ -61,7 +61,8 @@
                 Consumes = viewModel.Metadata.GetArrayFromMetaData<string>("consumes"),
                 Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
                 Definitions = TransformDefinitions(allDefinitions, parametersDefinitions, bodyDefinitionObject, responseDefinitionObjects),
-                Securities = TransformSecurities(swaggerModel)
+                Securities = TransformSecurities(swaggerModel),
+                SourceUrl = Utility.GetSourceUrl(swaggerModel.Metadata)
             };
         }
 

@@ -290,5 +290,10 @@
             var serialized = JsonConvert.SerializeObject(source);
             return JsonConvert.DeserializeObject<T>(serialized);
         }
+
+        public static string GetSourceUrl(Dictionary<string, object> metadata)
+        {
+            return metadata.GetValueFromMetaData<string>("x-internal-swagger-source-url");
+        }
     }
 }

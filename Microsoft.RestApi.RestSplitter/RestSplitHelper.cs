@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.RestApi.RestSplitter
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
 
@@ -12,7 +13,7 @@
 
     public static class RestSplitHelper
     {
-        public static RestFileInfo Split(string targetDir, string filePath, string serviceId, string serviceName, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig)
+        public static RestFileInfo Split(string targetDir, string filePath, string swaggerRelativePath, string serviceId, string serviceName, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig, RepoFile repoFile)
         {
             var restFileInfo = new RestFileInfo();
             if (!Directory.Exists(targetDir))
@@ -42,6 +43,12 @@
 
                 rootJObj["x-internal-service-id"] = serviceId;
                 rootJObj["x-internal-service-name"] = serviceName;
+                var sourceInfo = GetTheSwaggerSource(repoFile, swaggerRelativePath);
+                if (sourceInfo != null)
+                {
+                    rootJObj["x-internal-swagger-source-url"] = sourceInfo;
+                }
+
                 var generator = GeneratorFactory.CreateGenerator(rootJObj, targetDir, filePath, operationGroupMapping, mappingConfig);
                 var fileNameInfos = generator.Generate().ToList();
 
@@ -69,6 +76,28 @@
                 throw new InvalidOperationException($"title is not defined in {infoJObj}");
             }
             throw new InvalidOperationException($"info is not defined in {root}");
+        }
+
+        private static string GetTheSwaggerSource(RepoFile repoFile, string swaggerRelativePath)
+        {
+            swaggerRelativePath = swaggerRelativePath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var paths = swaggerRelativePath.Split(Path.AltDirectorySeparatorChar);
+            if (repoFile!= null && paths.Count() > 0)
+            {
+                var repo = repoFile.Repos.SingleOrDefault(r => string.Equals(r.Name, paths[0], StringComparison.OrdinalIgnoreCase));
+                if (repo != null)
+                {
+                    if (repo.Url.Contains("github.com"))
+                    {
+                        return $"{repo.Url.TrimEnd('/')}/blob/{repo.Branch}/{swaggerRelativePath.Substring(paths[0].Length + 1)}";
+                    }
+                    else if(repo.Url.Contains("visualstudio.com"))
+                    {
+                        return $"{repo.Url.TrimEnd('/')}?path={swaggerRelativePath.Substring(paths[0].Length + 1)}&version=GB{repo.Branch}&a=contents";
+                    }
+                }
+            }
+            return null;
         }
     }
 }

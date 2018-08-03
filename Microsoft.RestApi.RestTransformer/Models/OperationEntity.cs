@@ -56,5 +56,8 @@
 
         [YamlMember(Alias = "security")]
         public IList<SecurityEntity> Securities { get; set; }
+
+        [YamlMember(Alias = "source_url")]
+        public string SourceUrl { get; set; }
     }
 }
