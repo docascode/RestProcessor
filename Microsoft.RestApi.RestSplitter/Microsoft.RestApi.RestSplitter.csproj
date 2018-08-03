@@ -45,14 +45,23 @@
     <Reference Include="Microsoft.DocAsCode.Build.RestApi, Version=2.34.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.DocAsCode.Build.RestApi.2.34.0\lib\net461\Microsoft.DocAsCode.Build.RestApi.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DocAsCode.Build.TableOfContents, Version=2.34.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.DocAsCode.Build.TableOfContents.2.34.0\lib\net461\Microsoft.DocAsCode.Build.TableOfContents.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.DocAsCode.Common, Version=2.34.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.DocAsCode.Common.2.34.0\lib\netstandard2.0\Microsoft.DocAsCode.Common.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.DocAsCode.DataContracts.Common, Version=2.34.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.DocAsCode.DataContracts.Common.2.34.0\lib\net461\Microsoft.DocAsCode.DataContracts.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DocAsCode.DataContracts.ManagedReference, Version=2.34.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.DocAsCode.DataContracts.ManagedReference.2.34.0\lib\net461\Microsoft.DocAsCode.DataContracts.ManagedReference.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.DocAsCode.DataContracts.RestApi, Version=2.34.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.DocAsCode.DataContracts.RestApi.2.34.0\lib\net461\Microsoft.DocAsCode.DataContracts.RestApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DocAsCode.Dfm, Version=2.34.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.DocAsCode.Dfm.2.34.0\lib\net461\Microsoft.DocAsCode.Dfm.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.DocAsCode.MarkdownLite, Version=2.34.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.DocAsCode.MarkdownLite.2.34.0\lib\net461\Microsoft.DocAsCode.MarkdownLite.dll</HintPath>
@@ -121,6 +130,7 @@
     <Compile Include="RefResolver.cs" />
     <Compile Include="RestSplitHelper.cs" />
     <Compile Include="Model\SplitType.cs" />
+    <Compile Include="TocConverter.cs" />
     <Compile Include="Utility.cs" />
     <Compile Include="XMsPathsResolver.cs" />
   </ItemGroup>
