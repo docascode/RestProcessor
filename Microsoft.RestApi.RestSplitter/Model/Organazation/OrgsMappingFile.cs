@@ -46,5 +46,8 @@
 
         [JsonProperty("use_service_url_group")]
         public bool UseServiceUrlGroup { get; set; } = true;
+
+        [JsonProperty("use_yaml_toc")]
+        public bool UserYamlToc { get; set; }
     }
 }

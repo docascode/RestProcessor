@@ -256,6 +256,15 @@
                     }
                 }
             }
+
+            if (orgsMappingFile.UserYamlToc)
+            {
+                TocConverter.Convert(targetTocPath);
+                if (File.Exists(targetTocPath))
+                {
+                    File.Delete(targetTocPath);
+                }
+            }
         }
 
         private static SortedDictionary<string, List<SwaggerToc>> SplitSwaggers(string sourceRootDir, string targetApiVersionDir, ServiceInfo service, MappingConfig mappingConfig, string version)
