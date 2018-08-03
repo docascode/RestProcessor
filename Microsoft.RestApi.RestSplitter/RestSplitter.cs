@@ -148,7 +148,8 @@
                 UseYamlSchema = orgsMappingFile.UseYamlSchema,
                 RemoveTagFromOperationId = orgsMappingFile.RemoveTagFromOperationId,
                 NeedResolveXMsPaths = orgsMappingFile.NeedResolveXMsPaths,
-                UseServiceUrlGroup = orgsMappingFile.UseServiceUrlGroup
+                UseServiceUrlGroup = orgsMappingFile.UseServiceUrlGroup,
+                GenerateSourceUrl = orgsMappingFile.GenerateSourceUrl
             };
 
             RepoFile repoFile = null;

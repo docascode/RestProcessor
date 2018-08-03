@@ -49,5 +49,8 @@
 
         [JsonProperty("use_yaml_toc")]
         public bool UserYamlToc { get; set; }
+
+        [JsonProperty("generate_source_url")]
+        public bool GenerateSourceUrl { get; set; }
     }
 }

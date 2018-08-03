@@ -43,10 +43,13 @@
 
                 rootJObj["x-internal-service-id"] = serviceId;
                 rootJObj["x-internal-service-name"] = serviceName;
-                var sourceInfo = GetTheSwaggerSource(repoFile, swaggerRelativePath);
-                if (sourceInfo != null)
+                if (mappingConfig.GenerateSourceUrl)
                 {
-                    rootJObj["x-internal-swagger-source-url"] = sourceInfo;
+                    var sourceInfo = GetTheSwaggerSource(repoFile, swaggerRelativePath);
+                    if (sourceInfo != null)
+                    {
+                        rootJObj["x-internal-swagger-source-url"] = sourceInfo;
+                    }
                 }
 
                 var generator = GeneratorFactory.CreateGenerator(rootJObj, targetDir, filePath, operationGroupMapping, mappingConfig);
