@@ -43,6 +43,7 @@
 
                 rootJObj["x-internal-service-id"] = serviceId;
                 rootJObj["x-internal-service-name"] = serviceName;
+
                 if (mappingConfig.GenerateSourceUrl)
                 {
                     var sourceInfo = GetTheSwaggerSource(repoFile, swaggerRelativePath);
