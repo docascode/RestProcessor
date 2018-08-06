@@ -51,8 +51,8 @@
                     RootJObj["x-internal-operation-group-name"] = tag;
 
                     // Get file name from operation group mapping
-                    string newTagName = tag;
-                    if (OperationGroupMapping != null && OperationGroupMapping.TryGetValueOrDefault(tag, out newTagName, tag))
+                    string newTagName;
+                    if (OperationGroupMapping != null && OperationGroupMapping.TryGetValue(tag, out newTagName))
                     {
                         fileNameInfo.TocName = newTagName;
                         RootJObj["x-internal-operation-group-name"] = newTagName;
@@ -66,14 +66,7 @@
                     if (MappingConfig.IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj, MappingConfig.SplitOperationCountGreaterThan))
                     {
                         // Split operation group to operation
-                        fileNameInfo.ChildrenFileNameInfo = new List<FileNameInfo>(
-                            GenerateOperations(
-                                RootJObj, 
-                                (JObject)RootJObj["paths"], 
-                                TargetDir, 
-                                newTagName
-                            )
-                        );
+                        fileNameInfo.ChildrenFileNameInfo = new List<FileNameInfo>(GenerateOperations(RootJObj, (JObject)RootJObj["paths"], TargetDir, tag));
 
                         // Sort
                         fileNameInfo.ChildrenFileNameInfo.Sort((a, b) => string.CompareOrdinal(a.TocName, b.TocName));
@@ -103,8 +96,8 @@
                         RootJObj["x-internal-split-members"] = splitMembers;
                         RootJObj["x-internal-split-type"] = MappingConfig.UseYamlSchema ? SplitType.TagGroup.ToString() : SplitType.OperationGroup.ToString();
                     }
-                    
-                    var file = Utility.Serialize(TargetDir, Utility.TryToFormalizeUrl(newTagName, MappingConfig.FormalizeUrl), RootJObj);
+
+                    var file = Utility.Serialize(TargetDir, tag, RootJObj);
                     fileNameInfo.FileName = MappingConfig.UseYamlSchema ? Path.ChangeExtension(file.Item1, "yml") : file.Item1;
                     fileNameInfo.FilePath = file.Item2;
 
