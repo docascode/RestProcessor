@@ -6,7 +6,7 @@
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
-
+    using Microsoft.RestApi.Common;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -197,6 +197,8 @@
 
         public static string TryToFormalizeUrl(string path, bool isFormalized)
         {
+            Guard.ArgumentNotNullOrEmpty(path, "FormalizedUrl");
+
             if (isFormalized)
             {
                 return path
