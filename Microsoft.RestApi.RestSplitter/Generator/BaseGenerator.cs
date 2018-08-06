@@ -86,14 +86,11 @@
 
                     rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
                     rootJObj["x-internal-operation-name"] = operationTocName;
-
-                    var groupNamePath = Utility.TryToFormalizeUrl(groupName, MappingConfig.FormalizeUrl);
-                    var operationNamePath = Utility.TryToFormalizeUrl(operationName, MappingConfig.FormalizeUrl);
-                    var operationFile = Utility.Serialize(Path.Combine(targetDir, groupNamePath), RemoveTagFromOperationId(operationNamePath, groupNamePath), rootJObj);
+                    var operationFile = Utility.Serialize(Path.Combine(targetDir, groupName), RemoveTagFromOperationId(operationName, groupName), rootJObj);
                     ClearKey(rootJObj, "x-internal-split-type");
                     ClearKey(rootJObj, "x-internal-operation-name");
 
-                    var fileName = Path.Combine(groupNamePath, operationFile.Item1);
+                    var fileName = Path.Combine(groupName, operationFile.Item1);
                     yield return new FileNameInfo
                     {
                         TocName = operationTocName,
