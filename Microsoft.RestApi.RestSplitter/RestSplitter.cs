@@ -150,7 +150,14 @@
                 NeedResolveXMsPaths = orgsMappingFile.NeedResolveXMsPaths,
                 UseServiceUrlGroup = orgsMappingFile.UseServiceUrlGroup,
                 FormalizeUrl = orgsMappingFile.FormalizeUrl
+                GenerateSourceUrl = orgsMappingFile.GenerateSourceUrl
             };
+
+            RepoFile repoFile = null;
+            if (File.Exists(Path.Combine(targetRootDir, "repo.json")))
+            {
+                repoFile = JsonUtility.ReadFromFile<RepoFile>(Path.Combine(targetRootDir, "repo.json"));
+            }
 
             using (var writer = new StreamWriter(targetTocPath))
             {
@@ -201,7 +208,7 @@
                             var subTocDict = new SortedDictionary<string, List<SwaggerToc>>();
                             if (service.SwaggerInfo != null)
                             {
-                                subTocDict = SplitSwaggers(sourceRootDir, targetApiVersionDir, service, mappingConfig, version);
+                                subTocDict = SplitSwaggers(sourceRootDir, targetApiVersionDir, service, mappingConfig, repoFile, version);
                             }
 
                             // 3. Conceptual toc
@@ -257,9 +264,18 @@
                     }
                 }
             }
+
+            if (orgsMappingFile.UserYamlToc)
+            {
+                TocConverter.Convert(targetTocPath);
+                if (File.Exists(targetTocPath))
+                {
+                    File.Delete(targetTocPath);
+                }
+            }
         }
 
-        private static SortedDictionary<string, List<SwaggerToc>> SplitSwaggers(string sourceRootDir, string targetApiVersionDir, ServiceInfo service, MappingConfig mappingConfig, string version)
+        private static SortedDictionary<string, List<SwaggerToc>> SplitSwaggers(string sourceRootDir, string targetApiVersionDir, ServiceInfo service, MappingConfig mappingConfig, RepoFile repoFile, string version)
         {
             var subTocDict = new SortedDictionary<string, List<SwaggerToc>>();
 
@@ -269,7 +285,7 @@
                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiVersionDir, service.UrlGroup, subGroupName.TrimSubGroupName()));
                 var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
 
-                var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, mappingConfig.UseServiceUrlGroup ? service.UrlGroup : service.TocTitle, service.TocTitle, swagger.OperationGroupMapping, mappingConfig);
+                var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, swagger.Source.TrimEnd(), mappingConfig.UseServiceUrlGroup ? service.UrlGroup : service.TocTitle, service.TocTitle, swagger.OperationGroupMapping, mappingConfig, repoFile);
 
                 if (restFileInfo == null)
                 {
