@@ -195,6 +195,29 @@
             return groupName.Replace(" ", "").Trim().ToLower();
         }
 
+        public static string TryToFormalizeUrl(string path, bool isFormalized)
+        {
+            if (isFormalized)
+            {
+                return path
+                    .Replace("%", "")
+                    .Replace("\\", "")
+                    .Replace("\"", "")
+                    .Replace("^", "")
+                    .Replace("`", "")
+                    .Replace('<', '(')
+                    .Replace('>', ')')
+                    .Replace("{", "((")
+                    .Replace("}", "))")
+                    .Replace('|', '_')
+                    .Replace(' ', '-');
+            }
+            else
+            {
+                return path;
+            }
+        }
+
         private static string GetClosestUpperCaseWord(string word, int index)
         {
             var result = new StringBuilder();

@@ -149,6 +149,7 @@
                 RemoveTagFromOperationId = orgsMappingFile.RemoveTagFromOperationId,
                 NeedResolveXMsPaths = orgsMappingFile.NeedResolveXMsPaths,
                 UseServiceUrlGroup = orgsMappingFile.UseServiceUrlGroup,
+                FormalizeUrl = orgsMappingFile.FormalizeUrl
                 GenerateSourceUrl = orgsMappingFile.GenerateSourceUrl
             };
 

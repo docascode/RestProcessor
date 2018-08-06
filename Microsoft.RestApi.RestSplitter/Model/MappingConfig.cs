@@ -16,6 +16,7 @@
 
         public bool UseServiceUrlGroup { get; set; }
 
+        public bool FormalizeUrl { get; set; }
         public bool GenerateSourceUrl { get; set; }
     }
 }
