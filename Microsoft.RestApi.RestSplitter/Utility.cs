@@ -195,20 +195,27 @@
             return groupName.Replace(" ", "").Trim().ToLower();
         }
 
-        public static string FormalizeUrl(string path)
+        public static string TryToFormalizeUrl(string path, bool isFormalized)
         {
-            return path
-                .Replace("%", "")
-                .Replace("\\", "")
-                .Replace("\"", "")
-                .Replace("^", "")
-                .Replace("`", "")
-                .Replace('<', '(')
-                .Replace('>', ')')
-                .Replace("{", "((")
-                .Replace("}", "))")
-                .Replace('|', '_')
-                .Replace(' ', '-');
+            if (isFormalized)
+            {
+                return path
+                    .Replace("%", "")
+                    .Replace("\\", "")
+                    .Replace("\"", "")
+                    .Replace("^", "")
+                    .Replace("`", "")
+                    .Replace('<', '(')
+                    .Replace('>', ')')
+                    .Replace("{", "((")
+                    .Replace("}", "))")
+                    .Replace('|', '_')
+                    .Replace(' ', '-');
+            }
+            else
+            {
+                return path;
+            }
         }
 
         private static string GetClosestUpperCaseWord(string word, int index)

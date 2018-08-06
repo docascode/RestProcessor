@@ -104,7 +104,7 @@
                         RootJObj["x-internal-split-type"] = MappingConfig.UseYamlSchema ? SplitType.TagGroup.ToString() : SplitType.OperationGroup.ToString();
                     }
                     
-                    var file = Utility.Serialize(TargetDir, Utility.FormalizeUrl(newTagName), RootJObj);
+                    var file = Utility.Serialize(TargetDir, Utility.TryToFormalizeUrl(newTagName, MappingConfig.FormalizeUrl), RootJObj);
                     fileNameInfo.FileName = MappingConfig.UseYamlSchema ? Path.ChangeExtension(file.Item1, "yml") : file.Item1;
                     fileNameInfo.FilePath = file.Item2;
 
