@@ -13,7 +13,7 @@
 
     public static class Utility
     {
-        public static T GetValueFromMetaData<T>(this Dictionary<string, object> metadata, string key)
+        public static T GetValueFromMetaData<T>(this Dictionary<string, object> metadata, string key, T defaultValue=default(T))
         {
             Guard.ArgumentNotNull(metadata, nameof(metadata));
             Guard.ArgumentNotNullOrEmpty(key, nameof(key));
@@ -27,10 +27,10 @@
                 catch (Exception ex)
                 {
                     Console.WriteLine($"can not convert the metadata[{key}], detail: {ex}");
-                    return default(T);
+                    return defaultValue;
                 }
             }
-            return default(T);
+            return defaultValue;
         }
 
         public static T[] GetArrayFromMetaData<T>(this Dictionary<string, object> metadata, string key)
@@ -103,7 +103,7 @@
             {
                 var parameterizedHost = ((JObject)jHost).ToObject<Dictionary<string, object>>();
                 host = parameterizedHost.GetValueFromMetaData<string>("hostTemplate");
-                useSchemePrefix = parameterizedHost.GetValueFromMetaData<bool>("useSchemaPrefix");
+                useSchemePrefix = parameterizedHost.GetValueFromMetaData("useSchemePrefix", true);
                 var hostParameters = parameterizedHost.GetValueFromMetaData<JArray>("parameters");
                 if (hostParameters != null)
                 {
