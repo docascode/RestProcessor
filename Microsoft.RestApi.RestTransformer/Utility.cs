@@ -33,6 +33,26 @@
             return default(T);
         }
 
+        public static T GetValueFromMetaDataWithDefaultValue<T>(this Dictionary<string, object> metadata, string key, T defaultValue)
+        {
+            Guard.ArgumentNotNull(metadata, nameof(metadata));
+            Guard.ArgumentNotNullOrEmpty(key, nameof(key));
+
+            if (metadata.TryGetValue(key, out object value))
+            {
+                try
+                {
+                    return (T)value;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"can not convert the metadata[{key}], detail: {ex}");
+                    return defaultValue;
+                }
+            }
+            return defaultValue;
+        }
+
         public static T[] GetArrayFromMetaData<T>(this Dictionary<string, object> metadata, string key)
         {
             Guard.ArgumentNotNull(metadata, nameof(metadata));
@@ -103,7 +123,7 @@
             {
                 var parameterizedHost = ((JObject)jHost).ToObject<Dictionary<string, object>>();
                 host = parameterizedHost.GetValueFromMetaData<string>("hostTemplate");
-                useSchemePrefix = parameterizedHost.GetValueFromMetaData<bool>("useSchemaPrefix");
+                useSchemePrefix = parameterizedHost.GetValueFromMetaDataWithDefaultValue("useSchemePrefix", true);
                 var hostParameters = parameterizedHost.GetValueFromMetaData<JArray>("parameters");
                 if (hostParameters != null)
                 {
