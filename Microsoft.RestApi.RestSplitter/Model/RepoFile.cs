@@ -21,5 +21,8 @@
 
         [JsonProperty("url")]
         public string Url { get; set; }
+
+        [JsonProperty("is_public_repo")]
+        public bool IsPublicRepo { get; set; }
     }
 }

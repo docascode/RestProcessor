@@ -108,6 +108,7 @@
     <Compile Include="Models\ExampleResponseEntity.cs" />
     <Compile Include="Models\ExampleResponseHeaderEntity.cs" />
     <Compile Include="Models\IdentifiableEntity.cs" />
+    <Compile Include="Models\MetaDataEntity.cs" />
     <Compile Include="Models\NamedEntity.cs" />
     <Compile Include="Models\OperationEntity.cs" />
     <Compile Include="Models\OperationGroupEntity.cs" />
