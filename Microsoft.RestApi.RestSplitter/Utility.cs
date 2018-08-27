@@ -220,6 +220,28 @@
             }
         }
 
+        public static void WriteDictToFile(string filePath, IDictionary<string, string> dict)
+        {
+            try
+            {
+                if (!File.Exists(filePath))
+                {
+                    File.Create(filePath).Dispose();
+                }
+
+                using (var sw = new StreamWriter(filePath, false))
+                {
+                    string json = JsonConvert.SerializeObject(dict, Formatting.Indented);
+                    sw.WriteLine(json);
+                }
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Write dict file error: {ex}, filePath: {filePath}, DictionaryObj: {dict.ToString()}");
+                return;
+            }
+        }
+
         private static string GetClosestUpperCaseWord(string word, int index)
         {
             var result = new StringBuilder();

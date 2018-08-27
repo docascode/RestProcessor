@@ -13,9 +13,9 @@
 
     public static class RestSplitHelper
     {
-        public static RestFileInfo Split(string targetDir, string filePath, string swaggerRelativePath, string serviceId, string serviceName, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig, RepoFile repoFile)
+        public static RestFileInfo Split(string targetDir, string filePath, string swaggerRelativePath, string serviceId, string serviceName, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig, RepoFile repoFile, out string sourceSwaggerUrl)
         {
-            var restFileInfo = new RestFileInfo();
+            
             if (!Directory.Exists(targetDir))
             {
                 throw new ArgumentException($"{nameof(targetDir)} '{targetDir}' should exist.");
@@ -24,6 +24,8 @@
             {
                 throw new ArgumentException($"{nameof(filePath)} '{filePath}' should exist.");
             }
+
+            var restFileInfo = new RestFileInfo();
 
             using (var streamReader = File.OpenText(filePath))
             using (var reader = new JsonTextReader(streamReader))
@@ -44,13 +46,10 @@
                 rootJObj["x-internal-service-id"] = serviceId;
                 rootJObj["x-internal-service-name"] = serviceName;
 
-                if (mappingConfig.GenerateSourceUrl)
+                sourceSwaggerUrl = GetTheSwaggerSource(repoFile, swaggerRelativePath);
+                if (sourceSwaggerUrl != null)
                 {
-                    var sourceInfo = GetTheSwaggerSource(repoFile, swaggerRelativePath);
-                    if (sourceInfo != null)
-                    {
-                        rootJObj["x-internal-swagger-source-url"] = sourceInfo;
-                    }
+                    rootJObj["x-internal-swagger-source-url"] = sourceSwaggerUrl;
                 }
 
                 var generator = GeneratorFactory.CreateGenerator(rootJObj, targetDir, filePath, operationGroupMapping, mappingConfig);
@@ -89,7 +88,7 @@
             if (repoFile!= null && paths.Count() > 0)
             {
                 var repo = repoFile.Repos.SingleOrDefault(r => string.Equals(r.Name, paths[0], StringComparison.OrdinalIgnoreCase));
-                if (repo != null)
+                if (repo != null && repo.IsPublicRepo)
                 {
                     if (repo.Url.Contains("github.com"))
                     {
