@@ -22,7 +22,7 @@
         [JsonProperty("url")]
         public string Url { get; set; }
 
-        [JsonProperty("is_public_repo")]
-        public bool IsPublicRepo { get; set; }
+        [JsonProperty("enable_view_code")]
+        public bool EnableViewCode { get; set; }
     }
 }
