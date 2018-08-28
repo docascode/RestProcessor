@@ -88,7 +88,7 @@
             if (repoFile!= null && paths.Count() > 0)
             {
                 var repo = repoFile.Repos.SingleOrDefault(r => string.Equals(r.Name, paths[0], StringComparison.OrdinalIgnoreCase));
-                if (repo != null && repo.IsPublicRepo)
+                if (repo != null && repo.EnableViewCode)
                 {
                     if (repo.Url.Contains("github.com"))
                     {
