@@ -70,14 +70,6 @@
                     RootJObj["paths"] = filteredPaths;
                     RootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
 
-                    //Set metadata source_url
-                    string swaggerSourceUrl = LineNumberMappingDict.TryGetValue(operationGroup, out int lineNumber) ? GetTheSwaggerSource(lineNumber) : GetTheSwaggerSource();
-
-                    if (swaggerSourceUrl != null)
-                    {
-                        RootJObj["x-internal-swagger-source-url"] = swaggerSourceUrl;
-                    }
-
                     // Only split when the children count larger than MappingConfig.SplitOperationCountGreaterThan
                     if (MappingConfig.IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj, MappingConfig.SplitOperationCountGreaterThan))
                     {
@@ -87,8 +79,7 @@
                                 RootJObj, 
                                 (JObject)RootJObj["paths"], 
                                 TargetDir, 
-                                newOperationGroupName,
-                                swaggerSourceUrl
+                                newOperationGroupName
                             )
                         );
 
@@ -132,8 +123,9 @@
             }
         }
 
-        protected override string GetOperationName(JObject operation)
+        protected override string GetOperationName(JObject operation, out string operationId)
         {
+            operationId = GetOperationId(operation);
             return GetOperationGroupPerOperation(operation).Item2;
         }
 
@@ -195,10 +187,18 @@
             return operationGroups;
         }
 
+        private static string GetOperationId(JObject operation)
+        {
+            if (operation.TryGetValue("operationId", out JToken value) && value != null)
+            {
+                return value.ToString();
+            }
+            throw new InvalidOperationException($"operationId is not defined in {operation}");
+        }
+
         private static Tuple<string, string> GetOperationGroupPerOperation(JObject operation)
         {
-            JToken value;
-            if (operation.TryGetValue("operationId", out value) && value != null)
+            if (operation.TryGetValue("operationId", out JToken value) && value != null)
             {
                 return GetOperationGroupFromOperationId(value.ToString());
             }

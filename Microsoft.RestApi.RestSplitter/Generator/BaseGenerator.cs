@@ -51,7 +51,7 @@
 
         public abstract IEnumerable<FileNameInfo> Generate();
 
-        protected abstract string GetOperationName(JObject operation);
+        protected abstract string GetOperationName(JObject operation, out string operationId);
 
         #endregion
 
@@ -66,7 +66,7 @@
             }
         }
 
-        protected IEnumerable<FileNameInfo> GenerateOperations(JObject rootJObj, JObject paths, string targetDir, string groupName, string swaggerSourceUrl)
+        protected IEnumerable<FileNameInfo> GenerateOperations(JObject rootJObj, JObject paths, string targetDir, string groupName)
         {
             foreach (var path in paths)
             {
@@ -79,7 +79,7 @@
                     }
 
                     var operationObj = (JObject)item.Value;
-                    var operationName = GetOperationName(operationObj);
+                    var operationName = GetOperationName(operationObj, out string operationId);
                     var operationTocName = Utility.ExtractPascalNameByRegex(RemoveTagFromOperationId(operationName, groupName));
                     operationObj["x-internal-toc-name"] = operationTocName;
 
@@ -97,11 +97,21 @@
                     rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
                     rootJObj["x-internal-operation-name"] = operationTocName;
 
+                    //Set metadata source_url
+                    var lineNumberMappingKey = groupName == operationName ? groupName : $"{groupName}_{operationName}";
+                    string swaggerSourceUrl = LineNumberMappingDict.TryGetValue(lineNumberMappingKey, out int lineNumber) ? GetTheSwaggerSource(lineNumber) : GetTheSwaggerSource();
+
+                    if (swaggerSourceUrl != null)
+                    {
+                        rootJObj["x-internal-swagger-source-url"] = swaggerSourceUrl;
+                    }
+
                     var groupNamePath = Utility.TryToFormalizeUrl(groupName, MappingConfig.FormalizeUrl);
                     var operationNamePath = Utility.TryToFormalizeUrl(operationName, MappingConfig.FormalizeUrl);
                     var operationFile = Utility.Serialize(Path.Combine(targetDir, groupNamePath), RemoveTagFromOperationId(operationNamePath, groupNamePath), rootJObj);
                     ClearKey(rootJObj, "x-internal-split-type");
                     ClearKey(rootJObj, "x-internal-operation-name");
+                    ClearKey(rootJObj, "x-internal-swagger-source-url");
 
                     var fileName = Path.Combine(groupNamePath, operationFile.Item1);
                     yield return new FileNameInfo
