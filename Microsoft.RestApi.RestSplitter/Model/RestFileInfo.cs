@@ -18,5 +18,7 @@
         public List<FileNameInfo> ChildrenFileNameInfo { get; set; }
 
         public string TocName { get; set; }
+
+        public string SwaggerSourceUrl { get; set; }
     }
 }

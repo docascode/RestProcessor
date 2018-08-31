@@ -286,7 +286,7 @@
                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiVersionDir, service.UrlGroup, subGroupName.TrimSubGroupName()));
                 var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
 
-                var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, swagger.Source.TrimEnd(), mappingConfig.UseServiceUrlGroup ? service.UrlGroup : service.TocTitle, service.TocTitle, swagger.OperationGroupMapping, mappingConfig, repoFile, out string sourceSwaggerUrl);
+                var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, swagger.Source.TrimEnd(), mappingConfig.UseServiceUrlGroup ? service.UrlGroup : service.TocTitle, service.TocTitle, swagger.OperationGroupMapping, mappingConfig, repoFile);
 
                 if (restFileInfo == null)
                 {
@@ -322,7 +322,7 @@
                             // Write into ref mapping dict
                             if (!sourceSwaggerMappingDict.ContainsKey(nameInfo.FileName))
                             {
-                                sourceSwaggerMappingDict.Add(FileUtility.NormalizePath(nameInfo.FileName), sourceSwaggerUrl);
+                                sourceSwaggerMappingDict.Add(FileUtility.NormalizePath(nameInfo.FileName), nameInfo.SwaggerSourceUrl);
                             }
                         }
                     }
