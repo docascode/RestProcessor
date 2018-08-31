@@ -13,7 +13,7 @@
 
     public static class RestSplitHelper
     {
-        public static RestFileInfo Split(string targetDir, string filePath, string swaggerRelativePath, string serviceId, string serviceName, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig, RepoFile repoFile, out string sourceSwaggerUrl)
+        public static RestFileInfo Split(string targetDir, string filePath, string swaggerRelativePath, string serviceId, string serviceName, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig, RepoFile repoFile)
         {
             
             if (!Directory.Exists(targetDir))
@@ -30,8 +30,9 @@
             using (var streamReader = File.OpenText(filePath))
             using (var reader = new JsonTextReader(streamReader))
             {
-                var root = JToken.ReadFrom(reader);
-                var rootJObj = (JObject)root;
+                var rootJObj = JObject.Load(reader);
+
+                var lineNumberMappingDict = GetLineNumberMappingInfo(rootJObj); 
 
                 // Resolve $ref with json file instead of definition reference in the same swagger
                 var refResolver = new RefResolver(rootJObj, filePath);
@@ -46,13 +47,7 @@
                 rootJObj["x-internal-service-id"] = serviceId;
                 rootJObj["x-internal-service-name"] = serviceName;
 
-                sourceSwaggerUrl = GetTheSwaggerSource(repoFile, swaggerRelativePath);
-                if (sourceSwaggerUrl != null)
-                {
-                    rootJObj["x-internal-swagger-source-url"] = sourceSwaggerUrl;
-                }
-
-                var generator = GeneratorFactory.CreateGenerator(rootJObj, targetDir, filePath, operationGroupMapping, mappingConfig);
+                var generator = GeneratorFactory.CreateGenerator(rootJObj, targetDir, filePath, operationGroupMapping, mappingConfig, lineNumberMappingDict, repoFile, swaggerRelativePath);
                 var fileNameInfos = generator.Generate().ToList();
 
                 if (fileNameInfos.Any())
@@ -81,26 +76,40 @@
             throw new InvalidOperationException($"info is not defined in {root}");
         }
 
-        private static string GetTheSwaggerSource(RepoFile repoFile, string swaggerRelativePath)
+        private static IDictionary<string, int> GetLineNumberMappingInfo(JObject rootJObj)
         {
-            swaggerRelativePath = swaggerRelativePath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            var paths = swaggerRelativePath.Split(Path.AltDirectorySeparatorChar);
-            if (repoFile!= null && paths.Count() > 0)
+            var paths = (JObject)rootJObj["paths"];
+            var xMsPaths = (JObject)rootJObj["x-ms-paths"];
+
+            var lineNumberMappingDict = new Dictionary<string, int>();
+
+            ParsePathJObjectInfo(paths, ref lineNumberMappingDict);
+            ParsePathJObjectInfo(xMsPaths, ref lineNumberMappingDict);
+
+            return lineNumberMappingDict;
+        }
+
+        private static void ParsePathJObjectInfo(JObject paths, ref Dictionary<string, int> lineNumberMappingDict)
+        {
+            if (paths == null)
             {
-                var repo = repoFile.Repos.SingleOrDefault(r => string.Equals(r.Name, paths[0], StringComparison.OrdinalIgnoreCase));
-                if (repo != null && repo.EnableViewCode)
+                return;
+            }
+
+            foreach (var path in paths)
+            {
+                foreach (var item in (JObject)path.Value)
                 {
-                    if (repo.Url.Contains("github.com"))
+                    if (((JObject)item.Value).TryGetValue("operationId", out JToken opId) && opId != null)
                     {
-                        return $"{repo.Url.TrimEnd('/')}/blob/{repo.Branch}/{swaggerRelativePath.Substring(paths[0].Length + 1)}";
-                    }
-                    else if(repo.Url.Contains("visualstudio.com"))
-                    {
-                        return $"{repo.Url.TrimEnd('/')}?path={swaggerRelativePath.Substring(paths[0].Length + 1)}&version=GB{repo.Branch}&a=contents";
+                        if (!lineNumberMappingDict.ContainsKey(opId.ToString()))
+                        {
+                            var lineNumber = (paths[path.Key][item.Key]["operationId"] as IJsonLineInfo).LineNumber;
+                            lineNumberMappingDict.Add(opId.ToString(), lineNumber);
+                        }
                     }
                 }
             }
-            return null;
         }
     }
 }
