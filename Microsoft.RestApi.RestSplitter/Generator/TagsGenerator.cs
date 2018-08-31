@@ -62,16 +62,6 @@
                     RootJObj["paths"] = filteredPaths;
                     RootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
 
-                    //Set metadata source_url
-                    string swaggerSourceUrl = LineNumberMappingDict.TryGetValue(tag, out int lineNumber) ? GetTheSwaggerSource(lineNumber) : GetTheSwaggerSource();
-                    
-                    if (swaggerSourceUrl != null)
-                    {
-                        RootJObj["x-internal-swagger-source-url"] = swaggerSourceUrl;
-                    }
-
-                    fileNameInfo.SwaggerSourceUrl = swaggerSourceUrl;
-
                     // Only split when the children count larger than MappingConfig.SplitOperationCountGreaterThan
                     if (MappingConfig.IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj, MappingConfig.SplitOperationCountGreaterThan))
                     {
@@ -81,8 +71,7 @@
                                 RootJObj, 
                                 (JObject)RootJObj["paths"], 
                                 TargetDir, 
-                                newTagName,
-                                swaggerSourceUrl
+                                newTagName
                             )
                         );
 
@@ -133,11 +122,11 @@
 
         #region Protected Methods
 
-        protected override string GetOperationName(JObject operation)
+        protected override string GetOperationName(JObject operation, out string operationId)
         {
-            JToken value;
-            if (operation.TryGetValue("operationId", out value) && value != null)
+            if (operation.TryGetValue("operationId", out JToken value) && value != null)
             {
+                operationId = value.ToString();
                 return value.ToString();
             }
             throw new InvalidOperationException($"operationId is not defined in {operation}");
