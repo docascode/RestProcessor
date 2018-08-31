@@ -6,7 +6,7 @@
 
     using Microsoft.RestApi.Common;
     using Microsoft.RestApi.RestSplitter.Model;
-
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     public class OperationGroupGenerator : BaseGenerator
@@ -14,7 +14,7 @@
         protected OperationGroupMapping OperationGroupMapping { get; }
 
         #region Constructors
-        public OperationGroupGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig) : base(rootJObj, targetDir, filePath, mappingConfig)
+        public OperationGroupGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerRelativePath) : base(rootJObj, targetDir, filePath, mappingConfig, lineNumberMappingDict, repoFile, swaggerRelativePath)
         {
             OperationGroupMapping = operationGroupMapping;
         }
@@ -30,6 +30,7 @@
         {
             var pathsJObj = (JObject)RootJObj["paths"];
             var operationGroups = GetOperationGroups(pathsJObj);
+
             if (operationGroups.Count == 0)
             {
                 Console.WriteLine($"Operation groups is null or empty for file {FilePath}.");
@@ -40,6 +41,7 @@
                 {
                     JToken pathParameters = null;
                     var filteredPaths = FindPathsByOperationGroup(pathsJObj, operationGroup, ref pathParameters);
+
                     if (filteredPaths.Count == 0)
                     {
                         throw new InvalidOperationException($"Operation group '{operationGroup}' could not be found in for {FileUtility.GetDirectoryName(TargetDir)}");
@@ -68,6 +70,14 @@
                     RootJObj["paths"] = filteredPaths;
                     RootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
 
+                    //Set metadata source_url
+                    string swaggerSourceUrl = LineNumberMappingDict.TryGetValue(operationGroup, out int lineNumber) ? GetTheSwaggerSource(lineNumber) : GetTheSwaggerSource();
+
+                    if (swaggerSourceUrl != null)
+                    {
+                        RootJObj["x-internal-swagger-source-url"] = swaggerSourceUrl;
+                    }
+
                     // Only split when the children count larger than MappingConfig.SplitOperationCountGreaterThan
                     if (MappingConfig.IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj, MappingConfig.SplitOperationCountGreaterThan))
                     {
@@ -77,7 +87,8 @@
                                 RootJObj, 
                                 (JObject)RootJObj["paths"], 
                                 TargetDir, 
-                                newOperationGroupName
+                                newOperationGroupName,
+                                swaggerSourceUrl
                             )
                         );
 

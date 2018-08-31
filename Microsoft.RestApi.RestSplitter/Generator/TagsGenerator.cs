@@ -16,7 +16,7 @@
 
         #region Constructors
 
-        public TagsGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig) : base(rootJObj, targetDir, filePath, mappingConfig)
+        public TagsGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerRelativePath) : base(rootJObj, targetDir, filePath, mappingConfig, lineNumberMappingDict, repoFile, swaggerRelativePath)
         {
             OperationGroupMapping = operationGroupMapping;
         }
@@ -62,6 +62,16 @@
                     RootJObj["paths"] = filteredPaths;
                     RootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
 
+                    //Set metadata source_url
+                    string swaggerSourceUrl = LineNumberMappingDict.TryGetValue(tag, out int lineNumber) ? GetTheSwaggerSource(lineNumber) : GetTheSwaggerSource();
+                    
+                    if (swaggerSourceUrl != null)
+                    {
+                        RootJObj["x-internal-swagger-source-url"] = swaggerSourceUrl;
+                    }
+
+                    fileNameInfo.SwaggerSourceUrl = swaggerSourceUrl;
+
                     // Only split when the children count larger than MappingConfig.SplitOperationCountGreaterThan
                     if (MappingConfig.IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj, MappingConfig.SplitOperationCountGreaterThan))
                     {
@@ -71,7 +81,8 @@
                                 RootJObj, 
                                 (JObject)RootJObj["paths"], 
                                 TargetDir, 
-                                newTagName
+                                newTagName,
+                                swaggerSourceUrl
                             )
                         );
 
