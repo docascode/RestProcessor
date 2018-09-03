@@ -98,8 +98,7 @@
                     rootJObj["x-internal-operation-name"] = operationTocName;
 
                     //Set metadata source_url
-                    var lineNumberMappingKey = groupName == operationName ? groupName : $"{groupName}_{operationName}";
-                    string swaggerSourceUrl = LineNumberMappingDict.TryGetValue(lineNumberMappingKey, out int lineNumber) ? GetTheSwaggerSource(lineNumber) : GetTheSwaggerSource();
+                    string swaggerSourceUrl = LineNumberMappingDict.TryGetValue(operationId, out int lineNumber) ? GetTheSwaggerSource(lineNumber) : GetTheSwaggerSource();
 
                     if (swaggerSourceUrl != null)
                     {
