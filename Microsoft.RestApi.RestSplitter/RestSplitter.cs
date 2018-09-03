@@ -311,18 +311,36 @@
                     {
                         throw new InvalidOperationException($"Sub toc '{subTocTitle}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{swagger.Source}' to avoid conflicting");
                     }
-
+        
                     var childrenToc = new List<SwaggerToc>();
                     if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
                     {
                         foreach (var nameInfo in fileNameInfo.ChildrenFileNameInfo)
                         {
-                            childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, subGroupName.TrimSubGroupName(), nameInfo.FileName))));
-
-                            // Write into ref mapping dict
-                            if (!sourceSwaggerMappingDict.ContainsKey(nameInfo.FileName))
+                            try
                             {
-                                sourceSwaggerMappingDict.Add(FileUtility.NormalizePath(nameInfo.FileName), nameInfo.SwaggerSourceUrl);
+                                childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, subGroupName.TrimSubGroupName(), nameInfo.FileName))));
+
+                                var normalizedFileName = FileUtility.NormalizePath(nameInfo.FileName);
+                                // Write into ref mapping dict
+                                if (!sourceSwaggerMappingDict.ContainsKey(normalizedFileName))
+                                {
+                                    sourceSwaggerMappingDict.Add(normalizedFileName, nameInfo.SwaggerSourceUrl);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                foreach (var aa in sourceSwaggerMappingDict)
+                                {
+                                    Console.WriteLine($"{aa.Key}, {aa.Value}");
+                                }
+
+                                foreach (var toc in childrenToc)
+                                {
+                                    Console.WriteLine(toc.ToString());
+                                }
+                                Console.WriteLine();
+                                throw ex;
                             }
                         }
                     }
