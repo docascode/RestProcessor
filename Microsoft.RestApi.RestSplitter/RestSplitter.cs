@@ -317,30 +317,13 @@
                     {
                         foreach (var nameInfo in fileNameInfo.ChildrenFileNameInfo)
                         {
-                            try
-                            {
-                                childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, subGroupName.TrimSubGroupName(), nameInfo.FileName))));
+                            childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, subGroupName.TrimSubGroupName(), nameInfo.FileName))));
 
-                                var normalizedFileName = FileUtility.NormalizePath(nameInfo.FileName);
-                                // Write into ref mapping dict
-                                if (!sourceSwaggerMappingDict.ContainsKey(normalizedFileName))
-                                {
-                                    sourceSwaggerMappingDict.Add(normalizedFileName, nameInfo.SwaggerSourceUrl);
-                                }
-                            }
-                            catch (Exception ex)
+                            var normalizedFileName = FileUtility.NormalizePath(nameInfo.FileName);
+                            // Write into ref mapping dict
+                            if (!sourceSwaggerMappingDict.ContainsKey(normalizedFileName))
                             {
-                                foreach (var aa in sourceSwaggerMappingDict)
-                                {
-                                    Console.WriteLine($"{aa.Key}, {aa.Value}");
-                                }
-
-                                foreach (var toc in childrenToc)
-                                {
-                                    Console.WriteLine(toc.ToString());
-                                }
-                                Console.WriteLine();
-                                throw ex;
+                                sourceSwaggerMappingDict.Add(normalizedFileName, nameInfo.SwaggerSourceUrl);
                             }
                         }
                     }

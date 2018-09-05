@@ -100,6 +100,11 @@
             {
                 foreach (var item in (JObject)path.Value)
                 {
+                    // Skip find tag for parameters
+                    if (item.Key.Equals("parameters"))
+                    {
+                        continue;
+                    }
                     if (((JObject)item.Value).TryGetValue("operationId", out JToken opId) && opId != null)
                     {
                         if (!lineNumberMappingDict.ContainsKey(opId.ToString()))
