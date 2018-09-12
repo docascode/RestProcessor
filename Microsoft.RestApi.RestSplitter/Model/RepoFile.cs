@@ -21,5 +21,8 @@
 
         [JsonProperty("url")]
         public string Url { get; set; }
+
+        [JsonProperty("enable_view_code")]
+        public bool EnableViewCode { get; set; }
     }
 }

@@ -220,6 +220,46 @@
             }
         }
 
+        public static void WriteDictToFile(string filePath, IDictionary<string, string> dict)
+        {
+            try
+            {
+                if (!File.Exists(filePath))
+                {
+                    using (File.Create(filePath))
+                    {
+                    }
+                }
+
+                using (var sw = new StreamWriter(filePath, true))
+                {
+                    string json = JsonConvert.SerializeObject(dict, Formatting.Indented);
+                    sw.WriteLine(json);
+                }
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Write dict file error: {ex}, filePath: {filePath}, DictionaryObj: {dict.ToString()}");
+                return;
+            }
+        }
+
+        public static void ClearFile(string filePath)
+        {
+            try
+            {
+                if (File.Exists(filePath))
+                {
+                    File.WriteAllText(filePath, string.Empty);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Clear file error: {ex}");
+                return;
+            }
+        }
+
         private static string GetClosestUpperCaseWord(string word, int index)
         {
             var result = new StringBuilder();

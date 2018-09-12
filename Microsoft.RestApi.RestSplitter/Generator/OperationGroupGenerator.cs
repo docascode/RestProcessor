@@ -6,7 +6,7 @@
 
     using Microsoft.RestApi.Common;
     using Microsoft.RestApi.RestSplitter.Model;
-
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     public class OperationGroupGenerator : BaseGenerator
@@ -14,7 +14,7 @@
         protected OperationGroupMapping OperationGroupMapping { get; }
 
         #region Constructors
-        public OperationGroupGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig) : base(rootJObj, targetDir, filePath, mappingConfig)
+        public OperationGroupGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerRelativePath) : base(rootJObj, targetDir, filePath, mappingConfig, lineNumberMappingDict, repoFile, swaggerRelativePath)
         {
             OperationGroupMapping = operationGroupMapping;
         }
@@ -30,6 +30,7 @@
         {
             var pathsJObj = (JObject)RootJObj["paths"];
             var operationGroups = GetOperationGroups(pathsJObj);
+
             if (operationGroups.Count == 0)
             {
                 Console.WriteLine($"Operation groups is null or empty for file {FilePath}.");
@@ -40,6 +41,7 @@
                 {
                     JToken pathParameters = null;
                     var filteredPaths = FindPathsByOperationGroup(pathsJObj, operationGroup, ref pathParameters);
+
                     if (filteredPaths.Count == 0)
                     {
                         throw new InvalidOperationException($"Operation group '{operationGroup}' could not be found in for {FileUtility.GetDirectoryName(TargetDir)}");
@@ -121,8 +123,9 @@
             }
         }
 
-        protected override string GetOperationName(JObject operation)
+        protected override string GetOperationName(JObject operation, out string operationId)
         {
+            operationId = GetOperationId(operation);
             return GetOperationGroupPerOperation(operation).Item2;
         }
 
@@ -184,10 +187,18 @@
             return operationGroups;
         }
 
+        private static string GetOperationId(JObject operation)
+        {
+            if (operation.TryGetValue("operationId", out JToken value) && value != null)
+            {
+                return value.ToString();
+            }
+            throw new InvalidOperationException($"operationId is not defined in {operation}");
+        }
+
         private static Tuple<string, string> GetOperationGroupPerOperation(JObject operation)
         {
-            JToken value;
-            if (operation.TryGetValue("operationId", out value) && value != null)
+            if (operation.TryGetValue("operationId", out JToken value) && value != null)
             {
                 return GetOperationGroupFromOperationId(value.ToString());
             }

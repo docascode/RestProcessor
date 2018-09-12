@@ -52,7 +52,7 @@
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception occurs: {ex.Message}");
+                Console.WriteLine($"Exception occurs: {ex}");
                 return 1;
             }
         }

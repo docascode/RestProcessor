@@ -16,5 +16,10 @@
             FilePath = filePath;
             ChildrenToc = childrenToc;
         }
+        public override string ToString()
+        {
+            return $"{Title}, {FilePath}";
+        }
+
     }
 }

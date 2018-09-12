@@ -8,6 +8,7 @@
 
     using Newtonsoft.Json.Linq;
     using System.Linq;
+    using System;
 
     public abstract class BaseGenerator : IGenerator
     {
@@ -19,9 +20,15 @@
 
         protected MappingConfig MappingConfig { get; }
 
+        protected IDictionary<string, int> LineNumberMappingDict { get; }
+
+        protected RepoFile RepoFile { get; }
+
+        protected string SwaggerRelativePath { get; set; }
+
         #region Constructors
 
-        protected BaseGenerator(JObject rootJObj, string targetDir, string filePath, MappingConfig mappingConfig)
+        protected BaseGenerator(JObject rootJObj, string targetDir, string filePath, MappingConfig mappingConfig, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerRelativePath)
         {
             Guard.ArgumentNotNull(rootJObj, nameof(rootJObj));
             Guard.ArgumentNotNullOrEmpty(targetDir, nameof(targetDir));
@@ -32,6 +39,9 @@
             TargetDir = targetDir;
             FilePath = filePath;
             MappingConfig = mappingConfig;
+            LineNumberMappingDict = lineNumberMappingDict;
+            RepoFile = repoFile;
+            SwaggerRelativePath = swaggerRelativePath;
         }
 
 
@@ -41,7 +51,7 @@
 
         public abstract IEnumerable<FileNameInfo> Generate();
 
-        protected abstract string GetOperationName(JObject operation);
+        protected abstract string GetOperationName(JObject operation, out string operationId);
 
         #endregion
 
@@ -69,7 +79,7 @@
                     }
 
                     var operationObj = (JObject)item.Value;
-                    var operationName = GetOperationName(operationObj);
+                    var operationName = GetOperationName(operationObj, out string operationId);
                     var operationTocName = Utility.ExtractPascalNameByRegex(RemoveTagFromOperationId(operationName, groupName));
                     operationObj["x-internal-toc-name"] = operationTocName;
 
@@ -87,18 +97,28 @@
                     rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
                     rootJObj["x-internal-operation-name"] = operationTocName;
 
+                    //Set metadata source_url
+                    string swaggerSourceUrl = /*LineNumberMappingDict.TryGetValue(operationId, out int lineNumber) ? GetTheSwaggerSource(lineNumber) : */ GetTheSwaggerSource();
+
+                    if (swaggerSourceUrl != null)
+                    {
+                        rootJObj["x-internal-swagger-source-url"] = swaggerSourceUrl;
+                    }
+
                     var groupNamePath = Utility.TryToFormalizeUrl(groupName, MappingConfig.FormalizeUrl);
                     var operationNamePath = Utility.TryToFormalizeUrl(operationName, MappingConfig.FormalizeUrl);
                     var operationFile = Utility.Serialize(Path.Combine(targetDir, groupNamePath), RemoveTagFromOperationId(operationNamePath, groupNamePath), rootJObj);
                     ClearKey(rootJObj, "x-internal-split-type");
                     ClearKey(rootJObj, "x-internal-operation-name");
+                    ClearKey(rootJObj, "x-internal-swagger-source-url");
 
                     var fileName = Path.Combine(groupNamePath, operationFile.Item1);
                     yield return new FileNameInfo
                     {
                         TocName = operationTocName,
                         FileName = MappingConfig.UseYamlSchema ? Path.ChangeExtension(fileName, "yml") : fileName,
-                        FilePath = operationFile.Item2
+                        FilePath = operationFile.Item2,
+                        SwaggerSourceUrl = swaggerSourceUrl
                     };
                 }
             }
@@ -125,6 +145,28 @@
                     }
                 }
             }
+        }
+
+        protected string GetTheSwaggerSource(int lineNum = 1)
+        {
+            SwaggerRelativePath = SwaggerRelativePath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var paths = SwaggerRelativePath.Split(Path.AltDirectorySeparatorChar);
+            if (RepoFile != null && paths.Count() > 0)
+            {
+                var repo = RepoFile.Repos.SingleOrDefault(r => string.Equals(r.Name, paths[0], StringComparison.OrdinalIgnoreCase));
+                if (repo != null && repo.EnableViewCode)
+                {
+                    if (repo.Url.Contains("github.com"))
+                    {
+                        return $"{repo.Url.TrimEnd('/')}/blob/{repo.Branch}/{SwaggerRelativePath.Substring(paths[0].Length + 1)}#L{lineNum}";
+                    }
+                    else if (repo.Url.Contains("visualstudio.com"))
+                    {
+                        return $"{repo.Url.TrimEnd('/')}?path={SwaggerRelativePath.Substring(paths[0].Length + 1)}&version=GB{repo.Branch}&a=contents&line={lineNum}";
+                    }
+                }
+            }
+            return null;
         }
 
         private JArray DistinctParameters(JArray parameters)

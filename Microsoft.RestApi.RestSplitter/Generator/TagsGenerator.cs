@@ -16,7 +16,7 @@
 
         #region Constructors
 
-        public TagsGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig) : base(rootJObj, targetDir, filePath, mappingConfig)
+        public TagsGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerRelativePath) : base(rootJObj, targetDir, filePath, mappingConfig, lineNumberMappingDict, repoFile, swaggerRelativePath)
         {
             OperationGroupMapping = operationGroupMapping;
         }
@@ -122,11 +122,11 @@
 
         #region Protected Methods
 
-        protected override string GetOperationName(JObject operation)
+        protected override string GetOperationName(JObject operation, out string operationId)
         {
-            JToken value;
-            if (operation.TryGetValue("operationId", out value) && value != null)
+            if (operation.TryGetValue("operationId", out JToken value) && value != null)
             {
+                operationId = value.ToString();
                 return value.ToString();
             }
             throw new InvalidOperationException($"operationId is not defined in {operation}");

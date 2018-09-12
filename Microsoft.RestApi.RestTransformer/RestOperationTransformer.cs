@@ -41,6 +41,7 @@
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
             var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
+            var sourceUrl = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-swagger-source-url");
 
             return new OperationEntity
             {
@@ -62,7 +63,7 @@
                 Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
                 Definitions = TransformDefinitions(allDefinitions, parametersDefinitions, bodyDefinitionObject, responseDefinitionObjects),
                 Securities = TransformSecurities(swaggerModel),
-                SourceUrl = Utility.GetSourceUrl(swaggerModel.Metadata)
+                Metadata = TransformMetaData(sourceUrl)
             };
         }
 
@@ -1052,6 +1053,16 @@
             }
 
             return securities;
+        }
+
+        private static MetaDataEntity TransformMetaData(string sourceUrl)
+        {
+            return sourceUrl != null ? new MetaDataEntity
+            {
+                SourceUrl = sourceUrl
+            }
+            :
+            null;
         }
 
         #endregion
