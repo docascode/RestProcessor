@@ -226,7 +226,9 @@
             {
                 if (!File.Exists(filePath))
                 {
-                    File.Create(filePath).Dispose();
+                    using (File.Create(filePath))
+                    {
+                    }
                 }
 
                 using (var sw = new StreamWriter(filePath, true))

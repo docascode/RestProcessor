@@ -58,6 +58,6 @@
         public IList<SecurityEntity> Securities { get; set; }
 
         [YamlMember(Alias = "metadata")]
-        public MetaDataEntity MetaData { get; set; }
+        public MetaDataEntity Metadata { get; set; }
     }
 }

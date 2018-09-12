@@ -63,7 +63,7 @@
                 Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
                 Definitions = TransformDefinitions(allDefinitions, parametersDefinitions, bodyDefinitionObject, responseDefinitionObjects),
                 Securities = TransformSecurities(swaggerModel),
-                MetaData = TransformMetaData(sourceUrl)
+                Metadata = TransformMetaData(sourceUrl)
             };
         }
 
