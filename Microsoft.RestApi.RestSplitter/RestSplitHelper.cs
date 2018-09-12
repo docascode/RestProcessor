@@ -34,12 +34,6 @@
 
                 var lineNumberMappingDict = GetLineNumberMappingInfo(rootJObj);
 
-                //For test log
-                foreach (var entry in lineNumberMappingDict)
-                {
-                    Console.WriteLine($"line number entry: {entry.Key}, {entry.Value}");
-                }
-
                 // Resolve $ref with json file instead of definition reference in the same swagger
                 var refResolver = new RefResolver(rootJObj, filePath);
                 refResolver.Resolve();
