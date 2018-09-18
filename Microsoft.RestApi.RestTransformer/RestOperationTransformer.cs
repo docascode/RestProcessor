@@ -432,7 +432,7 @@
                             exampleRequestHeaders.Add(new ExampleRequestHeaderEntity
                             {
                                 Name = msExampleParameter.Key,
-                                Value = (string)msExampleParameter.Value
+                                Value = msExampleParameter.Value?.ToString()
                             });
                         }
                     }

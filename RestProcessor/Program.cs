@@ -100,14 +100,6 @@
                     var swaggerModel = SwaggerJsonParser.Parse(fileNameInfo.FilePath);
                     var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
 
-                    //var fileName = $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.raw.json";
-                    //using (var sw = new StreamWriter(Path.Combine(folder, fileName)))
-                    //using (var writer = new JsonTextWriter(sw))
-                    //{
-                    //    JsonSerializer.Serialize(writer, swaggerModel);
-                    //}
-                    //Console.WriteLine($"Done generate view model for {fileName}");
-
                     var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.yml");
                     try
                     {

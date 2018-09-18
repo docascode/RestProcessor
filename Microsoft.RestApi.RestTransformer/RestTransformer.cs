@@ -33,15 +33,6 @@
                     {
                         Console.WriteLine($"Warining: the group has no members: {folder}");
                     }
-                    
-                    if (File.Exists(Path.ChangeExtension(filePath, ".json")))
-                    {
-                        File.Delete(Path.ChangeExtension(filePath, ".json"));
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Warining: There is a duplicate operation group: {folder}");
-                    }
                 }
                 else if (currentFileType == "Operation")
                 {
@@ -56,20 +47,20 @@
                                 YamlSerializer.Serialize(writer, operationInfo);
                             }
                         }
-                        
-                        if (File.Exists(Path.ChangeExtension(filePath, ".json")))
-                        {
-                            File.Delete(Path.ChangeExtension(filePath, ".json"));
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Warining: There is a duplicate operation: {filePath}");
-                        }
                     }
                     else
                     {
                         Console.WriteLine($"Please make sure there is only 1 child here. the actual children number is : {viewModel.Children?.Count}");
                     }
+                }
+
+                if (File.Exists(Path.ChangeExtension(filePath, ".json")))
+                {
+                    File.Delete(Path.ChangeExtension(filePath, ".json"));
+                }
+                else
+                {
+                    Console.WriteLine($"Warining: There is a duplicate operation group: {folder}");
                 }
             }
         }
