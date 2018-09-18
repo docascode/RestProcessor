@@ -21,6 +21,7 @@
         };
         private static OrgsMappingFile MappingFile;
 
+        private static List<string> ErrorList = new List<string>();
 
         static int Main(string[] args)
         {
@@ -47,6 +48,15 @@
                 if (MappingFile.UseYamlSchema)
                 {
                     RestProcessor(restFileInfos);
+                }
+
+                if (ErrorList.Count > 0)
+                {
+                    foreach(var error in ErrorList)
+                    {
+                        Console.WriteLine($"Exception occurs: {error}");
+                    }
+                    return 1;
                 }
                 return 0;
             }
@@ -108,7 +118,7 @@
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error generate yml files for {fileNameInfo.FilePath}, details: {ex}");
+                        ErrorList.Add($"Error generate yml files for {fileNameInfo.FilePath}, details: {ex}");
                     }
                 }
                 
