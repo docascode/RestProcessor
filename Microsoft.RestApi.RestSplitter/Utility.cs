@@ -260,23 +260,6 @@
             }
         }
 
-        public static string GetSourceSwaggerFilePath(string filePath)
-        {
-            ////1. According to the pattern which is a contract with powershell script
-            var sourceSwaggerFileName = Path.GetFileName(filePath)?.Replace(".json", "_sourceswagger.json");
-            var sourceSwaggerFilePath = Path.Combine(Path.GetDirectoryName(filePath), sourceSwaggerFileName);
-
-            ////2. Judge the file is exist or using the filePath
-            if (!File.Exists(sourceSwaggerFilePath))
-            {
-                return filePath;
-            }
-            else
-            {
-                return sourceSwaggerFilePath;
-            }
-        }
-
         private static string GetClosestUpperCaseWord(string word, int index)
         {
             var result = new StringBuilder();
