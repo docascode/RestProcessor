@@ -126,6 +126,10 @@
         protected override string GetOperationName(JObject operation, out string operationId)
         {
             operationId = GetOperationId(operation);
+            if (operation.TryGetValue("x-operationTitle", out JToken operationName) && operationName != null)
+            {
+                return operationName.ToString();
+            }
             return GetOperationGroupPerOperation(operation).Item2;
         }
 

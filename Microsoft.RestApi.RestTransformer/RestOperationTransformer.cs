@@ -40,12 +40,13 @@
             var serviceId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-id");
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
+            var operationId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-id");
             var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
             var sourceUrl = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-swagger-source-url");
 
             return new OperationEntity
             {
-                Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}.{operationName}")?.ToLower(),
+                Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}.{operationId}")?.ToLower(),
                 Name = operationName,
                 Service = serviceName,
                 Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description),

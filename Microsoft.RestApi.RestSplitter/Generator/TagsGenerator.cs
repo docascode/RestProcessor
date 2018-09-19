@@ -127,6 +127,10 @@
             if (operation.TryGetValue("operationId", out JToken value) && value != null)
             {
                 operationId = value.ToString();
+                if (operation.TryGetValue("x-operationTitle", out JToken operationName) && operationName != null)
+                {
+                    return operationName.ToString();
+                }
                 return value.ToString();
             }
             throw new InvalidOperationException($"operationId is not defined in {operation}");
