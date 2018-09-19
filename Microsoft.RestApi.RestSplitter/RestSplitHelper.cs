@@ -25,49 +25,37 @@
                 throw new ArgumentException($"{nameof(filePath)} '{filePath}' should exist.");
             }
 
-            var sourceSwaggerFilePath = Utility.GetSourceSwaggerFilePath(filePath);
-            IDictionary<string, int> lineNumberMappingDict = new Dictionary<string, int>();
-
-            using (var streamReader = File.OpenText(sourceSwaggerFilePath))
-            {
-                using (var reader = new JsonTextReader(streamReader))
-                {
-                    var rootJObj = JObject.Load(reader);
-                    lineNumberMappingDict = GetLineNumberMappingInfo(rootJObj);
-                }
-            }
-
             var restFileInfo = new RestFileInfo();
 
             using (var streamReader = File.OpenText(filePath))
+            using (var reader = new JsonTextReader(streamReader))
             {
-                using (var reader = new JsonTextReader(streamReader))
+                var rootJObj = JObject.Load(reader);
+
+                var lineNumberMappingDict = GetLineNumberMappingInfo(rootJObj);
+
+                // Resolve $ref with json file instead of definition reference in the same swagger
+                var refResolver = new RefResolver(rootJObj, filePath);
+                refResolver.Resolve();
+
+                if (mappingConfig.NeedResolveXMsPaths)
                 {
-                    var rootJObj = JObject.Load(reader);
-
-                    // Resolve $ref with json file instead of definition reference in the same swagger
-                    var refResolver = new RefResolver(rootJObj, filePath);
-                    refResolver.Resolve();
-
-                    if (mappingConfig.NeedResolveXMsPaths)
-                    {
-                        var xMsPathsResolver = new XMsPathsResolver(rootJObj);
-                        xMsPathsResolver.Resolve();
-                    }
-
-                    rootJObj["x-internal-service-id"] = serviceId;
-                    rootJObj["x-internal-service-name"] = serviceName;
-
-                    var generator = GeneratorFactory.CreateGenerator(rootJObj, targetDir, filePath, operationGroupMapping, mappingConfig, lineNumberMappingDict, repoFile, swaggerRelativePath);
-                    var fileNameInfos = generator.Generate().ToList();
-
-                    if (fileNameInfos.Any())
-                    {
-                        restFileInfo.FileNameInfos = fileNameInfos;
-                    }
-
-                    restFileInfo.TocTitle = GetInfoTitle(rootJObj);
+                    var xMsPathsResolver = new XMsPathsResolver(rootJObj);
+                    xMsPathsResolver.Resolve();
                 }
+
+                rootJObj["x-internal-service-id"] = serviceId;
+                rootJObj["x-internal-service-name"] = serviceName;
+
+                var generator = GeneratorFactory.CreateGenerator(rootJObj, targetDir, filePath, operationGroupMapping, mappingConfig, lineNumberMappingDict, repoFile, swaggerRelativePath);
+                var fileNameInfos = generator.Generate().ToList();
+
+                if (fileNameInfos.Any())
+                {
+                    restFileInfo.FileNameInfos = fileNameInfos;
+                }
+
+                restFileInfo.TocTitle = GetInfoTitle(rootJObj);
             }
             return restFileInfo;
         }
