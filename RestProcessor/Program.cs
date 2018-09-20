@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-
+    using System.Threading.Tasks;
     using Microsoft.DocAsCode.Build.RestApi;
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
     using Microsoft.RestApi.Common;
@@ -25,6 +25,7 @@
 
         static int Main(string[] args)
         {
+            Console.WriteLine("Processor begin at:" + DateTime.UtcNow);
             try
             {
                 if (args.Length < 3)
@@ -43,13 +44,19 @@
                     MappingFile = YamlConverter.ConvertYamls(args[0], MappingFile);
                 }
                 var outputDir = args.Length < 4 ? Path.Combine(args[1], MappingFile.TargetApiRootDir) : args[3];
+
+                Console.WriteLine("Processor split begin at:" + DateTime.UtcNow);
                 var restFileInfos = RestSpliter(args[0], args[1], MappingFile, outputDir);
+
+                Console.WriteLine("Processor split end at:" + DateTime.UtcNow);
+                Console.WriteLine("Processor transform start at:" + DateTime.UtcNow);
 
                 if (MappingFile.UseYamlSchema)
                 {
+                    ExtractRestFiles(restFileInfos);
                     RestProcessor(restFileInfos);
                 }
-
+                Console.WriteLine("Processor transform end at:" + DateTime.UtcNow);
                 if (ErrorList.Count > 0)
                 {
                     foreach(var error in ErrorList)
@@ -64,6 +71,10 @@
             {
                 Console.WriteLine($"Exception occurs: {ex}");
                 return 1;
+            }
+            finally
+            {
+                Console.WriteLine("Processor end at:" + DateTime.UtcNow);
             }
         }
 
@@ -88,45 +99,36 @@
             return restFileInfos;
         }
 
-        public static void RestProcessor(IList<RestFileInfo> restFileInfos)
+        public static List<string> ExtractRestFiles(IList<RestFileInfo> restFileInfos)
         {
+            var splitedFilePaths = new List<string>();
             foreach (var restFileInfo in restFileInfos)
             {
-                foreach(var fileInfo in restFileInfo.FileNameInfos)
+                foreach (var fileInfo in restFileInfo.FileNameInfos)
                 {
-                    RestTransformerWrapper(fileInfo);
+                    ExtractRestFilesCore(fileInfo, splitedFilePaths);
                 }
             }
+           
+            foreach(var test in splitedFilePaths)
+            {
+                Console.WriteLine(test);
+            }
+            return splitedFilePaths;
+
         }
 
-        private static void RestTransformerWrapper(FileNameInfo fileNameInfo)
+        public static void ExtractRestFilesCore(FileNameInfo fileNameInfo, List<string> splitedFilePaths)
         {
-            if (fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath) && File.Exists(fileNameInfo.FilePath))
+            if(fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath) && File.Exists(fileNameInfo.FilePath))
             {
-                // if (fileNameInfo.FilePath .StartsWith("C:\\Code\\RestRepos\\azure-test\\docs-ref-autogen\\power-bi\\ManagedClusters\\CreateOrUpdate.json"))
-                {
-                    var folder = Path.GetDirectoryName(fileNameInfo.FilePath);
+                splitedFilePaths.Add(fileNameInfo.FilePath);
 
-                    var swaggerModel = SwaggerJsonParser.Parse(fileNameInfo.FilePath);
-                    var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
-
-                    var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(fileNameInfo.FilePath)}.yml");
-                    try
-                    {
-                        RestTransformer.Process(ymlPath, swaggerModel, viewModel, folder, MappingFile.ProductUid);
-                        Console.WriteLine($"Done generate yml model for {ymlPath}");
-                    }
-                    catch (Exception ex)
-                    {
-                        ErrorList.Add($"Error generate yml files for {fileNameInfo.FilePath}, details: {ex}");
-                    }
-                }
-                
                 if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
                 {
-                    foreach(var info in fileNameInfo.ChildrenFileNameInfo)
+                    foreach (var info in fileNameInfo.ChildrenFileNameInfo)
                     {
-                        RestTransformerWrapper(info);
+                        ExtractRestFilesCore(info, splitedFilePaths);
                     }
                 }
             }
@@ -137,10 +139,33 @@
                 {
                     foreach (var info in fileNameInfo.ChildrenFileNameInfo)
                     {
-                        RestTransformerWrapper(info);
+                        ExtractRestFilesCore(info, splitedFilePaths);
                     }
                 }
             }
+        }
+
+        public static void RestProcessor(IList<RestFileInfo> restFileInfos)
+        {
+            var filePaths = ExtractRestFiles(restFileInfos);
+            Parallel.ForEach(filePaths, (filePath) =>
+            {
+                var folder = Path.GetDirectoryName(filePath);
+
+                var swaggerModel = SwaggerJsonParser.Parse(filePath);
+                var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
+
+                var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(filePath)}.yml");
+                try
+                {
+                    RestTransformer.Process(ymlPath, swaggerModel, viewModel, folder, MappingFile.ProductUid);
+                    Console.WriteLine($"Done generate yml model for {ymlPath}");
+                }
+                catch (Exception ex)
+                {
+                    ErrorList.Add($"Error generate yml files for {filePath}, details: {ex}");
+                }
+            });
         }
     }
 }
