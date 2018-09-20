@@ -161,6 +161,13 @@
                     ErrorList.Add($"Error generate yml files for {filePath}, details: {ex}");
                 }
             });
+            Parallel.ForEach(filePaths, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (filePath) =>
+            {
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+            });
         }
     }
 }

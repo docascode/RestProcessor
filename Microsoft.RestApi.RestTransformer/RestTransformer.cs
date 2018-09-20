@@ -53,15 +53,6 @@
                         Console.WriteLine($"Please make sure there is only 1 child here. the actual children number is : {viewModel.Children?.Count}");
                     }
                 }
-
-                if (File.Exists(Path.ChangeExtension(filePath, ".json")))
-                {
-                    File.Delete(Path.ChangeExtension(filePath, ".json"));
-                }
-                else
-                {
-                    Console.WriteLine($"Warining: There is a duplicate operation group: {folder}");
-                }
             }
         }
     }
