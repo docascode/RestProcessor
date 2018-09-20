@@ -59,7 +59,7 @@
                 Console.WriteLine("Processor transform end at:" + DateTime.UtcNow);
                 if (ErrorList.Count > 0)
                 {
-                    foreach(var error in ErrorList)
+                    foreach (var error in ErrorList)
                     {
                         Console.WriteLine($"Exception occurs: {error}");
                     }
@@ -115,7 +115,7 @@
 
         public static void ExtractRestFilesCore(FileNameInfo fileNameInfo, List<string> splitedFilePaths)
         {
-            if(fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath) && File.Exists(fileNameInfo.FilePath))
+            if (fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath) && File.Exists(fileNameInfo.FilePath))
             {
                 splitedFilePaths.Add(fileNameInfo.FilePath);
 
