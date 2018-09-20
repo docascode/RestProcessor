@@ -80,7 +80,8 @@
 
                     var operationObj = (JObject)item.Value;
                     var operationName = GetOperationName(operationObj, out string operationId);
-                    var operationTocName = Utility.ExtractPascalNameByRegex(RemoveTagFromOperationId(operationName, groupName));
+                    operationId = RemoveTagFromOperationId(operationName, groupName);
+                    var operationTocName = Utility.ExtractPascalNameByRegex(operationName);
                     operationObj["x-internal-toc-name"] = operationTocName;
 
                     // Reuse the root object, to reuse the other properties

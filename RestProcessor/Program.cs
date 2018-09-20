@@ -109,11 +109,6 @@
                     ExtractRestFilesCore(fileInfo, splitedFilePaths);
                 }
             }
-           
-            foreach(var test in splitedFilePaths)
-            {
-                Console.WriteLine(test);
-            }
             return splitedFilePaths;
 
         }
@@ -148,7 +143,7 @@
         public static void RestProcessor(IList<RestFileInfo> restFileInfos)
         {
             var filePaths = ExtractRestFiles(restFileInfos);
-            Parallel.ForEach(filePaths, (filePath) =>
+            Parallel.ForEach(filePaths, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (filePath) =>
             {
                 var folder = Path.GetDirectoryName(filePath);
 
