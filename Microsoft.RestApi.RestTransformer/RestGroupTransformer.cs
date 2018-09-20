@@ -38,10 +38,10 @@
                         var childViewModel = SwaggerModelConverter.FromSwaggerModel(childSwaggerModel);
 
                         var model = childViewModel.Children.FirstOrDefault();
-                        var operationName = childSwaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
+                        var operationId = childSwaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-id");
                         var operation = new Operation
                         {
-                            Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}.{operationName}")?.ToLower(),
+                            Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}.{operationId}")?.ToLower(),
                             Summary = Utility.GetSummary(model?.Summary, model?.Description)
                         };
                         operations.Add(operation);
