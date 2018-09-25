@@ -98,9 +98,10 @@
                     rootJObj["x-internal-operation-name"] = operationTocName;
 
                     //Set metadata source_url
-                    string swaggerSourceUrl = LineNumberMappingDict.TryGetValue(operationId, out int lineNumber) ? GetTheSwaggerSource(lineNumber) : GetTheSwaggerSource();
+                    bool enableViewCode = false;
+                    string swaggerSourceUrl = LineNumberMappingDict.TryGetValue(operationId, out int lineNumber) ? GetTheSwaggerSource(lineNumber, out enableViewCode) : GetTheSwaggerSource(1, out enableViewCode);
 
-                    if (swaggerSourceUrl != null)
+                    if (swaggerSourceUrl != null && enableViewCode)
                     {
                         rootJObj["x-internal-swagger-source-url"] = swaggerSourceUrl;
                     }
@@ -147,15 +148,19 @@
             }
         }
 
-        protected string GetTheSwaggerSource(int lineNum = 1)
+        protected string GetTheSwaggerSource(int lineNum, out bool enableViewCode)
         {
             SwaggerRelativePath = SwaggerRelativePath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             var paths = SwaggerRelativePath.Split(Path.AltDirectorySeparatorChar);
+            enableViewCode = false;
+
             if (RepoFile != null && paths.Count() > 0)
             {
                 var repo = RepoFile.Repos.SingleOrDefault(r => string.Equals(r.Name, paths[0], StringComparison.OrdinalIgnoreCase));
-                if (repo != null && repo.EnableViewCode)
+                if (repo != null)
                 {
+                    enableViewCode = repo.EnableViewCode;
+
                     if (repo.Url.Contains("github.com"))
                     {
                         return $"{repo.Url.TrimEnd('/')}/blob/{repo.Branch}/{SwaggerRelativePath.Substring(paths[0].Length + 1)}#L{lineNum}";
