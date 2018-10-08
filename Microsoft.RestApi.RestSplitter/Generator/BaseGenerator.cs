@@ -80,8 +80,9 @@
 
                     var operationObj = (JObject)item.Value;
                     var operationName = GetOperationName(operationObj, out string operationId);
-                    operationId = RemoveTagFromOperationId(operationName, groupName);
-                    var operationTocName = Utility.ExtractPascalNameByRegex(operationName);
+                    operationId = RemoveTag(operationId, groupName);
+
+                    var operationTocName = Utility.ExtractPascalNameByRegex(RemoveTag(operationName, groupName));
                     operationObj["x-internal-toc-name"] = operationTocName;
 
                     // Reuse the root object, to reuse the other properties
@@ -109,7 +110,7 @@
 
                     var groupNamePath = Utility.TryToFormalizeUrl(groupName, MappingConfig.FormalizeUrl);
                     var operationNamePath = Utility.TryToFormalizeUrl(operationId, MappingConfig.FormalizeUrl);
-                    var operationFile = Utility.Serialize(Path.Combine(targetDir, groupNamePath), RemoveTagFromOperationId(operationNamePath, groupNamePath), rootJObj);
+                    var operationFile = Utility.Serialize(Path.Combine(targetDir, groupNamePath), RemoveTag(operationNamePath, groupNamePath), rootJObj);
                     ClearKey(rootJObj, "x-internal-split-type");
                     ClearKey(rootJObj, "x-internal-operation-id");
                     ClearKey(rootJObj, "x-internal-operation-name");
@@ -202,7 +203,7 @@
             return false;
         }
 
-        private string RemoveTagFromOperationId(string operationName, string groupName)
+        private string RemoveTag(string operationName, string groupName)
         {
             Guard.ArgumentNotNullOrEmpty(operationName, nameof(operationName));
             Guard.ArgumentNotNullOrEmpty(groupName, nameof(groupName));
