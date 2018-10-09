@@ -1,15 +1,17 @@
 ﻿namespace Microsoft.RestApi.RestCI
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
-    using Microsoft.DocAsCode.Build.RestApi;
-    using Microsoft.DocAsCode.Build.RestApi.Swagger;
+
     using Microsoft.RestApi.Common;
     using Microsoft.RestApi.RestSplitter;
     using Microsoft.RestApi.RestSplitter.Model;
     using Microsoft.RestApi.RestTransformer;
+    using Microsoft.RestApi.RestTransformer.Models;
+
     using Newtonsoft.Json;
 
     public class Program
@@ -19,7 +21,6 @@
             NullValueHandling = NullValueHandling.Ignore,
             Formatting = Formatting.Indented
         };
-        private static OrgsMappingFile MappingFile;
 
         private static List<string> ErrorList = new List<string>();
 
@@ -38,24 +39,24 @@
                 {
                     throw new ArgumentException($"mappingFilePath '{ args[2]}' should exist.");
                 }
-                MappingFile = JsonUtility.ReadFromFile<OrgsMappingFile>(args[2]);
-                if (MappingFile.ConvertYamlToJson)
+                var mappingFile = JsonUtility.ReadFromFile<OrgsMappingFile>(args[2]);
+                if (mappingFile.ConvertYamlToJson)
                 {
-                    MappingFile = YamlConverter.ConvertYamls(args[0], MappingFile);
+                    mappingFile = YamlConverter.ConvertYamls(args[0], mappingFile);
                 }
-                var outputDir = args.Length < 4 ? Path.Combine(args[1], MappingFile.TargetApiRootDir) : args[3];
+                var outputDir = args.Length < 4 ? Path.Combine(args[1], mappingFile.TargetApiRootDir) : args[3];
 
                 Console.WriteLine("Processor split begin at:" + DateTime.UtcNow);
-                var restFileInfos = RestSpliter(args[0], args[1], MappingFile, outputDir);
+                var restFileInfos = RestSpliter(args[0], args[1], mappingFile, outputDir);
 
                 Console.WriteLine("Processor split end at:" + DateTime.UtcNow);
                 Console.WriteLine("Processor transform start at:" + DateTime.UtcNow);
 
-                if (MappingFile.UseYamlSchema)
+                if (mappingFile.UseYamlSchema)
                 {
-                    ExtractRestFiles(restFileInfos);
                     RestProcessor(restFileInfos);
                 }
+
                 Console.WriteLine("Processor transform end at:" + DateTime.UtcNow);
                 if (ErrorList.Count > 0)
                 {
@@ -99,70 +100,86 @@
             return restFileInfos;
         }
 
-        public static List<string> ExtractRestFiles(IList<RestFileInfo> restFileInfos)
+        public static (List<string>, List<string>) ExtractRestFiles(IList<RestFileInfo> restFileInfos)
         {
-            var splitedFilePaths = new List<string>();
+            var splitedOperationPaths = new List<string>();
+            var splitedGroupPaths = new List<string>();
+
             foreach (var restFileInfo in restFileInfos)
             {
                 foreach (var fileInfo in restFileInfo.FileNameInfos)
                 {
-                    ExtractRestFilesCore(fileInfo, splitedFilePaths);
-                }
-            }
-            return splitedFilePaths;
-
-        }
-
-        public static void ExtractRestFilesCore(FileNameInfo fileNameInfo, List<string> splitedFilePaths)
-        {
-            if (fileNameInfo != null && !string.IsNullOrEmpty(fileNameInfo.FilePath) && File.Exists(fileNameInfo.FilePath))
-            {
-                splitedFilePaths.Add(fileNameInfo.FilePath);
-
-                if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
-                {
-                    foreach (var info in fileNameInfo.ChildrenFileNameInfo)
+                    if (fileInfo != null && !string.IsNullOrEmpty(fileInfo.FilePath) && File.Exists(fileInfo.FilePath))
                     {
-                        ExtractRestFilesCore(info, splitedFilePaths);
+                        splitedGroupPaths.Add(fileInfo.FilePath);
+
+                        if (fileInfo.ChildrenFileNameInfo != null && fileInfo.ChildrenFileNameInfo.Count > 0)
+                        {
+                            foreach (var info in fileInfo.ChildrenFileNameInfo)
+                            {
+                                splitedOperationPaths.Add(info.FilePath);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Warning: Can not find the file {fileInfo.FilePath}, please take attention!");
+                        if (fileInfo.ChildrenFileNameInfo != null && fileInfo.ChildrenFileNameInfo.Count > 0)
+                        {
+                            foreach (var info in fileInfo.ChildrenFileNameInfo)
+                            {
+                                splitedOperationPaths.Add(info.FilePath);
+                            }
+                        }
                     }
                 }
             }
-            else
-            {
-                Console.WriteLine($"Warning: Can not find the file {fileNameInfo.FilePath}, please take attention!");
-                if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
-                {
-                    foreach (var info in fileNameInfo.ChildrenFileNameInfo)
-                    {
-                        ExtractRestFilesCore(info, splitedFilePaths);
-                    }
-                }
-            }
+            return (splitedGroupPaths, splitedOperationPaths);
+
         }
 
         public static void RestProcessor(IList<RestFileInfo> restFileInfos)
         {
-            var filePaths = ExtractRestFiles(restFileInfos);
-            Parallel.ForEach(filePaths, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (filePath) =>
+            var (groupPaths, operationPaths) = ExtractRestFiles(restFileInfos);
+
+            var allOperations = new ConcurrentBag<Operation>();
+            Parallel.ForEach(operationPaths, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (filePath) =>
             {
                 var folder = Path.GetDirectoryName(filePath);
-
-                var swaggerModel = SwaggerJsonParser.Parse(filePath);
-                var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
-
                 var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(filePath)}.yml");
                 try
                 {
-                    RestTransformer.Process(ymlPath, swaggerModel, viewModel, folder, MappingFile.ProductUid);
-                    Console.WriteLine($"Done generate yml model for {ymlPath}");
+                    var operation = RestTransformer.ProcessOperation(ymlPath, filePath);
+                    if (operation != null)
+                    {
+                        allOperations.Add(operation);
+                    }
+                    Console.WriteLine($"Done generate yml model for {filePath}");
                 }
                 catch (Exception ex)
                 {
                     ErrorList.Add($"Error generate yml files for {filePath}, details: {ex}");
                 }
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
             });
-            Parallel.ForEach(filePaths, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (filePath) =>
+
+            Parallel.ForEach(groupPaths, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (filePath) =>
             {
+                var folder = Path.GetDirectoryName(filePath);
+                var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(filePath)}.yml");
+                try
+                {
+                    RestTransformer.ProcessGroup(ymlPath, filePath, allOperations);
+                    Console.WriteLine($"Done generate yml model for {filePath}");
+                }
+                catch (Exception ex)
+                {
+                    ErrorList.Add($"Error generate yml files for {filePath}, details: {ex}");
+                }
+
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);

@@ -116,7 +116,6 @@
     <Compile Include="Generator\OperationGroupGenerator.cs" />
     <Compile Include="Generator\TagsGenerator.cs" />
     <Compile Include="Model\GroupServiceMapping.cs" />
-    <Compile Include="Model\MappingConfig.cs" />
     <Compile Include="Model\MsExample.cs" />
     <Compile Include="Model\OperationGroupMapping.cs" />
     <Compile Include="Model\Organazation\ApisPageOptions.cs" />

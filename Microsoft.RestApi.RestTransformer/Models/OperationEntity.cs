@@ -9,6 +9,9 @@
         [YamlMember(Alias = "service", Order = -8)]
         public string Service { get; set; }
 
+        [YamlIgnore]
+        public string GroupId { get; set; }
+
         [YamlMember(Alias = "groupName", Order = -7)]
         public string GroupName { get; set; }
 

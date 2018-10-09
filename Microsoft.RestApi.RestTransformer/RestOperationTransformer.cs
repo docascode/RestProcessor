@@ -12,7 +12,7 @@
 
     public class RestOperationTransformer
     {
-        public static OperationEntity Transform(SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel, string productUid)
+        public static OperationEntity Transform(SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel)
         {
             var scheme = Utility.GetScheme(swaggerModel.Metadata);
             var hostWithParameters = Utility.GetHostWithParameters(swaggerModel.Host, swaggerModel.Metadata, viewModel.Metadata);
@@ -43,6 +43,7 @@
             var operationId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-id");
             var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
             var sourceUrl = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-swagger-source-url");
+            var productUid = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-product-uid");
 
             return new OperationEntity
             {
@@ -51,6 +52,7 @@
                 Service = serviceName,
                 Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description),
                 ApiVersion = apiVersion,
+                GroupId = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}")?.ToLower(),
                 GroupName = groupName,
                 IsDeprecated = swaggerModel.Metadata.GetValueFromMetaData<bool>("deprecated"),
                 IsPreview = swaggerModel.Metadata.GetValueFromMetaData<bool>("x-ms-preview"),
