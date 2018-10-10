@@ -4,12 +4,10 @@ Rest processor help us transform swagger.json(v2) to schema base yaml file by op
 
 ## Build & deployment status
 
-## Build & deployment status
-
-|  Environment (Branch)  |  Build Status  |  Package  |
-| ---------------------- | -------------- | --------- |
-| `PROD` (**master** branch) | [status](https://apidrop.visualstudio.com/Content%20CI/Content%20CI%20Team/_build?definitionId=184) | [nuget package](https://apidrop.visualstudio.com/Content%20CI/Content%20CI%20Team/_packaging?feed=ReferenceAutomation&package=RestProcessor&version=2018.9.24.1&protocolType=NuGet&_a=package)|
-| `PPE` (**develop** branch) | [status](https://apidrop.visualstudio.com/Content%20CI/Content%20CI%20Team/_build?definitionId=452) | [nuget package](https://apidrop.visualstudio.com/Content%20CI/Content%20CI%20Team/_packaging?feed=ReferenceAutomation&package=RestProcessor-Test&version=2018.9.25.2&protocolType=NuGet&_a=package)|
+|  Environment (Branch)  |  Build Status  |  Package  |  Function Test Status |
+| ---------------------- | -------------- | --------- |  -------------------- |
+| `PROD` (**master** branch) | [status](https://apidrop.visualstudio.com/Content%20CI/Content%20CI%20Team/_build?definitionId=184) | [nuget package](https://apidrop.visualstudio.com/Content%20CI/Content%20CI%20Team/_packaging?feed=ReferenceAutomation&package=RestProcessor&version=2018.9.24.1&protocolType=NuGet&_a=package)| No
+| `PPE` (**develop** branch) | [status](https://apidrop.visualstudio.com/Content%20CI/Content%20CI%20Team/_build?definitionId=452) | [nuget package](https://apidrop.visualstudio.com/Content%20CI/Content%20CI%20Team/_packaging?feed=ReferenceAutomation&package=RestProcessor-Test&version=2018.9.25.2&protocolType=NuGet&_a=package)| [test](https://apidrop.visualstudio.com/Content%20CI/Content%20CI%20Team/_build?definitionId=1129)
 
 ## Understanding development workflow
 
