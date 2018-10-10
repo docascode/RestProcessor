@@ -324,6 +324,7 @@
                             childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, subGroupName.TrimSubGroupName(), nameInfo.FileName))));
 
                             var normalizedFileName = FileUtility.NormalizePath(nameInfo.FileName);
+                            
                             // Write into ref mapping dict
                             if (!sourceSwaggerMappingDict.ContainsKey(normalizedFileName))
                             {
