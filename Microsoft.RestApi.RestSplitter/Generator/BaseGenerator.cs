@@ -80,7 +80,7 @@
 
                     var operationObj = (JObject)item.Value;
                     var operationName = GetOperationName(operationObj, out string operationId);
-                    operationId = RemoveTag(operationId, groupName);
+                    var operationIdWithoutTag = RemoveTag(operationId, groupName);
 
                     var operationTocName = Utility.ExtractPascalNameByRegex(RemoveTag(operationName, groupName));
                     operationObj["x-internal-toc-name"] = operationTocName;
@@ -97,7 +97,7 @@
                     };
 
                     rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
-                    rootJObj["x-internal-operation-id"] = operationId;
+                    rootJObj["x-internal-operation-id"] = operationIdWithoutTag;
                     rootJObj["x-internal-operation-name"] = operationTocName;
 
                     //Set metadata source_url
@@ -110,7 +110,7 @@
                     }
 
                     var groupNamePath = Utility.TryToFormalizeUrl(groupName, MappingConfig.FormalizeUrl);
-                    var operationNamePath = Utility.TryToFormalizeUrl(operationId, MappingConfig.FormalizeUrl);
+                    var operationNamePath = Utility.TryToFormalizeUrl(operationIdWithoutTag, MappingConfig.FormalizeUrl);
                     var operationFile = Utility.Serialize(Path.Combine(targetDir, groupNamePath), RemoveTag(operationNamePath, groupNamePath), rootJObj);
                     ClearKey(rootJObj, "x-internal-split-type");
                     ClearKey(rootJObj, "x-internal-operation-id");
