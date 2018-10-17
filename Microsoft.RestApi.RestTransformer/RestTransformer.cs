@@ -50,7 +50,7 @@
             return null;
         }
 
-        public static void ProcessGroup(string ymlPath, string filePath, ConcurrentBag<Operation> allOperations)
+        public static void ProcessGroup(string ymlPath, string filePath, ConcurrentDictionary<string, ConcurrentBag<Operation>> groupOperations)
         {
             var swaggerModel = SwaggerJsonParser.Parse(filePath);
             var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
@@ -60,7 +60,7 @@
                 if (currentFileType == "OperationGroup" || currentFileType == "TagGroup")
                 {
                     var restGroupTransformer = RestGroupTransformerFactory.CreateRestGroupTransformer(currentFileType);
-                    var groupInfo = restGroupTransformer.Transform(swaggerModel, viewModel, allOperations);
+                    var groupInfo = restGroupTransformer.Transform(swaggerModel, viewModel, groupOperations);
                     if (groupInfo != null)
                     {
                         using (var writer = new StreamWriter(ymlPath))

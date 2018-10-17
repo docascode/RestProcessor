@@ -11,7 +11,7 @@
     {
         protected abstract string GetSummary(SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel);
         
-        public OperationGroupEntity Transform(SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel, ConcurrentBag<Operation> allOperations)
+        public OperationGroupEntity Transform(SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel, ConcurrentDictionary<string, ConcurrentBag<Operation>> groupOperations)
         {
             var serviceId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-id");
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
@@ -22,19 +22,24 @@
             var apiVersion = swaggerModel.Info.Version;
 
             var groupId = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}")?.ToLower();
-            var operations = allOperations.Where(o => o.GroupId == groupId);
-            if (operations.Count() > 0)
+
+            ConcurrentBag<Operation> operations;
+            if (groupOperations.TryGetValue(groupId, out operations))
             {
-                return new OperationGroupEntity
+                if (operations.Count() > 0)
                 {
-                    Id = groupId,
-                    ApiVersion = apiVersion,
-                    Name = groupName,
-                    Operations = operations.ToList(),
-                    Service = serviceName,
-                    Summary = GetSummary(swaggerModel, viewModel)
-                };
+                    return new OperationGroupEntity
+                    {
+                        Id = groupId,
+                        ApiVersion = apiVersion,
+                        Name = groupName,
+                        Operations = operations.ToList(),
+                        Service = serviceName,
+                        Summary = GetSummary(swaggerModel, viewModel)
+                    };
+                }
             }
+            
             return null;
         }
     }

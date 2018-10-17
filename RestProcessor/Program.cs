@@ -142,7 +142,7 @@
         {
             var (groupPaths, operationPaths) = ExtractRestFiles(restFileInfos);
 
-            var allOperations = new ConcurrentBag<Operation>();
+            var groupOperations = new ConcurrentDictionary<string, ConcurrentBag<Operation>>();
             Parallel.ForEach(operationPaths, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (filePath) =>
             {
                 var folder = Path.GetDirectoryName(filePath);
@@ -152,7 +152,8 @@
                     var operation = RestTransformer.ProcessOperation(ymlPath, filePath);
                     if (operation != null)
                     {
-                        allOperations.Add(operation);
+                        var operations = groupOperations.GetOrAdd(operation.GroupId, new ConcurrentBag<Operation>());
+                        operations.Add(operation);
                     }
                     Console.WriteLine($"Done generate yml model for {filePath}");
                 }
@@ -172,7 +173,7 @@
                 var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(filePath)}.yml");
                 try
                 {
-                    RestTransformer.ProcessGroup(ymlPath, filePath, allOperations);
+                    RestTransformer.ProcessGroup(ymlPath, filePath, groupOperations);
                     Console.WriteLine($"Done generate yml model for {filePath}");
                 }
                 catch (Exception ex)
