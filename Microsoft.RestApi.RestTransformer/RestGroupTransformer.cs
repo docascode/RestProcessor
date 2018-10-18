@@ -1,62 +1,45 @@
 ﻿namespace Microsoft.RestApi.RestTransformer
 {
-    using System.Collections.Generic;
-    using System.IO;
+    using System.Collections.Concurrent;
     using System.Linq;
 
-    using Microsoft.DocAsCode.Build.RestApi;
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
     using Microsoft.DocAsCode.DataContracts.RestApi;
     using Microsoft.RestApi.RestTransformer.Models;
-
-    using Newtonsoft.Json.Linq;
 
     public abstract class RestGroupTransformer
     {
         protected abstract string GetSummary(SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel);
         
-        public OperationGroupEntity Transform(SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel, string folder, string productUid = null)
+        public OperationGroupEntity Transform(SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel, ConcurrentDictionary<string, ConcurrentBag<Operation>> groupOperations)
         {
             var serviceId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-id");
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
+            var productUid = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-product-uid");
+
             var basePath = swaggerModel.BasePath;
             var apiVersion = swaggerModel.Info.Version;
 
-            var members = swaggerModel.Metadata.GetArrayFromMetaData<JObject>("x-internal-split-members");
-            if (members != null && members.Count() > 0)
+            var groupId = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}")?.ToLower();
+
+            ConcurrentBag<Operation> operations;
+            if (groupOperations.TryGetValue(groupId, out operations))
             {
-                var operations = new List<Operation>();
-                if (members[0].TryGetValue("relativePath", out var relativePath))
+                if (operations.Count() > 0)
                 {
-                    var directoryName = Path.GetDirectoryName(Path.Combine(folder, (string)relativePath + ".json"));
-                    var operationPaths = Directory.GetFiles(directoryName, "*.json");
-
-                    foreach (var operationPath in operationPaths)
-                    {
-                        var childSwaggerModel = SwaggerJsonParser.Parse(operationPath);
-                        var childViewModel = SwaggerModelConverter.FromSwaggerModel(childSwaggerModel);
-
-                        var model = childViewModel.Children.FirstOrDefault();
-                        var operationId = childSwaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-id");
-                        var operation = new Operation
-                        {
-                            Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}.{operationId}")?.ToLower(),
-                            Summary = Utility.GetSummary(model?.Summary, model?.Description)
-                        };
-                        operations.Add(operation);
-                    }
                     return new OperationGroupEntity
                     {
-                        Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}")?.ToLower(),
+                        Id = groupId,
                         ApiVersion = apiVersion,
                         Name = groupName,
-                        Operations = operations,
+                        Operations = operations.OrderBy(p => p.Id).ToList(),
                         Service = serviceName,
                         Summary = GetSummary(swaggerModel, viewModel)
                     };
                 }
             }
+            
             return null;
         }
     }

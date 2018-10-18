@@ -144,19 +144,6 @@
 
             Utility.ClearFile(lineNumberMappingFilePath);
 
-            var mappingConfig = new MappingConfig
-            {
-                IsOperationLevel = orgsMappingFile.IsOperationLevel,
-                IsGroupedByTag = orgsMappingFile.IsGroupdedByTag,
-                SplitOperationCountGreaterThan = orgsMappingFile.SplitOperationCountGreaterThan,
-                UseYamlSchema = orgsMappingFile.UseYamlSchema,
-                RemoveTagFromOperationId = orgsMappingFile.RemoveTagFromOperationId,
-                NeedResolveXMsPaths = orgsMappingFile.NeedResolveXMsPaths,
-                UseServiceUrlGroup = orgsMappingFile.UseServiceUrlGroup,
-                FormalizeUrl = orgsMappingFile.FormalizeUrl,
-                GenerateSourceUrl = orgsMappingFile.GenerateSourceUrl
-            };
-
             RepoFile repoFile = null;
             if (File.Exists(Path.Combine(targetRootDir, "repo.json")))
             {
@@ -212,7 +199,7 @@
                             var subTocDict = new SortedDictionary<string, List<SwaggerToc>>();
                             if (service.SwaggerInfo != null)
                             {
-                                subTocDict = SplitSwaggers(sourceRootDir, targetApiVersionDir, service, mappingConfig, repoFile, version, lineNumberMappingFilePath);
+                                subTocDict = SplitSwaggers(sourceRootDir, targetApiVersionDir, service, orgsMappingFile, repoFile, version, lineNumberMappingFilePath);
                             }
 
                             // 3. Conceptual toc
@@ -279,7 +266,7 @@
             }
         }
 
-        private static SortedDictionary<string, List<SwaggerToc>> SplitSwaggers(string sourceRootDir, string targetApiVersionDir, ServiceInfo service, MappingConfig mappingConfig, RepoFile repoFile, string version, string lineNumberMappingFilePath)
+        private static SortedDictionary<string, List<SwaggerToc>> SplitSwaggers(string sourceRootDir, string targetApiVersionDir, ServiceInfo service, OrgsMappingFile orgsMappingFile, RepoFile repoFile, string version, string lineNumberMappingFilePath)
         {
             var subTocDict = new SortedDictionary<string, List<SwaggerToc>>();
 
@@ -289,7 +276,7 @@
                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiVersionDir, service.UrlGroup, subGroupName.TrimSubGroupName()));
                 var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
 
-                var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, swagger.Source.TrimEnd(), mappingConfig.UseServiceUrlGroup ? service.UrlGroup : service.TocTitle, service.TocTitle, swagger.OperationGroupMapping, mappingConfig, repoFile);
+                var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, swagger.Source.TrimEnd(), orgsMappingFile.UseServiceUrlGroup ? service.UrlGroup : service.TocTitle, service.TocTitle, swagger.OperationGroupMapping, orgsMappingFile, repoFile);
                 var sourceSwaggerMappingDict = new Dictionary<string, string>();
 
                 if (restFileInfo == null)
