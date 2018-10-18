@@ -14,7 +14,7 @@
     {
         public static readonly YamlSerializer YamlSerializer = new YamlSerializer();
 
-        public static Operation ProcessOperation(string ymlPath, string filePath)
+        public static Operation ProcessOperation(string groupKey, string ymlPath, string filePath)
         {
             var swaggerModel = SwaggerJsonParser.Parse(filePath);
             var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
@@ -25,7 +25,7 @@
                 {
                     if (viewModel.Children?.Count == 1)
                     {
-                        var operationInfo = RestOperationTransformer.Transform(swaggerModel, viewModel.Children.First());
+                        var operationInfo = RestOperationTransformer.Transform(groupKey, swaggerModel, viewModel.Children.First());
                         if (operationInfo != null)
                         {
                             using (var writer = new StreamWriter(ymlPath))

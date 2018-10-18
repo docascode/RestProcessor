@@ -33,7 +33,7 @@
                         Id = groupId,
                         ApiVersion = apiVersion,
                         Name = groupName,
-                        Operations = operations.ToList(),
+                        Operations = operations.OrderBy(p => p.Id).ToList(),
                         Service = serviceName,
                         Summary = GetSummary(swaggerModel, viewModel)
                     };
