@@ -13,7 +13,7 @@
 
     public static class RestSplitHelper
     {
-        public static RestFileInfo Split(string targetDir, string filePath, string swaggerRelativePath, string serviceId, string serviceName, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig, RepoFile repoFile)
+        public static RestFileInfo Split(string targetDir, string filePath, string swaggerRelativePath, string serviceId, string serviceName, OperationGroupMapping operationGroupMapping, OrgsMappingFile orgsMappingFile, RepoFile repoFile)
         {
             
             if (!Directory.Exists(targetDir))
@@ -49,7 +49,7 @@
                     var refResolver = new RefResolver(rootJObj, filePath);
                     refResolver.Resolve();
 
-                    if (mappingConfig.NeedResolveXMsPaths)
+                    if (orgsMappingFile.NeedResolveXMsPaths)
                     {
                         var xMsPathsResolver = new XMsPathsResolver(rootJObj);
                         xMsPathsResolver.Resolve();
@@ -58,7 +58,7 @@
                     rootJObj["x-internal-service-id"] = serviceId;
                     rootJObj["x-internal-service-name"] = serviceName;
 
-                    var generator = GeneratorFactory.CreateGenerator(rootJObj, targetDir, filePath, operationGroupMapping, mappingConfig, lineNumberMappingDict, repoFile, swaggerRelativePath);
+                    var generator = GeneratorFactory.CreateGenerator(rootJObj, targetDir, filePath, operationGroupMapping, orgsMappingFile, lineNumberMappingDict, repoFile, swaggerRelativePath);
                     var fileNameInfos = generator.Generate().ToList();
 
                     if (fileNameInfos.Any())

@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.RestApi.RestTransformer
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -12,7 +13,9 @@
 
     public class RestOperationTransformer
     {
-        public static OperationEntity Transform(SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel, string productUid)
+        private static ConcurrentDictionary<string, IList<Definition>> _cacheDefinitions = new ConcurrentDictionary<string, IList<Definition>>();
+
+        public static OperationEntity Transform(string groupKey, SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel)
         {
             var scheme = Utility.GetScheme(swaggerModel.Metadata);
             var hostWithParameters = Utility.GetHostWithParameters(swaggerModel.Host, swaggerModel.Metadata, viewModel.Metadata);
@@ -25,8 +28,12 @@
             }
             var apiVersion = Utility.GetApiVersion(viewModel, swaggerModel.Info.Version);
 
-            var allDefinitionObjects = GetAllDefinitionObjects(swaggerModel);
-            var allDefinitions = GetAllDefinitions(allDefinitionObjects);
+            IList<Definition> allDefinitions;
+            if (!_cacheDefinitions.TryGetValue(groupKey, out allDefinitions))
+            {
+                allDefinitions = GetAllDefinitions(GetAllDefinitionObjects(swaggerModel));
+                _cacheDefinitions.TryAdd(groupKey, allDefinitions);
+            }
 
             var bodyDefinitionObject = new DefinitionObject();
             var parametersDefinitions = new List<Definition>();
@@ -43,6 +50,7 @@
             var operationId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-id");
             var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
             var sourceUrl = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-swagger-source-url");
+            var productUid = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-product-uid");
 
             return new OperationEntity
             {
@@ -51,6 +59,7 @@
                 Service = serviceName,
                 Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description),
                 ApiVersion = apiVersion,
+                GroupId = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}")?.ToLower(),
                 GroupName = groupName,
                 IsDeprecated = swaggerModel.Metadata.GetValueFromMetaData<bool>("deprecated"),
                 IsPreview = swaggerModel.Metadata.GetValueFromMetaData<bool>("x-ms-preview"),
@@ -802,8 +811,13 @@
             return definitionObjects;
         }
 
-        private static IList<Definition> ResolveAllDefinitions(IList<Definition> allDefinitions, DefinitionObject bodyDefinitionObject, IList<DefinitionObject> responseDefinitionObjects)
+        private static IList<Definition> ResolveAllDefinitions(IList<Definition> definitions, DefinitionObject bodyDefinitionObject, IList<DefinitionObject> responseDefinitionObjects)
         {
+            if (definitions == null)
+            {
+                Console.WriteLine("null herer");
+            }
+            var allDefinitions = new List<Definition>(definitions);
             var definitionObjects = new List<DefinitionObject>();
             responseDefinitionObjects.Add(bodyDefinitionObject);
 
@@ -828,7 +842,7 @@
             var resolvedDefinitions = GetAllDefinitions(definitionObjects);
             foreach (var resolvedDefinition in resolvedDefinitions)
             {
-                if (!allDefinitions.Any(d => d.Type == resolvedDefinition.Type))
+                if (!definitions.Any(d => d.Type == resolvedDefinition.Type))
                 {
                     allDefinitions.Add(resolvedDefinition);
                 }
@@ -838,13 +852,13 @@
 
         private static IList<DefinitionEntity> TransformDefinitions(IList<Definition> allDefinitions, List<Definition> parametersDefinitions, DefinitionObject bodyDefinitionObject, IList<DefinitionObject> responseDefinitionObjects)
         {
-            allDefinitions = ResolveAllDefinitions(allDefinitions, bodyDefinitionObject, responseDefinitionObjects);
+            var resolvedAllDefinitions = ResolveAllDefinitions(allDefinitions, bodyDefinitionObject, responseDefinitionObjects);
             var definitions = new List<DefinitionEntity>();
             var typesDictionary = new Dictionary<string, bool>();
             var typesQueue = new Queue<string>();
             if (!string.IsNullOrEmpty(bodyDefinitionObject.Type))
             {
-                var polymorphicDefinitions = GetPolymorphicDefinitions(allDefinitions, bodyDefinitionObject.Type);
+                var polymorphicDefinitions = GetPolymorphicDefinitions(resolvedAllDefinitions, bodyDefinitionObject.Type);
                 if (polymorphicDefinitions?.Count > 0)
                 {
                     foreach (var polymorphicDefinition in polymorphicDefinitions)
@@ -859,7 +873,7 @@
             var bodyProperties = GetDefinitionProperties(bodyDefinitionObject);
             foreach(var parametersDefinition in parametersDefinitions)
             {
-                allDefinitions.Add(parametersDefinition);
+                resolvedAllDefinitions.Add(parametersDefinition);
                 typesQueue.Enqueue(parametersDefinition.Type);
             }
             foreach (var bodyProperty in bodyProperties)
@@ -903,7 +917,7 @@
                     continue;
                 }
                 typesDictionary[type] = true;
-                var polymorphicDefinitions = GetPolymorphicDefinitions(allDefinitions, type);
+                var polymorphicDefinitions = GetPolymorphicDefinitions(resolvedAllDefinitions, type);
                 if (polymorphicDefinitions?.Count > 0)
                 {
                     foreach (var polymorphicDefinition in polymorphicDefinitions)
@@ -916,7 +930,7 @@
                 }
                 else
                 {
-                    var selfDefinition = GetSelfDefinition(allDefinitions, type);
+                    var selfDefinition = GetSelfDefinition(resolvedAllDefinitions, type);
                     if (selfDefinition != null)
                     {
                         if (selfDefinition.DefinitionObjectType == DefinitionObjectType.Enum)
@@ -942,7 +956,7 @@
                         }
                         else if (selfDefinition.DefinitionObjectType != DefinitionObjectType.Simple)
                         {
-                            var parameters = GetDefinitionParameters(allDefinitions, selfDefinition, false).ToList();
+                            var parameters = GetDefinitionParameters(resolvedAllDefinitions, selfDefinition, false).ToList();
                             definitions.Add(new DefinitionEntity
                             {
                                 Name = selfDefinition.Name,

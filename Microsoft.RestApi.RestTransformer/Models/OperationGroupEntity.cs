@@ -21,6 +21,9 @@
 
     public class Operation : IdentifiableEntity
     {
+        [YamlIgnore]
+        public string GroupId { get; set; }
+
         [YamlMember(Alias = "summary")]
         public string Summary { get; set; }
     }

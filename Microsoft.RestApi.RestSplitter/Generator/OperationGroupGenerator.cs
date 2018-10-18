@@ -14,7 +14,8 @@
         protected OperationGroupMapping OperationGroupMapping { get; }
 
         #region Constructors
-        public OperationGroupGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, MappingConfig mappingConfig, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerRelativePath) : base(rootJObj, targetDir, filePath, mappingConfig, lineNumberMappingDict, repoFile, swaggerRelativePath)
+        public OperationGroupGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, OrgsMappingFile orgsMappingFile, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerRelativePath) 
+            : base(rootJObj, targetDir, filePath, orgsMappingFile, lineNumberMappingDict, repoFile, swaggerRelativePath)
         {
             OperationGroupMapping = operationGroupMapping;
         }
@@ -69,9 +70,10 @@
                     // Reset paths to filtered paths
                     RootJObj["paths"] = filteredPaths;
                     RootJObj["x-internal-toc-name"] = fileNameInfo.TocName;
+                    RootJObj["x-internal-product-uid"] = OrgsMappingFile.ProductUid;
 
                     // Only split when the children count larger than MappingConfig.SplitOperationCountGreaterThan
-                    if (MappingConfig.IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj, MappingConfig.SplitOperationCountGreaterThan))
+                    if (OrgsMappingFile.IsOperationLevel && Utility.ShouldSplitToOperation(RootJObj, OrgsMappingFile.SplitOperationCountGreaterThan))
                     {
                         // Split operation group to operation
                         fileNameInfo.ChildrenFileNameInfo = new List<FileNameInfo>(
@@ -110,14 +112,16 @@
                         RootJObj["x-internal-split-members"] = splitMembers;
                         RootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
                     }
-                    var file = Utility.Serialize(TargetDir, Utility.TryToFormalizeUrl(newOperationGroupName, MappingConfig.FormalizeUrl), RootJObj);
-                    fileNameInfo.FileName = MappingConfig.UseYamlSchema ? Path.ChangeExtension(file.Item1, "yml") : file.Item1;
+                    var file = Utility.Serialize(TargetDir, Utility.TryToFormalizeUrl(newOperationGroupName, OrgsMappingFile.FormalizeUrl), RootJObj);
+                    fileNameInfo.FileName = OrgsMappingFile.UseYamlSchema ? Path.ChangeExtension(file.Item1, "yml") : file.Item1;
                     fileNameInfo.FilePath = file.Item2;
 
                     // Clear up internal data
                     ClearKey(RootJObj, "x-internal-split-members");
                     ClearKey(RootJObj, "x-internal-split-type");
                     ClearKey(RootJObj, "x-internal-toc-name");
+                    ClearKey(RootJObj, "x-internal-product-uid");
+
                     yield return fileNameInfo;
                 }
             }

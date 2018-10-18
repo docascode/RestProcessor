@@ -18,7 +18,7 @@
 
         protected string FilePath { get; }
 
-        protected MappingConfig MappingConfig { get; }
+        protected OrgsMappingFile OrgsMappingFile { get; }
 
         protected IDictionary<string, int> LineNumberMappingDict { get; }
 
@@ -28,17 +28,17 @@
 
         #region Constructors
 
-        protected BaseGenerator(JObject rootJObj, string targetDir, string filePath, MappingConfig mappingConfig, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerRelativePath)
+        protected BaseGenerator(JObject rootJObj, string targetDir, string filePath, OrgsMappingFile orgsMappingFile, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerRelativePath)
         {
             Guard.ArgumentNotNull(rootJObj, nameof(rootJObj));
             Guard.ArgumentNotNullOrEmpty(targetDir, nameof(targetDir));
             Guard.ArgumentNotNullOrEmpty(filePath, nameof(filePath));
-            Guard.ArgumentNotNull(mappingConfig, nameof(mappingConfig));
+            Guard.ArgumentNotNull(orgsMappingFile, nameof(orgsMappingFile));
 
             RootJObj = rootJObj;
             TargetDir = targetDir;
             FilePath = filePath;
-            MappingConfig = mappingConfig;
+            OrgsMappingFile = orgsMappingFile;
             LineNumberMappingDict = lineNumberMappingDict;
             RepoFile = repoFile;
             SwaggerRelativePath = swaggerRelativePath;
@@ -109,8 +109,8 @@
                         rootJObj["x-internal-swagger-source-url"] = swaggerSourceUrl;
                     }
 
-                    var groupNamePath = Utility.TryToFormalizeUrl(groupName, MappingConfig.FormalizeUrl);
-                    var operationNamePath = Utility.TryToFormalizeUrl(operationId, MappingConfig.FormalizeUrl);
+                    var groupNamePath = Utility.TryToFormalizeUrl(groupName, OrgsMappingFile.FormalizeUrl);
+                    var operationNamePath = Utility.TryToFormalizeUrl(operationId, OrgsMappingFile.FormalizeUrl);
                     var operationFile = Utility.Serialize(Path.Combine(targetDir, groupNamePath), RemoveTag(operationNamePath, groupNamePath), rootJObj);
                     ClearKey(rootJObj, "x-internal-split-type");
                     ClearKey(rootJObj, "x-internal-operation-id");
@@ -121,7 +121,7 @@
                     yield return new FileNameInfo
                     {
                         TocName = operationTocName,
-                        FileName = MappingConfig.UseYamlSchema ? Path.ChangeExtension(fileName, "yml") : fileName,
+                        FileName = OrgsMappingFile.UseYamlSchema ? Path.ChangeExtension(fileName, "yml") : fileName,
                         FilePath = operationFile.Item2,
                         SwaggerSourceUrl = swaggerSourceUrl
                     };
@@ -214,7 +214,7 @@
             Guard.ArgumentNotNullOrEmpty(groupName, nameof(groupName));
 
             var internalOperationName = operationName;
-            if (MappingConfig.IsGroupedByTag && MappingConfig.RemoveTagFromOperationId)
+            if (OrgsMappingFile.IsGroupdedByTag && OrgsMappingFile.RemoveTagFromOperationId)
             {
                 if (operationName.StartsWith(groupName))
                 {

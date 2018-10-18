@@ -1,29 +1,69 @@
 ﻿namespace Microsoft.RestApi.RestTransformer
 {
     using System;
+    using System.Collections.Concurrent;
     using System.IO;
     using System.Linq;
 
+    using Microsoft.DocAsCode.Build.RestApi;
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
-    using Microsoft.DocAsCode.DataContracts.RestApi;
     using Microsoft.DocAsCode.YamlSerialization;
+    using Microsoft.RestApi.RestTransformer.Models;
 
     public class RestTransformer
     {
         public static readonly YamlSerializer YamlSerializer = new YamlSerializer();
 
-        public static void Process(string filePath, SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel, string folder, string productUid = null)
+        public static Operation ProcessOperation(string groupKey, string ymlPath, string filePath)
         {
+            var swaggerModel = SwaggerJsonParser.Parse(filePath);
+            var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
+            if (viewModel.Metadata.TryGetValue("x-internal-split-type", out var fileType))
+            {
+                string currentFileType = (string)fileType;
+                if (viewModel.Children?.Count == 1)
+                {
+                    if (viewModel.Children?.Count == 1)
+                    {
+                        var operationInfo = RestOperationTransformer.Transform(groupKey, swaggerModel, viewModel.Children.First());
+                        if (operationInfo != null)
+                        {
+                            using (var writer = new StreamWriter(ymlPath))
+                            {
+                                writer.WriteLine("### YamlMime:RESTOperation");
+                                YamlSerializer.Serialize(writer, operationInfo);
+                            }
+                            return new Operation
+                            {
+                                Id = operationInfo.Id,
+                                GroupId = operationInfo.GroupId,
+                                Summary = operationInfo.Summary
+                            };
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Please make sure there is only 1 child here. the actual children number is : {viewModel.Children?.Count}");
+                    }
+                }
+            }
+            return null;
+        }
+
+        public static void ProcessGroup(string ymlPath, string filePath, ConcurrentDictionary<string, ConcurrentBag<Operation>> groupOperations)
+        {
+            var swaggerModel = SwaggerJsonParser.Parse(filePath);
+            var viewModel = SwaggerModelConverter.FromSwaggerModel(swaggerModel);
             if (viewModel.Metadata.TryGetValue("x-internal-split-type", out var fileType))
             {
                 string currentFileType = (string)fileType;
                 if (currentFileType == "OperationGroup" || currentFileType == "TagGroup")
                 {
                     var restGroupTransformer = RestGroupTransformerFactory.CreateRestGroupTransformer(currentFileType);
-                    var groupInfo = restGroupTransformer.Transform(swaggerModel, viewModel, folder, productUid);
+                    var groupInfo = restGroupTransformer.Transform(swaggerModel, viewModel, groupOperations);
                     if (groupInfo != null)
                     {
-                        using (var writer = new StreamWriter(filePath))
+                        using (var writer = new StreamWriter(ymlPath))
                         {
                             writer.WriteLine("### YamlMime:RESTOperationGroup");
                             YamlSerializer.Serialize(writer, groupInfo);
@@ -31,26 +71,7 @@
                     }
                     else
                     {
-                        Console.WriteLine($"Warining: the group has no members: {folder}");
-                    }
-                }
-                else if (currentFileType == "Operation")
-                {
-                    if (viewModel.Children?.Count == 1)
-                    {
-                        var operationInfo = RestOperationTransformer.Transform(swaggerModel, viewModel.Children.First(), productUid);
-                        if (operationInfo != null)
-                        {
-                            using (var writer = new StreamWriter(filePath))
-                            {
-                                writer.WriteLine("### YamlMime:RESTOperation");
-                                YamlSerializer.Serialize(writer, operationInfo);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Please make sure there is only 1 child here. the actual children number is : {viewModel.Children?.Count}");
+                        Console.WriteLine($"Warining: the group has no members: {filePath}");
                     }
                 }
             }
