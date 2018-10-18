@@ -109,7 +109,6 @@
                         rootJObj["x-internal-swagger-source-url"] = swaggerSourceUrl;
                     }
 
-
                     var groupNamePath = Utility.TryToFormalizeUrl(groupName, OrgsMappingFile.FormalizeUrl);
                     var operationNamePath = Utility.TryToFormalizeUrl(operationId, OrgsMappingFile.FormalizeUrl);
                     var operationFile = Utility.Serialize(Path.Combine(targetDir, groupNamePath), RemoveTag(operationNamePath, groupNamePath), rootJObj);
