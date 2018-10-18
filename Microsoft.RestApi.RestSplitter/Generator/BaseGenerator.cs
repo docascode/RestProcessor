@@ -80,7 +80,7 @@
 
                     var operationObj = (JObject)item.Value;
                     var operationName = GetOperationName(operationObj, out string operationId);
-                    operationId = RemoveTag(operationId, groupName);
+                    var operationIdWithoutTag = RemoveTag(operationId, groupName);
 
                     var operationTocName = Utility.ExtractPascalNameByRegex(RemoveTag(operationName, groupName));
                     operationObj["x-internal-toc-name"] = operationTocName;
@@ -97,7 +97,7 @@
                     };
 
                     rootJObj["x-internal-split-type"] = SplitType.Operation.ToString();
-                    rootJObj["x-internal-operation-id"] = operationId;
+                    rootJObj["x-internal-operation-id"] = operationIdWithoutTag;
                     rootJObj["x-internal-operation-name"] = operationTocName;
 
                     //Set metadata source_url
@@ -108,6 +108,7 @@
                     {
                         rootJObj["x-internal-swagger-source-url"] = swaggerSourceUrl;
                     }
+
 
                     var groupNamePath = Utility.TryToFormalizeUrl(groupName, OrgsMappingFile.FormalizeUrl);
                     var operationNamePath = Utility.TryToFormalizeUrl(operationId, OrgsMappingFile.FormalizeUrl);
