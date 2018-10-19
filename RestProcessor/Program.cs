@@ -6,7 +6,6 @@
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
-
     using Microsoft.RestApi.Common;
     using Microsoft.RestApi.RestSplitter;
     using Microsoft.RestApi.RestSplitter.Model;
@@ -103,7 +102,6 @@
 
         public static (List<string>, ConcurrentDictionary<string, ConcurrentBag<string>>) ExtractRestFiles(IList<RestFileInfo> restFileInfos)
         {
-            //var splitedOperationPaths = new List<string>();
             var splitedGroupPaths = new List<string>();
             var splitedGroupOperationPaths = new ConcurrentDictionary<string, ConcurrentBag<string>>();
 
