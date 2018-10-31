@@ -3,10 +3,12 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
 
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
     using Microsoft.DocAsCode.DataContracts.RestApi;
+    using Microsoft.RestApi.Common;
     using Microsoft.RestApi.RestTransformer.Models;
 
     using Newtonsoft.Json.Linq;
@@ -593,6 +595,7 @@
                 }
             }
 
+           
             return allDefinitionObjects;
         }
 
@@ -1263,6 +1266,17 @@
                         }
 
                         definitionObject.EnumValues = enumObjects;
+                    }
+                    else if (nodeObjectDict.TryGetValue("x-internal-loop-ref-name", out var loopName))
+                    {
+                        definitionObject.DefinitionObjectType = DefinitionObjectType.Simple;
+                        definitionObject.Type = (string)loopName;
+                        var token = nodeObjectDict.GetDictionaryFromMetaData<Dictionary<string, object>>("x-internal-loop-token");
+                        if (token != null)
+                        {
+                            definitionObject.Description = token.GetValueFromMetaData<string>("description");
+                            definitionObject.IsReadOnly = token.GetValueFromMetaData<bool>("readOnly");
+                        }
                     }
                     else if (definitionObject.AllOfs.Count == 0 && definitionObject.PropertyItems.Count == 0)
                     {

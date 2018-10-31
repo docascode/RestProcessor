@@ -21,7 +21,7 @@
             if (viewModel.Metadata.TryGetValue("x-internal-split-type", out var fileType))
             {
                 string currentFileType = (string)fileType;
-                if (viewModel.Children?.Count == 1)
+                if (string.Equals("Operation", currentFileType))
                 {
                     if (viewModel.Children?.Count == 1)
                     {
