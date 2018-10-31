@@ -3,24 +3,38 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
 
-    using Microsoft.DocAsCode.Build.RestApi.Swagger;
     using Microsoft.DocAsCode.DataContracts.RestApi;
     using Microsoft.RestApi.Common;
     using Microsoft.RestApi.RestTransformer.Models;
 
     using Newtonsoft.Json.Linq;
 
-    public class RestOperationTransformer
+    public class NewRestOperationTransformer
     {
         private static ConcurrentDictionary<string, IList<Definition>> _cacheDefinitions = new ConcurrentDictionary<string, IList<Definition>>();
 
-        public static OperationEntity Transform(string groupKey, SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel)
+        private static PathViewModel ToPathViewModel(KeyValuePair<string, JObject> pathObject)
         {
-            var scheme = Utility.GetScheme(swaggerModel.Metadata);
-            var hostWithParameters = Utility.GetHostWithParameters(swaggerModel.Host, swaggerModel.Metadata, viewModel.Metadata);
+            var path = pathObject.Key;
+            var operations = pathObject.Value.ToObject<Dictionary<string, object>>();
+            var operation = operations.First();
+
+            var pathViewModel = JsonUtility.ToSpecificType<PathViewModel>(operation.Value);
+            pathViewModel.Path = pathObject.Key;
+            pathViewModel.Method = operation.Key;
+            return pathViewModel;
+        }
+
+        private static Dictionary<string, JObject> swaggerDefinitions = null;
+
+        public static OperationEntity Transform(string groupKey, JObject swaggerObject, KeyValuePair<string,JObject> pathObject)
+        {
+            var swaggerMetadata = swaggerObject.ToObject<Dictionary<string, object>>();
+            var pathViewModel = ToPathViewModel(pathObject);
+            var scheme = Utility.GetScheme(swaggerMetadata);
+            var hostWithParameters = Utility.GetHostWithParameters(swaggerMetadata.GetValueFromMetaData<string>("host"), swaggerMetadata, pathViewModel.Metadata);
 
             var host = hostWithParameters.Host;
             var hostParameters = hostWithParameters.Parameters;
@@ -28,77 +42,92 @@
             {
                 scheme = string.Empty;
             }
-            var apiVersion = Utility.GetApiVersion(viewModel, swaggerModel.Info.Version);
+            var apiVersion = Utility.GetApiVersion(
+                pathViewModel.Metadata.GetValueFromMetaData<string>("x-ms-docs-override-version"), 
+                swaggerMetadata.GetDictionaryFromMetaData<Dictionary<string, object>>("info"));
 
             IList<Definition> allDefinitions;
             if (!_cacheDefinitions.TryGetValue(groupKey, out allDefinitions))
             {
-                allDefinitions = GetAllDefinitions(GetAllDefinitionObjects(swaggerModel));
+                swaggerDefinitions = GetSwaggerDefinitions(swaggerMetadata, "definitions");
+                allDefinitions = GetAllDefinitions(GetAllDefinitionObjects(swaggerDefinitions));
                 _cacheDefinitions.TryAdd(groupKey, allDefinitions);
             }
 
+            var referenceParameters = ResolveReferenceParameters(swaggerMetadata);
             var bodyDefinitionObject = new DefinitionObject();
             var parametersDefinitions = new List<Definition>();
-            var allSimpleParameters = TransformAllSimpleParameters(hostParameters, viewModel, ref bodyDefinitionObject, ref parametersDefinitions);
+            var allSimpleParameters = TransformAllSimpleParameters(hostParameters, pathViewModel, referenceParameters, ref bodyDefinitionObject, ref parametersDefinitions);
 
             var responseDefinitionObjects = new List<DefinitionObject>();
-            var responses = TransformResponses(viewModel, allDefinitions, ref responseDefinitionObjects);
+            //var responses = TransformResponses(viewModel, allDefinitions, ref responseDefinitionObjects);
 
-            var basePath = swaggerModel.BasePath;
-            var paths = TransformPaths(viewModel, scheme, host, basePath, apiVersion, allSimpleParameters);
-            var serviceId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-id");
-            var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
-            var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
-            var operationId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-id");
-            var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
-            var sourceUrl = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-swagger-source-url");
-            var productUid = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-product-uid");
+            var basePath = swaggerMetadata.GetValueFromMetaData<string>("basePath");
+            var paths = TransformPaths(pathViewModel, scheme, host, basePath, apiVersion, allSimpleParameters);
+            var serviceId = swaggerMetadata.GetValueFromMetaData<string>("x-internal-service-id");
+            var serviceName = swaggerMetadata.GetValueFromMetaData<string>("x-internal-service-name");
+            var groupName = swaggerMetadata.GetValueFromMetaData<string>("x-internal-toc-name");
+            var operationId = swaggerMetadata.GetValueFromMetaData<string>("x-internal-operation-id");
+            var operationName = swaggerMetadata.GetValueFromMetaData<string>("x-internal-operation-name");
+            var sourceUrl = swaggerMetadata.GetValueFromMetaData<string>("x-internal-swagger-source-url");
+            var productUid = swaggerMetadata.GetValueFromMetaData<string>("x-internal-product-uid");
 
             return new OperationEntity
             {
-                Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}.{operationId}")?.ToLower(),
+                Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(host, productUid, basePath)}.{serviceId}.{groupName}.{operationId}")?.ToLower(),
                 Name = operationName,
                 Service = serviceName,
-                Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description),
+                Summary = Utility.GetSummary(pathViewModel.Summary, pathViewModel.Description),
                 ApiVersion = apiVersion,
-                GroupId = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}")?.ToLower(),
+                GroupId = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(host, productUid, basePath)}.{serviceId}.{groupName}")?.ToLower(),
                 GroupName = groupName,
-                IsDeprecated = swaggerModel.Metadata.GetValueFromMetaData<bool>("deprecated"),
-                IsPreview = swaggerModel.Metadata.GetValueFromMetaData<bool>("x-ms-preview"),
-                Responses = responses,
+                IsDeprecated = swaggerMetadata.GetValueFromMetaData<bool>("deprecated"),
+                IsPreview = swaggerMetadata.GetValueFromMetaData<bool>("x-ms-preview"),
+                //Responses = responses,
                 Parameters = Helper.SortParameters(paths, allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Query || p.ParameterEntityType == ParameterEntityType.Path).ToList()),
                 RequestHeaders = allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Header).ToList(),
-                RequestBodies = TransformRequestBodies(allDefinitions, allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Body).ToList(), bodyDefinitionObject),
+                //RequestBodies = TransformRequestBodies(allDefinitions, allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Body).ToList(), bodyDefinitionObject),
                 Paths = Helper.HandlePathsDefaultValues(paths, apiVersion, allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Query || p.ParameterEntityType == ParameterEntityType.Path).ToList()),
-                Produces = viewModel.Metadata.GetArrayFromMetaData<string>("produces"),
-                Consumes = viewModel.Metadata.GetArrayFromMetaData<string>("consumes"),
-                Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
-                Definitions = TransformDefinitions(allDefinitions, parametersDefinitions, bodyDefinitionObject, responseDefinitionObjects),
-                Securities = TransformSecurities(swaggerModel),
+                Produces = pathViewModel.Produces?.ToArray(),
+                Consumes = pathViewModel.Consumes?.ToArray(),
+                Examples = TransformExamples(pathViewModel, paths, allSimpleParameters, bodyDefinitionObject),
+                //Definitions = TransformDefinitions(allDefinitions, parametersDefinitions, bodyDefinitionObject, responseDefinitionObjects),
+                Securities = TransformSecurities(swaggerMetadata),
                 Metadata = TransformMetaData(sourceUrl)
             };
         }
 
         #region Parameters
 
-        private static IList<ParameterEntity> TransformAllSimpleParameters(List<ParameterEntity> hostParameters, RestApiChildItemViewModel viewModel, ref DefinitionObject definitionObject, ref List<Definition> definitions)
+        private static Dictionary<string, ParameterObject> ResolveReferenceParameters(Dictionary<string, object> swaggerMetadata)
+        {
+            var referenceParameters = new Dictionary<string, ParameterObject>();
+            var parameters = swaggerMetadata.GetDictionaryFromMetaData<Dictionary<string,object>>("parameters");
+            foreach(var parameter in parameters)
+            {
+                referenceParameters.Add($"#/parameters/{parameter.Key}", JsonUtility.ToSpecificType<ParameterObject>(parameter.Value));
+            }
+            return referenceParameters;
+        }
+
+        private static IList<ParameterEntity> TransformAllSimpleParameters(List<ParameterEntity> hostParameters, PathViewModel pathViewModel, Dictionary<string, ParameterObject> referenceParameters, ref DefinitionObject definitionObject, ref List<Definition> definitions)
         {
             var parameters = hostParameters == null ? new List<ParameterEntity>() : new List<ParameterEntity>(hostParameters);
-            if (viewModel?.Parameters != null)
+            if (pathViewModel.Parameters != null)
             {
-                foreach (var parameter in viewModel.Parameters)
+                foreach (var parameterObject in pathViewModel.Parameters)
                 {
-                    var inType = parameter.Metadata.GetValueFromMetaData<string>("in");
-                    if (inType != null && Enum.TryParse<ParameterEntityType>(inType, true, out var parameterEntityType))
+                    var parameter = string.IsNullOrEmpty(parameterObject.Reference) ? parameterObject : referenceParameters[parameterObject.Reference];
+                    if (parameter.In != null && Enum.TryParse<ParameterEntityType>(parameter.In, true, out var parameterEntityType))
                     {
-                        var isRequired = parameter.Metadata.GetValueFromMetaData<bool>("required");
+                        var isRequired = parameter.Required;
                         if (parameter.Metadata.TryGetValue("x-ms-required", out var msRequired))
                         {
                             isRequired = (bool)msRequired;
                         }
                         var types = new List<BaseParameterTypeEntity>();
-                       
-                        if (parameter.Metadata.TryGetValue("type", out var type))
+                        
+                        if (!string.IsNullOrEmpty(parameter.Type))
                         {
                             var enumValues = parameter.Metadata.GetArrayFromMetaData<string>("enum");
                             var enumNode = parameter.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("x-ms-enum");
@@ -152,7 +181,7 @@
                             {
                                 types.Add(new BaseParameterTypeEntity
                                 {
-                                    Id = (string)type
+                                    Id = (string)parameter.Type
                                 });
                             }
 
@@ -163,17 +192,17 @@
                                 IsRequired = isRequired,
                                 Pattern = parameter.Metadata.GetValueFromMetaData<string>("pattern"),
                                 Format = parameter.Metadata.GetValueFromMetaData<string>("format"),
-                                In = inType,
+                                In = parameter.In,
                                 ParameterEntityType = parameterEntityType,
                                 Types = types,
                                 EnumValues = enumValues
                             };
                             parameters.Add(parameterEntity);
                         }
-                        else if (parameter.Metadata.TryGetValue("schema", out var schema))
+                        else if (parameter.Schema != null)
                         {
-                            definitionObject = ResolveSchema((JObject)schema);
-                            definitionObject.Name = parameter.Name;
+                            definitionObject = ResolveSchema(parameter.Schema);
+                            //definitionObject.Name = parameter.Name;
                         }
                     }
                 }
@@ -208,11 +237,11 @@
             return string.Join("&", queries);
         }
 
-        private static IList<PathEntity> TransformPaths(RestApiChildItemViewModel viewModel, string scheme, string host, string basePath, string apiVersion, IList<ParameterEntity> parameters)
+        private static IList<PathEntity> TransformPaths(PathViewModel viewModel, string scheme, string host, string basePath, string apiVersion, IList<ParameterEntity> parameters)
         {
             var pathEntities = new List<PathEntity>();
 
-            var paths = viewModel.Path?.Split('?');
+            var paths = viewModel.Path.Split('?');
             var requiredQueryStrings = parameters.Where(p => p.IsRequired && p.In == "query");
             var requiredPath = paths[0];
 
@@ -223,7 +252,7 @@
 
             pathEntities.Add(new PathEntity
             {
-                Content = $"{viewModel.OperationName.ToUpper()} {Utility.ResolveScheme(scheme)}{Utility.GetHostWithBasePath(host, basePath)}{requiredPath}",
+                Content = $"{viewModel.Method.ToUpper()} {Utility.ResolveScheme(scheme)}{Utility.GetHostWithBasePath(host, basePath)}{requiredPath}",
                 IsOptional = false
             });
 
@@ -235,7 +264,7 @@
 
                 pathEntities.Add(new PathEntity
                 {
-                    Content = $"{viewModel.OperationName.ToUpper()} {Utility.ResolveScheme(scheme)}{Utility.GetHostWithBasePath(host, basePath)}{optionPath}",
+                    Content = $"{viewModel.Method.ToUpper()} {Utility.ResolveScheme(scheme)}{Utility.GetHostWithBasePath(host, basePath)}{optionPath}",
                     IsOptional = true
                 });
             }
@@ -529,10 +558,10 @@
             return exampleResponses;
         }
 
-        private static IList<ExampleEntity> TransformExamples(RestApiChildItemViewModel viewModel, IList<PathEntity> paths, IList<ParameterEntity> parameters, DefinitionObject bodyDefinitionObject)
+        private static IList<ExampleEntity> TransformExamples(PathViewModel pathViewModel, IList<PathEntity> paths, IList<ParameterEntity> parameters, DefinitionObject bodyDefinitionObject)
         {
             var examples = new List<ExampleEntity>();
-            var msExamples = viewModel.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("x-ms-examples");
+            var msExamples = pathViewModel.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("x-ms-examples");
             if (msExamples != null)
             {
                 foreach (var msExample in msExamples)
@@ -562,15 +591,28 @@
 
         #region Definitions
 
-        private static IList<DefinitionObject> GetAllDefinitionObjects(SwaggerModel swaggerModel)
+        private static Dictionary<string, JObject> GetSwaggerDefinitions(Dictionary<string, object>  swaggerMetadata, string key)
+        {
+            var swaggerDefinitions = new Dictionary<string, JObject>();
+            var definitions = swaggerMetadata.GetDictionaryFromMetaData<Dictionary<string, JObject>>(key);
+            foreach(var definition in definitions)
+            {
+                var innerValue = definition.Value;
+                innerValue["x-internal-ref-name"] = definition.Key;
+                swaggerDefinitions.Add($"#/definitions/{definition.Key}", innerValue);
+            }
+            return swaggerDefinitions;
+        }
+
+        private static IList<DefinitionObject> GetAllDefinitionObjects(Dictionary<string, JObject> definitions)
         {
             var allDefinitionObjects = new List<DefinitionObject>();
-            if (swaggerModel.Definitions != null)
+            if(definitions != null && definitions.Count > 0)
             {
-                var definitions = ((JObject)swaggerModel.Definitions).ToObject<Dictionary<string, JObject>>();
                 foreach (var definition in definitions)
                 {
                     var definitionObject = ResolveSchema(definition.Value);
+
                     definitionObject.Name = definition.Key;
                     definitionObject.Type = definition.Key;
                     var flattenDefinitionObjects = FlattenDefinitionObject(definitionObject);
@@ -594,8 +636,6 @@
                     }
                 }
             }
-
-           
             return allDefinitionObjects;
         }
 
@@ -1001,10 +1041,10 @@
 
         #region Security
 
-        private static IList<SecurityEntity> GetAllSecurityEntities(SwaggerModel swaggerModel)
+        private static IList<SecurityEntity> GetAllSecurityEntities(Dictionary<string, object> swaggerMetadata)
         {
             var allSecurities = new List<SecurityEntity>();
-            var securityDefinitionsModel = swaggerModel.Metadata.GetDictionaryFromMetaData<Dictionary<string, JObject>>("securityDefinitions");
+            var securityDefinitionsModel = swaggerMetadata.GetDictionaryFromMetaData<Dictionary<string, JObject>>("securityDefinitions");
             if (securityDefinitionsModel != null)
             {
                 foreach (var definition in securityDefinitionsModel)
@@ -1043,13 +1083,13 @@
             return allSecurities;
         }
 
-        private static IList<SecurityEntity> TransformSecurities(SwaggerModel swaggerModel)
+        private static IList<SecurityEntity> TransformSecurities(Dictionary<string, object> swaggerMetadata)
         {
             var securities = new List<SecurityEntity>();
-            var securitiesModel = swaggerModel.Metadata.GetArrayFromMetaData<JObject>("security");
+            var securitiesModel = swaggerMetadata.GetArrayFromMetaData<JObject>("security");
             if (securitiesModel != null)
             {
-                var allSecurities = GetAllSecurityEntities(swaggerModel);
+                var allSecurities = GetAllSecurityEntities(swaggerMetadata);
                 foreach (var securityModel in securitiesModel)
                 {
                     var security = securityModel.ToObject<Dictionary<string, object>>().FirstOrDefault();
@@ -1091,7 +1131,7 @@
         {
             if (nodeObject.Type == JTokenType.Object)
             {
-                var nodeObjectDict = nodeObject.ToObject<Dictionary<string, object>>();
+                var nodeObjectDict = nodeObject.ToSpecificObject<Dictionary<string, object>>();
                 var refName = nodeObjectDict.GetValueFromMetaData<string>("x-internal-ref-name");
                 if (string.IsNullOrEmpty(refName))
                 {
@@ -1168,6 +1208,10 @@
                 {
                     definitionObject.DefinitionObjectType = DefinitionObjectType.Array;
                     var itemsDefine = nodeObjectDict.GetValueFromMetaData<JObject>("items");
+                    if (itemsDefine.TryGetValue("$ref", out var reference))
+                    {
+                        itemsDefine = swaggerDefinitions[(string)reference];
+                    }
                     if (itemsDefine.TryGetValue("x-internal-ref-name", out var type))
                     {
                         definitionObject.Type = (string)type;
@@ -1266,17 +1310,6 @@
                         }
 
                         definitionObject.EnumValues = enumObjects;
-                    }
-                    else if (nodeObjectDict.TryGetValue("x-internal-loop-ref-name", out var loopName))
-                    {
-                        definitionObject.DefinitionObjectType = DefinitionObjectType.Simple;
-                        definitionObject.Type = (string)loopName;
-                        var token = nodeObjectDict.GetDictionaryFromMetaData<Dictionary<string, object>>("x-internal-loop-token");
-                        if (token != null)
-                        {
-                            definitionObject.Description = token.GetValueFromMetaData<string>("description");
-                            definitionObject.IsReadOnly = token.GetValueFromMetaData<bool>("readOnly");
-                        }
                     }
                     else if (definitionObject.AllOfs.Count == 0 && definitionObject.PropertyItems.Count == 0)
                     {
