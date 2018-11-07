@@ -74,7 +74,7 @@
                 Consumes = viewModel.Metadata.GetArrayFromMetaData<string>("consumes"),
                 Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
                 Definitions = TransformDefinitions(allDefinitions, parametersDefinitions, bodyDefinitionObject, responseDefinitionObjects),
-                Securities = TransformSecurities(swaggerModel),
+                Securities = TransformSecurities(viewModel, swaggerModel),
                 Metadata = TransformMetaData(sourceUrl)
             };
         }
@@ -1043,10 +1043,15 @@
             return allSecurities;
         }
 
-        private static IList<SecurityEntity> TransformSecurities(SwaggerModel swaggerModel)
+        private static IList<SecurityEntity> TransformSecurities(RestApiChildItemViewModel viewModel, SwaggerModel swaggerModel)
         {
             var securities = new List<SecurityEntity>();
-            var securitiesModel = swaggerModel.Metadata.GetArrayFromMetaData<JObject>("security");
+
+            var securitiesModel = viewModel.Metadata.GetArrayFromMetaData<JObject>("security");
+            if(securitiesModel == null)
+            {
+                securitiesModel = swaggerModel.Metadata.GetArrayFromMetaData<JObject>("security");
+            }
             if (securitiesModel != null)
             {
                 var allSecurities = GetAllSecurityEntities(swaggerModel);
