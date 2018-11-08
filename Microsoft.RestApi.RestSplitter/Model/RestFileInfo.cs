@@ -20,5 +20,8 @@
         public string TocName { get; set; }
 
         public string SwaggerSourceUrl { get; set; }
+
+        public string Version { get; set; }
+
     }
 }

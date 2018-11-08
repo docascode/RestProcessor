@@ -44,6 +44,7 @@
                 {
                     mappingFile = YamlConverter.ConvertYamls(args[0], mappingFile);
                 }
+               
                 var outputDir = args.Length < 4 ? Path.Combine(args[1], mappingFile.TargetApiRootDir) : args[3];
 
                 Console.WriteLine("Processor split begin at:" + DateTime.UtcNow);
@@ -100,10 +101,10 @@
             return restFileInfos;
         }
 
-        public static (List<string>, ConcurrentDictionary<string, ConcurrentBag<string>>) ExtractRestFiles(IList<RestFileInfo> restFileInfos)
+        public static (List<FileNameInfo>, ConcurrentDictionary<string, ConcurrentBag<FileNameInfo>>) ExtractRestFiles(IList<RestFileInfo> restFileInfos)
         {
-            var splitedGroupPaths = new List<string>();
-            var splitedGroupOperationPaths = new ConcurrentDictionary<string, ConcurrentBag<string>>();
+            var splitedGroupFiles = new List<FileNameInfo>();
+            var splitedGroupOperationFiles = new ConcurrentDictionary<string, ConcurrentBag<FileNameInfo>>();
 
             foreach (var restFileInfo in restFileInfos)
             {
@@ -111,14 +112,14 @@
                 {
                     if (fileInfo != null && !string.IsNullOrEmpty(fileInfo.FilePath) && File.Exists(fileInfo.FilePath))
                     {
-                        splitedGroupPaths.Add(fileInfo.FilePath);
+                        splitedGroupFiles.Add(fileInfo);
 
                         if (fileInfo.ChildrenFileNameInfo != null && fileInfo.ChildrenFileNameInfo.Count > 0)
                         {
                             foreach (var info in fileInfo.ChildrenFileNameInfo)
                             {
-                                var operationPaths = splitedGroupOperationPaths.GetOrAdd(fileInfo.FilePath, new ConcurrentBag<string>());
-                                operationPaths.Add(info.FilePath);
+                                var operationFiles = splitedGroupOperationFiles.GetOrAdd(fileInfo.FilePath, new ConcurrentBag<FileNameInfo>());
+                                operationFiles.Add(info);
                             }
                         }
                     }
@@ -130,47 +131,48 @@
                         {
                             foreach (var info in fileInfo.ChildrenFileNameInfo)
                             {
-                                var operationPaths = splitedGroupOperationPaths.GetOrAdd(guidKey, new ConcurrentBag<string>());
-                                operationPaths.Add(info.FilePath);
+                                var operationFiles = splitedGroupOperationFiles.GetOrAdd(guidKey, new ConcurrentBag<FileNameInfo>());
+                                operationFiles.Add(info);
                             }
                         }
                     }
                 }
             }
-            return (splitedGroupPaths, splitedGroupOperationPaths);
+            return (splitedGroupFiles, splitedGroupOperationFiles);
 
         }
 
-        private static void RestProcessorForOperation(string groupKey, string filePath, ConcurrentDictionary<string, ConcurrentBag<Operation>> groupOperations)
+        private static void RestProcessorForOperation(string groupKey, FileNameInfo file, ConcurrentDictionary<string, ConcurrentBag<Operation>> groupOperations)
         {
-            var folder = Path.GetDirectoryName(filePath);
-            var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(filePath)}.yml");
+            var folder = Path.GetDirectoryName(file.FilePath);
+            var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(file.FilePath)}.yml");
             try
             {
-                var operation = RestTransformer.ProcessOperation(groupKey, ymlPath, filePath);
+                var operation = RestTransformer.ProcessOperation(groupKey, ymlPath, file.FilePath);
                 if (operation != null)
                 {
-                    var operations = groupOperations.GetOrAdd(operation.GroupId, new ConcurrentBag<Operation>());
+                    var key = string.IsNullOrEmpty(file.Version) ? operation.GroupId : $"{file.Version}_{operation.GroupId}";
+                    var operations = groupOperations.GetOrAdd(key, new ConcurrentBag<Operation>());
                     operations.Add(operation);
                 }
-                Console.WriteLine($"Done generate yml model for {filePath}");
+                Console.WriteLine($"Done generate yml model for {file.FilePath}");
             }
             catch (Exception ex)
             {
-                ErrorList.Add($"Error generate yml files for {filePath}, details: {ex}");
+                ErrorList.Add($"Error generate yml files for {file.FilePath}, details: {ex}");
             }
             finally 
             {
-                if (File.Exists(filePath))
+                if (File.Exists(file.FilePath))
                 {
-                    File.Delete(filePath);
+                    File.Delete(file.FilePath);
                 }
             }
         }
 
         public static void RestProcessor(IList<RestFileInfo> restFileInfos)
         {
-            var (groupPaths, groupOperationPaths) = ExtractRestFiles(restFileInfos);
+            var (groupFiles, groupOperationFiles) = ExtractRestFiles(restFileInfos);
             var groupOperations = new ConcurrentDictionary<string, ConcurrentBag<Operation>>();
 
             //foreach (var groupOperationPath in groupOperationPaths)
@@ -204,34 +206,34 @@
             //    }
             //}
 
-            Parallel.ForEach(groupOperationPaths, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (groupOperationPath) =>
+            Parallel.ForEach(groupOperationFiles, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (groupOperationFile) =>
             {
-                var firstOperationPath = groupOperationPath.Value.First();
-                RestProcessorForOperation(groupOperationPath.Key, firstOperationPath, groupOperations);
-                var otherOperationPaths = groupOperationPath.Value.Skip(1);
-                Parallel.ForEach(otherOperationPaths, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (filePath) =>
+                var firstOperationFile = groupOperationFile.Value.First();
+                RestProcessorForOperation(groupOperationFile.Key, firstOperationFile, groupOperations);
+                var otherOperationFiles = groupOperationFile.Value.Skip(1);
+                Parallel.ForEach(otherOperationFiles, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (file) =>
                 {
-                    RestProcessorForOperation(groupOperationPath.Key, filePath, groupOperations);
+                    RestProcessorForOperation(groupOperationFile.Key, file, groupOperations);
                 });
             });
 
-            Parallel.ForEach(groupPaths, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (filePath) =>
+            Parallel.ForEach(groupFiles, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (file) =>
             {
-                var folder = Path.GetDirectoryName(filePath);
-                var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(filePath)}.yml");
+                var folder = Path.GetDirectoryName(file.FilePath);
+                var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(file.FilePath)}.yml");
                 try
                 {
-                    RestTransformer.ProcessGroup(ymlPath, filePath, groupOperations);
-                    Console.WriteLine($"Done generate yml model for {filePath}");
+                    RestTransformer.ProcessGroup(ymlPath, file.FilePath, groupOperations, file.Version);
+                    Console.WriteLine($"Done generate yml model for {file.FilePath}");
                 }
                 catch (Exception ex)
                 {
-                    ErrorList.Add($"Error generate yml files for {filePath}, details: {ex}");
+                    ErrorList.Add($"Error generate yml files for {file.FilePath}, details: {ex}");
                 }
 
-                if (File.Exists(filePath))
+                if (File.Exists(file.FilePath))
                 {
-                    File.Delete(filePath);
+                    File.Delete(file.FilePath);
                 }
             });
         }
