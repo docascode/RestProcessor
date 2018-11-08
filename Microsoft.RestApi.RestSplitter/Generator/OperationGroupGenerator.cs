@@ -14,8 +14,8 @@
         protected OperationGroupMapping OperationGroupMapping { get; }
 
         #region Constructors
-        public OperationGroupGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, OrgsMappingFile orgsMappingFile, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerRelativePath) 
-            : base(rootJObj, targetDir, filePath, orgsMappingFile, lineNumberMappingDict, repoFile, swaggerRelativePath)
+        public OperationGroupGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, OrgsMappingFile orgsMappingFile, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerRelativePath, string version) 
+            : base(rootJObj, targetDir, filePath, orgsMappingFile, lineNumberMappingDict, repoFile, swaggerRelativePath, version)
         {
             OperationGroupMapping = operationGroupMapping;
         }
@@ -115,6 +115,7 @@
                     var file = Utility.Serialize(TargetDir, Utility.TryToFormalizeUrl(newOperationGroupName, OrgsMappingFile.FormalizeUrl), RootJObj);
                     fileNameInfo.FileName = OrgsMappingFile.UseYamlSchema ? Path.ChangeExtension(file.Item1, "yml") : file.Item1;
                     fileNameInfo.FilePath = file.Item2;
+                    fileNameInfo.Version = Version;
 
                     // Clear up internal data
                     ClearKey(RootJObj, "x-internal-split-members");

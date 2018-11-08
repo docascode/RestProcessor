@@ -7,13 +7,13 @@
 
     public class GeneratorFactory
     {
-        public static IGenerator CreateGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, OrgsMappingFile orgsMappingFile, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerSourcePath)
+        public static IGenerator CreateGenerator(JObject rootJObj, string targetDir, string filePath, OperationGroupMapping operationGroupMapping, OrgsMappingFile orgsMappingFile, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerSourcePath, string version)
         {
             if (orgsMappingFile.IsGroupdedByTag)
             {
-                return new TagsGenerator(rootJObj, targetDir, filePath, operationGroupMapping, orgsMappingFile, lineNumberMappingDict, repoFile, swaggerSourcePath);
+                return new TagsGenerator(rootJObj, targetDir, filePath, operationGroupMapping, orgsMappingFile, lineNumberMappingDict, repoFile, swaggerSourcePath, version);
             }
-            return new OperationGroupGenerator(rootJObj, targetDir, filePath, operationGroupMapping, orgsMappingFile, lineNumberMappingDict, repoFile, swaggerSourcePath);
+            return new OperationGroupGenerator(rootJObj, targetDir, filePath, operationGroupMapping, orgsMappingFile, lineNumberMappingDict, repoFile, swaggerSourcePath, version);
         }
     }
 }

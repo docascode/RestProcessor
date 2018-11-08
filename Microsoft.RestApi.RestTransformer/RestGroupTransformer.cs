@@ -11,7 +11,7 @@
     {
         protected abstract string GetSummary(SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel);
         
-        public OperationGroupEntity Transform(SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel, ConcurrentDictionary<string, ConcurrentBag<Operation>> groupOperations)
+        public OperationGroupEntity Transform(SwaggerModel swaggerModel, RestApiRootItemViewModel viewModel, ConcurrentDictionary<string, ConcurrentBag<Operation>> groupOperations, string version)
         {
             var serviceId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-id");
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
@@ -24,7 +24,8 @@
             var groupId = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}")?.ToLower();
 
             ConcurrentBag<Operation> operations;
-            if (groupOperations.TryGetValue(groupId, out operations))
+            var key = string.IsNullOrEmpty(version) ? groupId : $"{version}_{groupId}";
+            if (groupOperations.TryGetValue(key, out operations))
             {
                 if (operations.Count() > 0)
                 {

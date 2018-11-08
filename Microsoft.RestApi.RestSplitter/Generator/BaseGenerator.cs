@@ -26,9 +26,11 @@
 
         protected string SwaggerRelativePath { get; set; }
 
+        protected string Version { get; set; }
+
         #region Constructors
 
-        protected BaseGenerator(JObject rootJObj, string targetDir, string filePath, OrgsMappingFile orgsMappingFile, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerRelativePath)
+        protected BaseGenerator(JObject rootJObj, string targetDir, string filePath, OrgsMappingFile orgsMappingFile, IDictionary<string, int> lineNumberMappingDict, RepoFile repoFile, string swaggerRelativePath, string version)
         {
             Guard.ArgumentNotNull(rootJObj, nameof(rootJObj));
             Guard.ArgumentNotNullOrEmpty(targetDir, nameof(targetDir));
@@ -42,6 +44,7 @@
             LineNumberMappingDict = lineNumberMappingDict;
             RepoFile = repoFile;
             SwaggerRelativePath = swaggerRelativePath;
+            Version = version;
         }
 
 
@@ -123,7 +126,8 @@
                         TocName = operationTocName,
                         FileName = OrgsMappingFile.UseYamlSchema ? Path.ChangeExtension(fileName, "yml") : fileName,
                         FilePath = operationFile.Item2,
-                        SwaggerSourceUrl = swaggerSourceUrl
+                        SwaggerSourceUrl = swaggerSourceUrl,
+                        Version = Version
                     };
                 }
             }
