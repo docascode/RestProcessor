@@ -64,7 +64,7 @@
                     else
                     {
                         var fileNameWithoutExt = Path.GetFileNameWithoutExtension(newOperationGroupName);
-                        fileNameInfo.TocName = Utility.ExtractPascalNameByRegex(fileNameWithoutExt);
+                        fileNameInfo.TocName = Utility.ExtractPascalNameByRegex(fileNameWithoutExt, OrgsMappingFile.NoSplitWords);
                     }
 
                     // Reset paths to filtered paths

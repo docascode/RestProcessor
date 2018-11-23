@@ -47,7 +47,7 @@
 
                     var fileNameInfo = new FileNameInfo
                     {
-                        TocName = Utility.ExtractPascalNameByRegex(tag)
+                        TocName = Utility.ExtractPascalNameByRegex(tag, OrgsMappingFile.NoSplitWords)
                     };
                     RootJObj["x-internal-operation-group-name"] = tag;
 
