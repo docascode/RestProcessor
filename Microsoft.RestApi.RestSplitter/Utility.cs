@@ -30,7 +30,7 @@
         public static readonly string Pattern = @"(?:{0}|[A-Z]+?(?={0}|[A-Z][a-z]|$)|[A-Z](?:[0-9]*?)(?:[a-z]*?)(?={0}|[A-Z]|$)|(?:[a-z]+?)(?={0}|[A-Z]|$))";
         public static readonly HashSet<string> Keyword = new HashSet<string> {
             "BI", "IP", "ML", "MAM", "OS", "VMs", "VM", "APIM", "vCenters", "WANs", "WAN", "IDs", "ID", "REST", "OAuth2", "SignalR", "iOS", "IOS",
-            "PlayFab", "OpenId"
+            "PlayFab", "OpenId", "NuGet"
         };
 
         public static Tuple<string, string> Serialize(string targetDir, string name, JObject root)
@@ -40,7 +40,12 @@
             {
                 Directory.CreateDirectory(targetDir);
             }
-            using (var sw = new StreamWriter(Path.Combine(targetDir, fileName)))
+            var filePath = Path.Combine(targetDir, fileName);
+            if (File.Exists(filePath))
+            {
+                throw new Exception($"There alreay exist a file: {filePath}");
+            }
+            using (var sw = new StreamWriter(filePath))
             using (var writer = new JsonTextWriter(sw))
             {
                 JsonSerializer.Serialize(writer, root);
@@ -120,7 +125,7 @@
             }
         }
 
-        public static string ExtractPascalNameByRegex(string name)
+        public static string ExtractPascalNameByRegex(string name, List<string>noSplitWords)
         {
             if (name.Contains(" "))
             {
@@ -132,7 +137,9 @@
             }
 
             var result = new List<string>();
-            var p = string.Format(Pattern, string.Join("|", Keyword));
+
+
+            var p = string.Format(Pattern, string.Join("|", noSplitWords?.Count > 0 ? Keyword.Concat(noSplitWords).Distinct() : Keyword));
             while (name.Length > 0)
             {
                 var m = Regex.Match(name, p);
@@ -145,7 +152,7 @@
             }
             return string.Join(" ", result);
         }
-
+        
         public static string ExtractPascalName(string name)
         {
             if (name.Contains(" "))

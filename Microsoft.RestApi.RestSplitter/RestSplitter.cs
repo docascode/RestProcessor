@@ -285,7 +285,7 @@
                 }
                 _restFileInfos.Add(restFileInfo);
 
-                var tocTitle = Utility.ExtractPascalNameByRegex(restFileInfo.TocTitle);
+                var tocTitle = Utility.ExtractPascalNameByRegex(restFileInfo.TocTitle, orgsMappingFile.NoSplitWords);
                 List<SwaggerToc> subTocList;
                 if (!subTocDict.TryGetValue(subGroupName, out subTocList))
                 {

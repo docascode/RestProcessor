@@ -55,5 +55,8 @@
 
         [JsonProperty("generate_source_url")]
         public bool GenerateSourceUrl { get; set; }
+
+        [JsonProperty("no_split_words")]
+        public List<string> NoSplitWords { get; set; }
     }
 }
