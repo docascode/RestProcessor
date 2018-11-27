@@ -325,8 +325,9 @@
                 {
                     var definitionObject = ResolveSchema(response.Metadata.GetValueFromMetaData<JObject>("schema"));
                     //todo: will resolve responses and parameters
-                    definitionObject.Type = response.Metadata.GetValueFromMetaData<string>("x-internal-ref-name");
+                    definitionObject.Type = string.IsNullOrEmpty(definitionObject.Type) ? response.Metadata.GetValueFromMetaData<string>("x-internal-ref-name") : definitionObject.Type;
                     definitionObjects.Add(definitionObject);
+
                     if (string.IsNullOrEmpty(definitionObject.DiscriminatorKey) && !string.IsNullOrEmpty(definitionObject.Type))
                     {
                         typesName.Add(new BaseParameterTypeEntity
