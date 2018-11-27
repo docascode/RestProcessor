@@ -40,17 +40,14 @@
             {
                 foreach (var operationGroup in operationGroups)
                 {
-                    JToken pathParameters = null;
-                    var filteredPaths = FindPathsByOperationGroup(pathsJObj, operationGroup, ref pathParameters);
+                    Dictionary<string, JToken> pathsParameters = new Dictionary<string, JToken>();
+                    var filteredPaths = FindPathsByOperationGroup(pathsJObj, operationGroup, ref pathsParameters);
 
                     if (filteredPaths.Count == 0)
                     {
                         throw new InvalidOperationException($"Operation group '{operationGroup}' could not be found in for {FileUtility.GetDirectoryName(TargetDir)}");
                     }
-                    if(pathParameters != null)
-                    {
-                        MergePathParametersToOperations(filteredPaths, pathParameters);
-                    }
+                    MergePathParametersToOperations(filteredPaths, pathsParameters);
 
                     // Get file name from operation group mapping
                     var fileNameInfo = new FileNameInfo();
@@ -142,7 +139,7 @@
 
         #region Private Methods
 
-        private static JObject FindPathsByOperationGroup(JObject paths, string expectedOpGroup, ref JToken pathParameters)
+        private static JObject FindPathsByOperationGroup(JObject paths, string expectedOpGroup, ref Dictionary<string, JToken> pathParameters)
         {
             var filteredPaths = new JObject();
             foreach (var path in paths)
@@ -153,7 +150,7 @@
                     // Skip find tag for parameters
                     if (item.Key.Equals("parameters"))
                     {
-                        pathParameters = item.Value;
+                        pathParameters[pathUrl] = item.Value;
                         continue;
                     }
                     var opGroup = GetOperationGroupPerOperation((JObject)item.Value).Item1;
