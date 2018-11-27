@@ -36,14 +36,11 @@
             }
             foreach (var tag in tags)
             {
-                JToken pathParameters = null;
-                var filteredPaths = FindPathsByTag(pathsJObj, tag, ref pathParameters);
+                Dictionary<string, JToken> pathsParameters = new Dictionary<string, JToken>();
+                var filteredPaths = FindPathsByTag(pathsJObj, tag, ref pathsParameters);
                 if(filteredPaths.Count > 0)
                 {
-                    if (pathParameters != null)
-                    {
-                        MergePathParametersToOperations(filteredPaths, pathParameters);
-                    }
+                    MergePathParametersToOperations(filteredPaths, pathsParameters);
 
                     var fileNameInfo = new FileNameInfo
                     {
@@ -144,7 +141,7 @@
 
         #region Private Methods
 
-        private static JObject FindPathsByTag(JObject paths, string tag, ref JToken pathParameters)
+        private static JObject FindPathsByTag(JObject paths, string tag, ref Dictionary<string, JToken> pathParameters)
         {
             var filteredPaths = new JObject();
             foreach (var path in paths)
@@ -155,7 +152,7 @@
                     // Skip find tag for parameters
                     if (item.Key.Equals("parameters"))
                     {
-                        pathParameters = item.Value;
+                        pathParameters[pathUrl] = item.Value;
                         continue;
                     }
                     var tags = GetTagsPerOperation((JObject)item.Value);

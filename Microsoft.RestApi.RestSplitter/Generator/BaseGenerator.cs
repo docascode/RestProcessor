@@ -133,10 +133,11 @@
             }
         }
 
-        protected void MergePathParametersToOperations(JObject filteredPaths, JToken pathParameters)
+        protected void MergePathParametersToOperations(JObject filteredPaths, Dictionary<string, JToken> pathsParameters)
         {
             foreach (var path in filteredPaths)
             {
+                var pathParameters = pathsParameters.ContainsKey(path.Key) ? pathsParameters[path.Key] : null;
                 foreach (var item in (JObject)path.Value)
                 {
                     var operationObj = (JObject)item.Value;
@@ -145,10 +146,14 @@
                     {
                         JArray parameters = new JArray();
                         parameters.Merge(operationParameters);
-                        parameters.Merge(pathParameters);
+                        if (pathParameters != null)
+                        {
+                            parameters.Merge(pathParameters);
+                        }
+
                         operationObj["parameters"] = DistinctParameters(parameters);
                     }
-                    else
+                    else if (pathParameters != null)
                     {
                         operationObj["parameters"] = pathParameters;
                     }
