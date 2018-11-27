@@ -3,12 +3,10 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
 
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
     using Microsoft.DocAsCode.DataContracts.RestApi;
-    using Microsoft.RestApi.Common;
     using Microsoft.RestApi.RestTransformer.Models;
 
     using Newtonsoft.Json.Linq;
@@ -326,6 +324,8 @@
                 if (schema != null)
                 {
                     var definitionObject = ResolveSchema(response.Metadata.GetValueFromMetaData<JObject>("schema"));
+                    //todo: will resolve responses and parameters
+                    definitionObject.Type = response.Metadata.GetValueFromMetaData<string>("x-internal-ref-name");
                     definitionObjects.Add(definitionObject);
                     if (string.IsNullOrEmpty(definitionObject.DiscriminatorKey) && !string.IsNullOrEmpty(definitionObject.Type))
                     {
