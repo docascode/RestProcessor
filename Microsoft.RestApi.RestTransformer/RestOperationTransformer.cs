@@ -1064,7 +1064,7 @@
                     var scopes = ((JArray)security.Value).ToObject<string[]>();
                     var securityEntity = new SecurityEntity
                     {
-                        Name = foundSecurity?.Name,
+                        Name = foundSecurity?.Name ?? security.Key,
                         Type = foundSecurity?.Type,
                         Description = foundSecurity?.Description,
                         In = foundSecurity?.In,
