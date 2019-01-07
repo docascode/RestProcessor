@@ -25,7 +25,7 @@
 
         public string Type { get; set; }
 
-        public string AdditionalType { get; set; }
+        public BaseParameterTypeEntity AdditionalType { get; set; }
 
         public bool IsReadOnly { get; set; }
 
@@ -107,7 +107,7 @@
 
         public string Type { get; set; }
 
-        public string AdditionalType { get; set; }
+        public BaseParameterTypeEntity AdditionalType { get; set; }
 
         public bool IsReadOnly { get; set; }
 

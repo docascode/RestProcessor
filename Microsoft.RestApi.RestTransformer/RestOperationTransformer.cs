@@ -14,6 +14,7 @@
     public class RestOperationTransformer
     {
         private static ConcurrentDictionary<string, IList<Definition>> _cacheDefinitions = new ConcurrentDictionary<string, IList<Definition>>();
+        public readonly static string[] PrimitiveDataTypes = new string[] { "number", "integer", "boolean", "array", "string" };
 
         public static OperationEntity Transform(string groupKey, SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel)
         {
@@ -96,7 +97,7 @@
                             isRequired = (bool)msRequired;
                         }
                         var types = new List<BaseParameterTypeEntity>();
-                       
+
                         if (parameter.Metadata.TryGetValue("type", out var type))
                         {
                             var enumValues = parameter.Metadata.GetArrayFromMetaData<string>("enum");
@@ -179,7 +180,7 @@
             }
             return parameters;
         }
-        
+
         #endregion
 
         #region Paths
@@ -275,7 +276,7 @@
                             Types = new List<BaseParameterTypeEntity> { new BaseParameterTypeEntity { Id = bodyDefinitionObject.Type } }
                         });
                     }
-                    
+
                     if (bodyParameters.Count > 0)
                     {
                         bodies.Add(new RequestBody
@@ -597,7 +598,7 @@
                 }
             }
 
-           
+
             return allDefinitionObjects;
         }
 
@@ -708,14 +709,14 @@
                     }
                     else
                     {
-                        if (!string.IsNullOrEmpty(property.AdditionalType))
+                        if (!string.IsNullOrEmpty(property.AdditionalType?.Id))
                         {
                             parameterTypeEntity.IsDictionary = true;
                             parameterTypeEntity.Id = "object";
                             parameterTypeEntity.AdditionalTypes = new List<IdentifiableEntity>
                             {
                                 new IdentifiableEntity{ Id = "string" },
-                                new IdentifiableEntity{ Id = property.AdditionalType }
+                                new BaseParameterTypeEntity{ Id = property.AdditionalType.Id, IsArray = property.AdditionalType.IsArray }
                             };
                             types.Add(parameterTypeEntity);
                         }
@@ -883,13 +884,13 @@
             }
             foreach (var bodyProperty in bodyProperties)
             {
-                if ((!string.IsNullOrEmpty(bodyProperty.Type) || !string.IsNullOrEmpty(bodyProperty.AdditionalType))
+                if ((!string.IsNullOrEmpty(bodyProperty.Type) || !string.IsNullOrEmpty(bodyProperty.AdditionalType?.Id))
                     && (bodyProperty.DefinitionObjectType == DefinitionObjectType.Object || bodyProperty.DefinitionObjectType == DefinitionObjectType.Array)
                     && !typesQueue.Any(t => t == bodyProperty.Type))
                 {
-                    if (!string.IsNullOrEmpty(bodyProperty.AdditionalType))
+                    if (!string.IsNullOrEmpty(bodyProperty.AdditionalType?.Id))
                     {
-                        typesQueue.Enqueue(bodyProperty.AdditionalType);
+                        typesQueue.Enqueue(bodyProperty.AdditionalType.Id);
                     }
                     else
                     {
@@ -899,13 +900,13 @@
             }
             foreach (var responseDefinitionObject in responseDefinitionObjects)
             {
-                if ((!string.IsNullOrEmpty(responseDefinitionObject.Type) || !string.IsNullOrEmpty(responseDefinitionObject.AdditionalType))
+                if ((!string.IsNullOrEmpty(responseDefinitionObject.Type) || !string.IsNullOrEmpty(responseDefinitionObject.AdditionalType?.Id))
                     && (responseDefinitionObject.DefinitionObjectType == DefinitionObjectType.Object || responseDefinitionObject.DefinitionObjectType == DefinitionObjectType.Array)
                     && !typesQueue.Any(t => t == responseDefinitionObject.Type))
                 {
-                    if (!string.IsNullOrEmpty(responseDefinitionObject.AdditionalType))
+                    if (!string.IsNullOrEmpty(responseDefinitionObject.AdditionalType?.Id))
                     {
-                        typesQueue.Enqueue(responseDefinitionObject.AdditionalType);
+                        typesQueue.Enqueue(responseDefinitionObject.AdditionalType.Id);
                     }
                     else
                     {
@@ -982,9 +983,9 @@
 
                             foreach (var definitionProperty in selfDefinition.DefinitionProperties)
                             {
-                                if (!string.IsNullOrEmpty(definitionProperty.AdditionalType))
+                                if (!string.IsNullOrEmpty(definitionProperty.AdditionalType?.Id))
                                 {
-                                    typesQueue.Enqueue(definitionProperty.AdditionalType);
+                                    typesQueue.Enqueue(definitionProperty.AdditionalType.Id);
                                 }
                                 else if (!string.IsNullOrEmpty(definitionProperty.Type))
                                 {
@@ -1144,7 +1145,7 @@
                 definitionObject.Type = refName;
                 definitionObject.Description = nodeObjectDict.GetValueFromMetaData<string>("description");
                 definitionObject.Title = nodeObjectDict.GetValueFromMetaData<string>("title");
-               
+
                 definitionObject.IsReadOnly = nodeObjectDict.GetValueFromMetaData<bool>("readOnly");
                 definitionObject.IsFlatten = definitionObject.IsFlatten ? true : nodeObjectDict.GetValueFromMetaData<bool>("x-ms-client-flatten");
 
@@ -1175,7 +1176,7 @@
                 if (nodeObjectDict.GetValueFromMetaData<JObject>("properties") != null)
                 {
                     definitionObject.DefinitionObjectType = DefinitionObjectType.Object;
-                    var propertiesNode = nodeObjectDict.GetValueFromMetaData<JObject>("properties"); 
+                    var propertiesNode = nodeObjectDict.GetValueFromMetaData<JObject>("properties");
 
                     var properties = propertiesNode.ToObject<Dictionary<string, object>>();
                     foreach (var property in properties)
@@ -1192,18 +1193,34 @@
                     var additionalProperties = additionalPropertiesNode.ToObject<Dictionary<string, object>>();
                     var additionalType = additionalProperties.GetValueFromMetaData<string>("type");
                     var additionalPropertyProperties = additionalProperties.GetDictionaryFromMetaData<Dictionary<string, object>>("properties");
+                    var additionalPropertyItemsDefine = additionalProperties.GetDictionaryFromMetaData<Dictionary<string, object>>("items");
 
                     if (additionalPropertyProperties != null)
                     {
                         var childDefinitionObject = new DefinitionObject();
-                        definitionObject.AdditionalType = additionalProperties.GetValueFromMetaData<string>("x-internal-ref-name");
+                        definitionObject.AdditionalType = new BaseParameterTypeEntity { Id = additionalProperties.GetValueFromMetaData<string>("x-internal-ref-name") };
                         ResolveObject(string.Empty, additionalPropertiesNode, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue);
                         definitionObject.PropertyItems.Add(childDefinitionObject);
+                    }
+                    else if (additionalPropertyItemsDefine != null)
+                    {
+                        var typeOfArrayItems = additionalPropertyItemsDefine.GetValueFromMetaData<string>("type");
+                        if (PrimitiveDataTypes.Contains(typeOfArrayItems))
+                        {
+                            definitionObject.AdditionalType = definitionObject.AdditionalType = new BaseParameterTypeEntity { Id = typeOfArrayItems, IsArray = true };
+                        }
+                        else
+                        {
+                            var childDefinitionObject = new DefinitionObject();
+                            definitionObject.AdditionalType = definitionObject.AdditionalType = new BaseParameterTypeEntity { Id = additionalPropertyItemsDefine.GetValueFromMetaData<string>("x-internal-ref-name"), IsArray = true };
+                            ResolveObject(string.Empty, additionalPropertiesNode, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue);
+                            definitionObject.PropertyItems.Add(childDefinitionObject);
+                        }
                     }
                     else
                     {
                         definitionObject.DefinitionObjectType = DefinitionObjectType.Simple;
-                        definitionObject.AdditionalType = additionalType;
+                        definitionObject.AdditionalType = new BaseParameterTypeEntity { Id = additionalType };
                     }
                 }
                 else if (nodeObjectDict.GetValueFromMetaData<JObject>("items") != null)
@@ -1352,7 +1369,7 @@
                     var items = new List<DefinitionObject>();
                     foreach (var item in definitionObject.PropertyItems)
                     {
-                        if (!item.IsFlatten || (item.DefinitionObjectType == DefinitionObjectType.Simple && !string.IsNullOrEmpty(item.AdditionalType)))
+                        if (!item.IsFlatten || (item.DefinitionObjectType == DefinitionObjectType.Simple && !string.IsNullOrEmpty(item.AdditionalType?.Id)))
                         {
                             items.Add(item);
                         }
@@ -1371,7 +1388,7 @@
                         }
                         definitionObject.AllOfs.Add(allOf);
                     }
-                     definitionObject.PropertyItems = items;
+                    definitionObject.PropertyItems = items;
                     propertyItem.PropertyItems = new List<DefinitionObject>();
                 }
             }
@@ -1383,7 +1400,7 @@
             ResolveObject(string.Empty, nodeObject, definitionObject);
             ResolveDefinitionClientFlatten(definitionObject);
             return definitionObject;
-        }
+        }   
 
         #endregion
     }
