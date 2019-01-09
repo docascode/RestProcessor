@@ -413,11 +413,8 @@
             if (pathContent.Contains('?'))
             {
                 var contents = pathContent.Split('?');
-                if (contents[1].Contains('&'))
-                {
-                    var queries = contents[1].Split('&');
-                    contents[1] = string.Join("&", queries.Where(q => !q.Contains("={")));
-                }
+                var queries = contents[1].Split('&');
+                contents[1] = string.Join("&", queries.Where(q => !q.Contains("={")));
                 if (string.IsNullOrEmpty(contents[1]))
                 {
                     pathContent = contents[0];
