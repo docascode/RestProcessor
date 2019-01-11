@@ -1157,7 +1157,7 @@
                 definitionObject.DiscriminatorKey = nodeObjectDict.GetValueFromMetaData<string>("discriminator");
                 definitionObject.DiscriminatorValue = nodeObjectDict.GetValueFromMetaData<string>("x-ms-discriminator-value");
                 var discriminatorPropertyKey = definitionObject.DiscriminatorKey;
-                var discriminatorPropertyValue = string.IsNullOrEmpty(definitionObject.DiscriminatorValue) ? discriminatorValue : definitionObject.DiscriminatorValue;
+                var discriminatorPropertyValue = string.IsNullOrEmpty(discriminatorValue) ? definitionObject.DiscriminatorValue : discriminatorValue;
 
                 var allOf = nodeObjectDict.GetArrayFromMetaData<JObject>("allOf");
                 if (allOf != null && allOf.Count() > 0)
