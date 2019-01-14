@@ -62,5 +62,8 @@
 
         [YamlMember(Alias = "metadata")]
         public MetaDataEntity Metadata { get; set; }
+
+        [YamlMember(Alias = "errorCodes")]
+        public IList<ErrorCodeEntity> ErrorCodes { get; set; }
     }
 }

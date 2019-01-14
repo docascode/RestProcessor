@@ -106,6 +106,7 @@
     <Compile Include="Models\DefinitionEntity.cs" />
     <Compile Include="Models\DefinitionObject.cs" />
     <Compile Include="Models\DefinitionParameterEntity.cs" />
+    <Compile Include="Models\ErrorCodeEntity.cs" />
     <Compile Include="Models\ExampleEntity.cs" />
     <Compile Include="Models\ExampleHeaderEntity.cs" />
     <Compile Include="Models\ExampleRequestEntity.cs" />

@@ -73,7 +73,8 @@
                 Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
                 Definitions = TransformDefinitions(allDefinitions, parametersDefinitions, bodyDefinitionObject, responseDefinitionObjects),
                 Securities = TransformSecurities(viewModel, swaggerModel),
-                Metadata = TransformMetaData(sourceUrl)
+                Metadata = TransformMetaData(sourceUrl),
+                ErrorCodes = TransformErrorCodes(viewModel, swaggerModel)
             };
         }
 
@@ -412,11 +413,8 @@
             if (pathContent.Contains('?'))
             {
                 var contents = pathContent.Split('?');
-                if (contents[1].Contains('&'))
-                {
-                    var queries = contents[1].Split('&');
-                    contents[1] = string.Join("&", queries.Where(q => !q.Contains("={")));
-                }
+                var queries = contents[1].Split('&');
+                contents[1] = string.Join("&", queries.Where(q => !q.Contains("={")));
                 if (string.IsNullOrEmpty(contents[1]))
                 {
                     pathContent = contents[0];
@@ -1063,7 +1061,7 @@
                     var scopes = ((JArray)security.Value).ToObject<string[]>();
                     var securityEntity = new SecurityEntity
                     {
-                        Name = foundSecurity?.Name,
+                        Name = foundSecurity?.Name ?? security.Key,
                         Type = foundSecurity?.Type,
                         Description = foundSecurity?.Description,
                         In = foundSecurity?.In,
@@ -1079,6 +1077,9 @@
             return securities;
         }
 
+        #endregion
+
+        #region MetaData
         private static MetaDataEntity TransformMetaData(string sourceUrl)
         {
             return sourceUrl != null ? new MetaDataEntity
@@ -1087,6 +1088,38 @@
             }
             :
             null;
+        }
+
+        #endregion
+
+        #region ErrorCodes
+
+        private static IList<ErrorCodeEntity> TransformErrorCodes(RestApiChildItemViewModel viewModel, SwaggerModel swaggerModel)
+        {
+            var errorCodes = new List<ErrorCodeEntity>();
+
+            var errorCodeNames = viewModel.Metadata.GetArrayFromMetaData<string>("x-ms-docs-errors");
+            if (errorCodeNames != null && errorCodeNames.Count() > 0)
+            {
+                var allErrorCodes = swaggerModel.Metadata.GetDictionaryFromMetaData<Dictionary<string, JObject>>("x-ms-docs-errors-mapping");
+                if (allErrorCodes != null && allErrorCodes.Count > 0)
+                {
+                    foreach (var errorCodeName in errorCodeNames)
+                    {
+                        if (allErrorCodes.TryGetValue(errorCodeName, out var errorCode))
+                        {
+                            var errorCodeEntity = new ErrorCodeEntity
+                            {
+                                Name = (string)errorCode.GetValue("name"),
+                                Code = (string)errorCode.GetValue("id"),
+                            };
+                            errorCodes.Add(errorCodeEntity);
+                        }
+                    }
+                }
+            }
+
+            return errorCodes;
         }
 
         #endregion
@@ -1121,7 +1154,7 @@
                 definitionObject.DiscriminatorKey = nodeObjectDict.GetValueFromMetaData<string>("discriminator");
                 definitionObject.DiscriminatorValue = nodeObjectDict.GetValueFromMetaData<string>("x-ms-discriminator-value");
                 var discriminatorPropertyKey = definitionObject.DiscriminatorKey;
-                var discriminatorPropertyValue = string.IsNullOrEmpty(definitionObject.DiscriminatorValue) ? discriminatorValue : definitionObject.DiscriminatorValue;
+                var discriminatorPropertyValue = string.IsNullOrEmpty(discriminatorValue) ? definitionObject.DiscriminatorValue : discriminatorValue;
 
                 var allOf = nodeObjectDict.GetArrayFromMetaData<JObject>("allOf");
                 if (allOf != null && allOf.Count() > 0)
