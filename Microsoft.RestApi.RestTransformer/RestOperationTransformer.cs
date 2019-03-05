@@ -919,6 +919,7 @@
                     continue;
                 }
                 typesDictionary[type] = true;
+
                 var polymorphicDefinitions = GetPolymorphicDefinitions(resolvedAllDefinitions, type);
                 if (polymorphicDefinitions?.Count > 0)
                 {
@@ -930,67 +931,65 @@
                         }
                     }
                 }
-                else
-                {
-                    var selfDefinition = GetSelfDefinition(resolvedAllDefinitions, type);
-                    if (selfDefinition != null)
-                    {
-                        if (selfDefinition.DefinitionObjectType == DefinitionObjectType.Enum)
-                        {
-                            definitions.Add(new DefinitionEntity
-                            {
-                                Name = selfDefinition.Name,
-                                Description = Utility.GetDefinitionDescription(selfDefinition),
-                                Kind = "enum",
-                                ParameterItems = selfDefinition.EnumValues.Select(p => new DefinitionParameterEntity
-                                {
-                                    Name = p.Value,
-                                    Types = new List<BaseParameterTypeEntity>
-                                    {
-                                        new BaseParameterTypeEntity
-                                        {
-                                            Id = "string"
-                                        }
-                                    },
-                                    Description = p.Description
-                                }).ToList()
-                            });
-                        }
-                        else if (selfDefinition.DefinitionObjectType != DefinitionObjectType.Simple)
-                        {
-                            var parameters = GetDefinitionParameters(resolvedAllDefinitions, selfDefinition, false).ToList();
-                            definitions.Add(new DefinitionEntity
-                            {
-                                Name = selfDefinition.Name,
-                                Description = Utility.GetDefinitionDescription(selfDefinition),
-                                Kind = "object",
-                                ParameterItems = parameters?.Select(p => new DefinitionParameterEntity
-                                {
-                                    Id = p.Id,
-                                    Name = p.Name,
-                                    Description = p.Description,
-                                    IsReadOnly = p.IsReadOnly,
-                                    Types = p.Types,
-                                    TypesTitle = p.TypesTitle,
-                                    Pattern = p.Pattern,
-                                    Format = p.Format
-                                }).ToList()
-                            });
 
-                            foreach (var definitionProperty in selfDefinition.DefinitionProperties)
+                var selfDefinition = GetSelfDefinition(resolvedAllDefinitions, type);
+                if (selfDefinition != null)
+                {
+                    if (selfDefinition.DefinitionObjectType == DefinitionObjectType.Enum)
+                    {
+                        definitions.Add(new DefinitionEntity
+                        {
+                            Name = selfDefinition.Name,
+                            Description = Utility.GetDefinitionDescription(selfDefinition),
+                            Kind = "enum",
+                            ParameterItems = selfDefinition.EnumValues.Select(p => new DefinitionParameterEntity
                             {
-                                if (!string.IsNullOrEmpty(definitionProperty.AdditionalType))
+                                Name = p.Value,
+                                Types = new List<BaseParameterTypeEntity>
                                 {
-                                    typesQueue.Enqueue(definitionProperty.AdditionalType);
-                                }
-                                else if (!string.IsNullOrEmpty(definitionProperty.Type))
-                                {
-                                    typesQueue.Enqueue(definitionProperty.Type);
-                                }
+                                    new BaseParameterTypeEntity
+                                    {
+                                        Id = "string"
+                                    }
+                                },
+                                Description = p.Description
+                            }).ToList()
+                        });
+                    }
+                    else if (selfDefinition.DefinitionObjectType != DefinitionObjectType.Simple)
+                    {
+                        var parameters = GetDefinitionParameters(resolvedAllDefinitions, selfDefinition, false).ToList();
+                        definitions.Add(new DefinitionEntity
+                        {
+                            Name = selfDefinition.Name,
+                            Description = Utility.GetDefinitionDescription(selfDefinition),
+                            Kind = "object",
+                            ParameterItems = parameters?.Select(p => new DefinitionParameterEntity
+                            {
+                                Id = p.Id,
+                                Name = p.Name,
+                                Description = p.Description,
+                                IsReadOnly = p.IsReadOnly,
+                                Types = p.Types,
+                                TypesTitle = p.TypesTitle,
+                                Pattern = p.Pattern,
+                                Format = p.Format
+                            }).ToList()
+                        });
+
+                        foreach (var definitionProperty in selfDefinition.DefinitionProperties)
+                        {
+                            if (!string.IsNullOrEmpty(definitionProperty.AdditionalType))
+                            {
+                                typesQueue.Enqueue(definitionProperty.AdditionalType);
+                            }
+                            else if (!string.IsNullOrEmpty(definitionProperty.Type))
+                            {
+                                typesQueue.Enqueue(definitionProperty.Type);
                             }
                         }
                     }
-                }
+                }        
             }
 
             return definitions;
