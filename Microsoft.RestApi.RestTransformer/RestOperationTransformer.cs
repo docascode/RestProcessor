@@ -676,7 +676,30 @@
 
         private static IList<Definition> GetPolymorphicDefinitions(IList<Definition> allDefinitions, string baseType)
         {
-            return allDefinitions?.Where(d => !string.IsNullOrEmpty(d.DiscriminatorValue) && d.AllOfTypes != null && d.AllOfTypes.Any(t => t == baseType)).ToList();
+            var result = new List<Definition>();
+            var hash = new HashSet<string>();
+            var stack = new Stack<string>();
+            stack.Push(baseType);
+
+            while(stack.Any())
+            {
+                var newBaseType = stack.Pop();
+                var derivedDefinitions = allDefinitions?.Where(d => !string.IsNullOrEmpty(d.DiscriminatorValue) && d.AllOfTypes != null && d.AllOfTypes.Any(t => t == newBaseType)).ToList();
+                
+                derivedDefinitions.ForEach(d =>
+                {
+                    var derivedType = d.Type;
+
+                    if (hash.Add(derivedType))
+                    {
+                        result.Add(d);
+                        stack.Push(d.Type);
+                    }
+                });
+                
+            }
+
+            return result;
         }
 
         private static IList<ParameterEntity> GetDefinitionParameters(IList<Definition> allDefinitions, Definition definition, bool filterReadOnly = true)
