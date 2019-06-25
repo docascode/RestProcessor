@@ -44,6 +44,7 @@
                 using (var reader = new JsonTextReader(streamReader))
                 {
                     reader.DateParseHandling = DateParseHandling.None;
+
                     var rootJObj = JObject.Load(reader);
 
                     // Resolve $ref with json file instead of definition reference in the same swagger
