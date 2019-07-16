@@ -81,6 +81,7 @@
                                 using (var streamReader = File.OpenText(fullPath))
                                 using (var reader = new JsonTextReader(streamReader))
                                 {
+                                    reader.DateParseHandling = DateParseHandling.None;
                                     var root = JToken.ReadFrom(reader);
                                     var fileName = Path.GetFileNameWithoutExtension(fullPath);
                                     const int counter = 0;
