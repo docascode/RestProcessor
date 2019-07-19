@@ -173,6 +173,7 @@
                         {
                             definitionObject = ResolveSchema((JObject)schema);
                             definitionObject.Name = parameter.Name;
+                            definitionObject.Description = parameter.Description;
                         }
                     }
                 }
@@ -255,7 +256,7 @@
                 if (polymorphicDefinitions == null  || polymorphicDefinitions.Count == 0)
                 {
                     var selfDefinition = GetSelfDefinition(allDefinitions, bodyDefinitionObject.Type);
-                    if (selfDefinition != null)
+                    if (selfDefinition != null && bodyDefinitionObject.DefinitionObjectType != DefinitionObjectType.Array)
                     {
                         var parameterEntities = GetDefinitionParameters(allDefinitions, selfDefinition, true);
                         bodyParameters.AddRange(parameterEntities);
@@ -272,7 +273,7 @@
                             ParameterEntityType = ParameterEntityType.Body,
                             Pattern = bodyDefinitionObject.Pattern,
                             Format = bodyDefinitionObject.Format,
-                            Types = new List<BaseParameterTypeEntity> { new BaseParameterTypeEntity { Id = bodyDefinitionObject.Type } }
+                            Types = new List<BaseParameterTypeEntity> { new BaseParameterTypeEntity { Id = bodyDefinitionObject.Type, IsArray = bodyDefinitionObject.DefinitionObjectType == DefinitionObjectType.Array } }
                         });
                     }
                     
@@ -848,7 +849,7 @@
 
             foreach (var responseDefinitionObject in responseDefinitionObjects)
             {
-                var flattenDefinitionObjects = FlattenDefinitionObject(bodyDefinitionObject);
+                var flattenDefinitionObjects = FlattenDefinitionObject(responseDefinitionObject);
                 foreach (var flattenDefinitionObject in flattenDefinitionObjects)
                 {
                     if (!string.IsNullOrEmpty(flattenDefinitionObject.Type)
