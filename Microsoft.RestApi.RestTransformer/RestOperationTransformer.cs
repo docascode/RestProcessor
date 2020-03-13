@@ -685,7 +685,7 @@
             while(stack.Any())
             {
                 var newBaseType = stack.Pop();
-                var derivedDefinitions = allDefinitions?.Where(d => !string.IsNullOrEmpty(d.DiscriminatorValue) && d.AllOfTypes != null && d.AllOfTypes.Any(t => t == newBaseType)).ToList();
+                var derivedDefinitions = allDefinitions?.Where(d => d.AllOfTypes != null && d.AllOfTypes.Any(t => t == newBaseType)).ToList();
                 
                 derivedDefinitions.ForEach(d =>
                 {
@@ -1175,7 +1175,7 @@
                 var requiredProperties = nodeObjectDict.GetArrayFromMetaData<string>("required");
 
                 definitionObject.DiscriminatorKey = nodeObjectDict.GetValueFromMetaData<string>("discriminator");
-                definitionObject.DiscriminatorValue = nodeObjectDict.GetValueFromMetaData<string>("x-ms-discriminator-value")?? definitionObject.Name;
+                definitionObject.DiscriminatorValue = nodeObjectDict.GetValueFromMetaData<string>("x-ms-discriminator-value");
                 var discriminatorPropertyKey = definitionObject.DiscriminatorKey;
                 var discriminatorPropertyValue = string.IsNullOrEmpty(discriminatorValue) ? definitionObject.DiscriminatorValue : discriminatorValue;
 
