@@ -1175,7 +1175,7 @@
                 var requiredProperties = nodeObjectDict.GetArrayFromMetaData<string>("required");
 
                 definitionObject.DiscriminatorKey = nodeObjectDict.GetValueFromMetaData<string>("discriminator");
-                definitionObject.DiscriminatorValue = nodeObjectDict.GetValueFromMetaData<string>("x-ms-discriminator-value");
+                definitionObject.DiscriminatorValue = nodeObjectDict.GetValueFromMetaData<string>("x-ms-discriminator-value")?? definitionObject.Name;
                 var discriminatorPropertyKey = definitionObject.DiscriminatorKey;
                 var discriminatorPropertyValue = string.IsNullOrEmpty(discriminatorValue) ? definitionObject.DiscriminatorValue : discriminatorValue;
 
