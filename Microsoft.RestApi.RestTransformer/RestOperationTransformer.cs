@@ -946,21 +946,21 @@
                 typesDictionary[type] = true;
 
                 var selfDefinition = GetSelfDefinition(resolvedAllDefinitions, type);
-                if (selfDefinition != null)
+
+                var polymorphicDefinitions = selfDefinition != null && string.IsNullOrEmpty(selfDefinition.DiscriminatorKey) ? null : GetPolymorphicDefinitions(resolvedAllDefinitions, type);
+                if (polymorphicDefinitions?.Count > 0)
                 {
-                    var polymorphicDefinitions = string.IsNullOrEmpty(selfDefinition.DiscriminatorKey) ? null : GetPolymorphicDefinitions(resolvedAllDefinitions, type);
-                    if (polymorphicDefinitions?.Count > 0)
+                    foreach (var polymorphicDefinition in polymorphicDefinitions)
                     {
-                        foreach (var polymorphicDefinition in polymorphicDefinitions)
+                        if (!string.IsNullOrEmpty(polymorphicDefinition.Type))
                         {
-                            if (!string.IsNullOrEmpty(polymorphicDefinition.Type))
-                            {
-                                typesQueue.Enqueue(polymorphicDefinition.Type);
-                            }
+                            typesQueue.Enqueue(polymorphicDefinition.Type);
                         }
                     }
+                }
 
-
+                if (selfDefinition != null)
+                {
                     if (selfDefinition.DefinitionObjectType == DefinitionObjectType.Enum)
                     {
                         definitions.Add(new DefinitionEntity
