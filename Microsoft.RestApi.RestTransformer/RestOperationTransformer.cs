@@ -96,7 +96,7 @@
                             isRequired = (bool)msRequired;
                         }
                         var types = new List<BaseParameterTypeEntity>();
-                       
+
                         if (parameter.Metadata.TryGetValue("type", out var type))
                         {
                             var enumValues = parameter.Metadata.GetArrayFromMetaData<string>("enum");
@@ -180,7 +180,7 @@
             }
             return parameters;
         }
-        
+
         #endregion
 
         #region Paths
@@ -252,8 +252,8 @@
 
             if (!string.IsNullOrEmpty(bodyDefinitionObject?.Type))
             {
-                var polymorphicDefinitions = string.IsNullOrEmpty(bodyDefinitionObject.DiscriminatorKey)? null : GetPolymorphicDefinitions(allDefinitions, bodyDefinitionObject.Type);
-                if (polymorphicDefinitions == null  || polymorphicDefinitions.Count == 0)
+                var polymorphicDefinitions = string.IsNullOrEmpty(bodyDefinitionObject.DiscriminatorKey) ? null : GetPolymorphicDefinitions(allDefinitions, bodyDefinitionObject.Type);
+                if (polymorphicDefinitions == null || polymorphicDefinitions.Count == 0)
                 {
                     var selfDefinition = GetSelfDefinition(allDefinitions, bodyDefinitionObject.Type);
                     if (selfDefinition != null && bodyDefinitionObject.DefinitionObjectType != DefinitionObjectType.Array)
@@ -276,7 +276,7 @@
                             Types = new List<BaseParameterTypeEntity> { new BaseParameterTypeEntity { Id = bodyDefinitionObject.Type, IsArray = bodyDefinitionObject.DefinitionObjectType == DefinitionObjectType.Array } }
                         });
                     }
-                    
+
                     if (bodyParameters.Count > 0)
                     {
                         bodies.Add(new RequestBody
@@ -360,7 +360,7 @@
                 var headers = response.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("headers");
                 if (headers != null)
                 {
-                    foreach(var header in headers)
+                    foreach (var header in headers)
                     {
                         var headerValue = ((JObject)header.Value).ToObject<Dictionary<string, object>>();
                         headerList.Add(new ResponseHeader
@@ -595,7 +595,7 @@
                 }
             }
 
-           
+
             return allDefinitionObjects;
         }
 
@@ -683,11 +683,11 @@
             var stack = new Stack<string>();
             stack.Push(baseType);
 
-            while(stack.Any())
+            while (stack.Any())
             {
                 var newBaseType = stack.Pop();
                 var derivedDefinitions = allDefinitions?.Where(d => d.AllOfTypes != null && d.AllOfTypes.Any(t => t == newBaseType)).ToList();
-                
+
                 derivedDefinitions.ForEach(d =>
                 {
                     var derivedType = d.Type;
@@ -698,7 +698,7 @@
                         stack.Push(d.Type);
                     }
                 });
-                
+
             }
 
             return result;
@@ -754,7 +754,7 @@
                         }
                         else if (property.DefinitionObjectType != DefinitionObjectType.Simple)
                         {
-                            var polymorphicDefinitions = string.IsNullOrEmpty(property.DiscriminatorKey)? null : GetPolymorphicDefinitions(allDefinitions, property.Type);
+                            var polymorphicDefinitions = string.IsNullOrEmpty(property.DiscriminatorKey) ? null : GetPolymorphicDefinitions(allDefinitions, property.Type);
                             if (polymorphicDefinitions?.Count > 0)
                             {
                                 typesTitle = property.Type + (property.DefinitionObjectType == DefinitionObjectType.Array ? "[]" : string.Empty);
@@ -898,7 +898,7 @@
                 }
             }
             var bodyProperties = GetDefinitionProperties(bodyDefinitionObject);
-            foreach(var parametersDefinition in parametersDefinitions)
+            foreach (var parametersDefinition in parametersDefinitions)
             {
                 resolvedAllDefinitions.Add(parametersDefinition);
                 typesQueue.Enqueue(parametersDefinition.Type);
@@ -946,20 +946,21 @@
                 typesDictionary[type] = true;
 
                 var selfDefinition = GetSelfDefinition(resolvedAllDefinitions, type);
-                var polymorphicDefinitions = string.IsNullOrEmpty(selfDefinition.DiscriminatorKey)? null : GetPolymorphicDefinitions(resolvedAllDefinitions, type);
-                if (polymorphicDefinitions?.Count > 0)
-                {
-                    foreach (var polymorphicDefinition in polymorphicDefinitions)
-                    {
-                        if (!string.IsNullOrEmpty(polymorphicDefinition.Type))
-                        {
-                            typesQueue.Enqueue(polymorphicDefinition.Type);
-                        }
-                    }
-                }
-
                 if (selfDefinition != null)
                 {
+                    var polymorphicDefinitions = string.IsNullOrEmpty(selfDefinition.DiscriminatorKey) ? null : GetPolymorphicDefinitions(resolvedAllDefinitions, type);
+                    if (polymorphicDefinitions?.Count > 0)
+                    {
+                        foreach (var polymorphicDefinition in polymorphicDefinitions)
+                        {
+                            if (!string.IsNullOrEmpty(polymorphicDefinition.Type))
+                            {
+                                typesQueue.Enqueue(polymorphicDefinition.Type);
+                            }
+                        }
+                    }
+
+
                     if (selfDefinition.DefinitionObjectType == DefinitionObjectType.Enum)
                     {
                         definitions.Add(new DefinitionEntity
@@ -1014,7 +1015,7 @@
                             }
                         }
                     }
-                }        
+                }
             }
 
             return definitions;
@@ -1037,7 +1038,7 @@
                         Key = definition.Key
                     };
                     var definitionValue = definition.Value.ToObject<Dictionary<string, object>>();
-                    if(definitionValue != null)
+                    if (definitionValue != null)
                     {
                         securityEntity.Name = definitionValue.GetValueFromMetaData<string>("name");
                         securityEntity.Type = definitionValue.GetValueFromMetaData<string>("type");
@@ -1050,7 +1051,7 @@
                         if (scopes != null)
                         {
                             securityEntity.Scopes = new List<SecurityScopeEntity>();
-                            foreach(var scope in scopes)
+                            foreach (var scope in scopes)
                             {
                                 securityEntity.Scopes.Add(new SecurityScopeEntity
                                 {
@@ -1071,7 +1072,7 @@
             var securities = new List<SecurityEntity>();
 
             var securitiesModel = viewModel.Metadata.GetArrayFromMetaData<JObject>("security");
-            if(securitiesModel == null)
+            if (securitiesModel == null)
             {
                 securitiesModel = swaggerModel.Metadata.GetArrayFromMetaData<JObject>("security");
             }
@@ -1165,7 +1166,7 @@
                 definitionObject.Type = refName;
                 definitionObject.Description = nodeObjectDict.GetValueFromMetaData<string>("description");
                 definitionObject.Title = nodeObjectDict.GetValueFromMetaData<string>("title");
-               
+
                 definitionObject.IsReadOnly = nodeObjectDict.GetValueFromMetaData<bool>("readOnly");
                 definitionObject.IsFlatten = definitionObject.IsFlatten ? true : nodeObjectDict.GetValueFromMetaData<bool>("x-ms-client-flatten");
 
@@ -1196,7 +1197,7 @@
                 if (nodeObjectDict.GetValueFromMetaData<JObject>("properties") != null)
                 {
                     definitionObject.DefinitionObjectType = DefinitionObjectType.Object;
-                    var propertiesNode = nodeObjectDict.GetValueFromMetaData<JObject>("properties"); 
+                    var propertiesNode = nodeObjectDict.GetValueFromMetaData<JObject>("properties");
 
                     var properties = propertiesNode.ToObject<Dictionary<string, object>>();
                     foreach (var property in properties)
@@ -1386,13 +1387,13 @@
                     }
                     foreach (var allOf in propertyItem.AllOfs)
                     {
-                        foreach(var item in allOf.PropertyItems)
+                        foreach (var item in allOf.PropertyItems)
                         {
                             item.Name = propertyItem.Name + "." + item.Name;
                         }
                         definitionObject.AllOfs.Add(allOf);
                     }
-                     definitionObject.PropertyItems = items;
+                    definitionObject.PropertyItems = items;
                     propertyItem.PropertyItems = new List<DefinitionObject>();
                 }
             }
