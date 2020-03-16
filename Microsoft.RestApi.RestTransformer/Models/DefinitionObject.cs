@@ -91,6 +91,8 @@
         public IList<EnumValue> EnumValues { get; set; }
 
         public string DiscriminatorValue { get; set; }
+
+        public string DiscriminatorKey { get; set; }
     }
 
     public class DefinitionProperty

@@ -252,7 +252,7 @@
 
             if (!string.IsNullOrEmpty(bodyDefinitionObject?.Type))
             {
-                var polymorphicDefinitions = GetPolymorphicDefinitions(allDefinitions, bodyDefinitionObject.Type);
+                var polymorphicDefinitions = string.IsNullOrEmpty(bodyDefinitionObject.DiscriminatorKey)? null : GetPolymorphicDefinitions(allDefinitions, bodyDefinitionObject.Type);
                 if (polymorphicDefinitions == null  || polymorphicDefinitions.Count == 0)
                 {
                     var selfDefinition = GetSelfDefinition(allDefinitions, bodyDefinitionObject.Type);
@@ -615,6 +615,7 @@
                     DefinitionObjectType = definitionObject.DefinitionObjectType,
                     DefinitionProperties = GetDefinitionProperties(definitionObject),
                     DiscriminatorValue = definitionObject.DiscriminatorValue,
+                    DiscriminatorKey = definitionObject.DiscriminatorKey,
                     EnumValues = definitionObject.EnumValues,
                     AllOfTypes = definitionObject.AllOfs?.Select(p => p.Type).ToList()
                 };
@@ -753,7 +754,7 @@
                         }
                         else if (property.DefinitionObjectType != DefinitionObjectType.Simple)
                         {
-                            var polymorphicDefinitions = GetPolymorphicDefinitions(allDefinitions, property.Type);
+                            var polymorphicDefinitions = string.IsNullOrEmpty(property.DiscriminatorKey)? null : GetPolymorphicDefinitions(allDefinitions, property.Type);
                             if (polymorphicDefinitions?.Count > 0)
                             {
                                 typesTitle = property.Type + (property.DefinitionObjectType == DefinitionObjectType.Array ? "[]" : string.Empty);
@@ -882,7 +883,7 @@
             var definitions = new List<DefinitionEntity>();
             var typesDictionary = new Dictionary<string, bool>();
             var typesQueue = new Queue<string>();
-            if (!string.IsNullOrEmpty(bodyDefinitionObject.Type))
+            if (!string.IsNullOrEmpty(bodyDefinitionObject.Type) && !string.IsNullOrEmpty(bodyDefinitionObject.DiscriminatorKey))
             {
                 var polymorphicDefinitions = GetPolymorphicDefinitions(resolvedAllDefinitions, bodyDefinitionObject.Type);
                 if (polymorphicDefinitions?.Count > 0)
@@ -944,7 +945,8 @@
                 }
                 typesDictionary[type] = true;
 
-                var polymorphicDefinitions = GetPolymorphicDefinitions(resolvedAllDefinitions, type);
+                var selfDefinition = GetSelfDefinition(resolvedAllDefinitions, type);
+                var polymorphicDefinitions = string.IsNullOrEmpty(selfDefinition.DiscriminatorKey)? null : GetPolymorphicDefinitions(resolvedAllDefinitions, type);
                 if (polymorphicDefinitions?.Count > 0)
                 {
                     foreach (var polymorphicDefinition in polymorphicDefinitions)
@@ -956,7 +958,6 @@
                     }
                 }
 
-                var selfDefinition = GetSelfDefinition(resolvedAllDefinitions, type);
                 if (selfDefinition != null)
                 {
                     if (selfDefinition.DefinitionObjectType == DefinitionObjectType.Enum)
