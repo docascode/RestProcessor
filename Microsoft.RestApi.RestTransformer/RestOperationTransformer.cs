@@ -47,6 +47,7 @@
             var serviceId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-id");
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
+            var subgroupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-sub-group-name");
             var operationId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-id");
             var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
             var sourceUrl = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-swagger-source-url");
@@ -54,12 +55,12 @@
 
             return new OperationEntity
             {
-                Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}.{operationId}")?.ToLower(),
+                Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{subgroupName}.{groupName}.{operationId}")?.ToLower(),
                 Name = operationName,
                 Service = serviceName,
                 Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description),
                 ApiVersion = apiVersion,
-                GroupId = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}")?.ToLower(),
+                GroupId = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{subgroupName}.{groupName}")?.ToLower(),
                 GroupName = groupName,
                 IsDeprecated = swaggerModel.Metadata.GetValueFromMetaData<bool>("deprecated"),
                 IsPreview = swaggerModel.Metadata.GetValueFromMetaData<bool>("x-ms-preview"),
