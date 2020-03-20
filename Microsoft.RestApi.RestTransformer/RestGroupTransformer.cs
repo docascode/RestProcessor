@@ -16,12 +16,13 @@
             var serviceId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-id");
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
+            var subgroupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-sub-group-name");
             var productUid = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-product-uid");
 
             var basePath = swaggerModel.BasePath;
             var apiVersion = swaggerModel.Info.Version;
 
-            var groupId = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{groupName}")?.ToLower();
+            var groupId = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{subgroupName}.{groupName}")?.ToLower();
 
             ConcurrentBag<Operation> operations;
             var key = string.IsNullOrEmpty(version) ? groupId : $"{version}_{groupId}";
