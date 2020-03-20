@@ -13,7 +13,7 @@
 
     public static class RestSplitHelper
     {
-        public static RestFileInfo Split(string targetDir, string filePath, string swaggerRelativePath, string serviceId, string serviceName, OperationGroupMapping operationGroupMapping, OrgsMappingFile orgsMappingFile, RepoFile repoFile, string version)
+        public static RestFileInfo Split(string targetDir, string filePath, string swaggerRelativePath, string serviceId, string serviceName, string subGroupName, OperationGroupMapping operationGroupMapping, OrgsMappingFile orgsMappingFile, RepoFile repoFile, string version)
         {
             
             if (!Directory.Exists(targetDir))
@@ -59,6 +59,7 @@
 
                     rootJObj["x-internal-service-id"] = serviceId;
                     rootJObj["x-internal-service-name"] = serviceName;
+                    rootJObj["x-internal-sub-group-name"] = subGroupName;
 
                     var generator = GeneratorFactory.CreateGenerator(rootJObj, targetDir, filePath, operationGroupMapping, orgsMappingFile, lineNumberMappingDict, repoFile, swaggerRelativePath, version);
                     var fileNameInfos = generator.Generate().ToList();

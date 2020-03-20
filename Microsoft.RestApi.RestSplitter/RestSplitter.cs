@@ -276,7 +276,7 @@
                 var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiVersionDir, service.UrlGroup, subGroupName.TrimSubGroupName()));
                 var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
 
-                var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, swagger.Source.TrimEnd(), orgsMappingFile.UseServiceUrlGroup ? service.UrlGroup : service.TocTitle, service.TocTitle, swagger.OperationGroupMapping, orgsMappingFile, repoFile, version);
+                var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, swagger.Source.TrimEnd(), orgsMappingFile.UseServiceUrlGroup ? service.UrlGroup : service.TocTitle, service.TocTitle, subGroupName, swagger.OperationGroupMapping, orgsMappingFile, repoFile, version);
                 var sourceSwaggerMappingDict = new Dictionary<string, string>();
 
                 if (restFileInfo == null)

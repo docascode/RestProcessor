@@ -224,7 +224,9 @@
             {
                 return null;
             }
-            return value.Replace("/", ".").Replace("\\", ".").Replace(" ", "").Trim('.');
+
+            var splitedValue = value.Replace("/", ".").Replace("\\", ".").Replace(" ", "").Trim('.').Split(new[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+            return string.Join(".", splitedValue);
         }
 
         public static string FirstLetterToUpper(this string str)
