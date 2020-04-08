@@ -96,6 +96,8 @@
                         {
                             isRequired = (bool)msRequired;
                         }
+
+                        var skipUrlEncoding = parameterEntityType == ParameterEntityType.Path? parameter.Metadata.GetValueFromMetaData<bool>("x-ms-skip-url-encoding"): false;
                         var types = new List<BaseParameterTypeEntity>();
                        
                         if (parameter.Metadata.TryGetValue("type", out var type))
@@ -161,6 +163,7 @@
                                 Name = parameter.Name,
                                 Description = parameter.Description,
                                 IsRequired = isRequired,
+                                SkipUrlEncoding = skipUrlEncoding,
                                 Pattern = parameter.Metadata.GetValueFromMetaData<string>("pattern"),
                                 Format = parameter.Metadata.GetValueFromMetaData<string>("format"),
                                 In = inType,
