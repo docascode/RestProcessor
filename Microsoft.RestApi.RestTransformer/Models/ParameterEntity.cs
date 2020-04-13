@@ -17,7 +17,7 @@
         public bool IsRequired { get; set; }
 
         [YamlMember(Alias = "skipUrlEncoding")]
-        [JsonProperty("skipUrlEncoding")]
+        [JsonProperty("x-ms-skip-url-encoding")]
         public bool SkipUrlEncoding { get; set; }
 
         [YamlIgnore]
