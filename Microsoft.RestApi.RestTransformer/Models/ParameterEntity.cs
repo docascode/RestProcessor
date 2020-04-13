@@ -16,6 +16,10 @@
         [JsonProperty("required")]
         public bool IsRequired { get; set; }
 
+        [YamlMember(Alias = "skipUrlEncoding")]
+        [JsonProperty("skipUrlEncoding")]
+        public bool SkipUrlEncoding { get; set; }
+
         [YamlIgnore]
         public string[] EnumValues { get; set; }
 
