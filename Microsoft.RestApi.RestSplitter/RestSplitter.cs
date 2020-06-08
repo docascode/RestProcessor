@@ -256,6 +256,8 @@
                 }
             }
 
+            TocConverter.GenerateOverviewNode(targetTocPath);
+
             if (orgsMappingFile.UserYamlToc)
             {
                 TocConverter.Convert(targetTocPath);
