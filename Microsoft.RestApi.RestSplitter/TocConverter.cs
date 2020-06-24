@@ -43,6 +43,12 @@
             while (tocNodeQueue.Count > 0)
             {
                 var tocNode = tocNodeQueue.Dequeue();
+
+                if (tocNode.Href != null)
+                {
+                    tocNode.Href = HrefEncodeSpace(tocNode.Href);
+                }
+
                 if (tocNode.Items != null)
                 {
                     tocNode.Items.ForEach(item => tocNodeQueue.Enqueue(item));
@@ -63,6 +69,11 @@
             {
                 WriteTocModelToFile(tocModel, writer, 1);
             }
+        }
+
+        private static string HrefEncodeSpace(string href)
+        {
+            return href.Replace(" ", "%20");
         }
 
         private static void ConvertCore(string tocMarkdownFilePath, string tocYmlPath)
