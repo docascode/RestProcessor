@@ -28,6 +28,7 @@
             }
             var apiVersion = Utility.GetApiVersion(viewModel, swaggerModel.Info.Version);
 
+            var securities = TransformSecurities(viewModel, swaggerModel);
             IList<Definition> allDefinitions;
             if (!_cacheDefinitions.TryGetValue(groupKey, out allDefinitions))
             {
@@ -37,7 +38,7 @@
 
             var bodyDefinitionObject = new DefinitionObject();
             var parametersDefinitions = new List<Definition>();
-            var allSimpleParameters = TransformAllSimpleParameters(hostParameters, viewModel, ref bodyDefinitionObject, ref parametersDefinitions);
+            var allSimpleParameters = TransformAllSimpleParameters(securities, hostParameters, viewModel, ref bodyDefinitionObject, ref parametersDefinitions);
 
             var responseDefinitionObjects = new List<DefinitionObject>();
             var responses = TransformResponses(viewModel, allDefinitions, ref responseDefinitionObjects);
@@ -73,7 +74,7 @@
                 Consumes = viewModel.Metadata.GetArrayFromMetaData<string>("consumes"),
                 Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
                 Definitions = TransformDefinitions(allDefinitions, parametersDefinitions, bodyDefinitionObject, responseDefinitionObjects),
-                Securities = TransformSecurities(viewModel, swaggerModel),
+                Securities = securities,
                 Metadata = TransformMetaData(sourceUrl),
                 ErrorCodes = TransformErrorCodes(viewModel, swaggerModel)
             };
@@ -81,9 +82,29 @@
 
         #region Parameters
 
-        private static IList<ParameterEntity> TransformAllSimpleParameters(List<ParameterEntity> hostParameters, RestApiChildItemViewModel viewModel, ref DefinitionObject definitionObject, ref List<Definition> definitions)
+        private static IList<ParameterEntity> TransformAllSimpleParameters(IList<SecurityEntity> securities ,List<ParameterEntity> hostParameters, RestApiChildItemViewModel viewModel, ref DefinitionObject definitionObject, ref List<Definition> definitions)
         {
             var parameters = hostParameters == null ? new List<ParameterEntity>() : new List<ParameterEntity>(hostParameters);
+            if (securities != null && securities.Count == 1 && securities.First().Type == "apiKey")
+            {
+                var security = securities.First();
+                if (security.In != null && Enum.TryParse<ParameterEntityType>(security.In, true, out var parameterEntityType))
+                {
+                    parameters.Add(new ParameterEntity
+                    {
+                        Name = security.Name,
+                        Description = security.Description,
+                        IsRequired = true,
+                        In = security.In,
+                        ParameterEntityType = parameterEntityType,
+                        Types = new List<BaseParameterTypeEntity>()
+                        {
+                            new BaseParameterTypeEntity{ Id = "string"}
+                        }
+                    });
+                }
+            }
+
             if (viewModel?.Parameters != null)
             {
                 foreach (var parameter in viewModel.Parameters)
