@@ -58,5 +58,8 @@
 
         [JsonProperty("no_split_words")]
         public List<string> NoSplitWords { get; set; }
+
+        [JsonProperty("group_name_mapping")]
+        public Dictionary<string, string> GroupNameMapping { get; set; }
     }
 }

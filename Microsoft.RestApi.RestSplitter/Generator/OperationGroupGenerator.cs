@@ -139,7 +139,7 @@
 
         #region Private Methods
 
-        private static JObject FindPathsByOperationGroup(JObject paths, string expectedOpGroup, ref Dictionary<string, JToken> pathParameters)
+        private JObject FindPathsByOperationGroup(JObject paths, string expectedOpGroup, ref Dictionary<string, JToken> pathParameters)
         {
             var filteredPaths = new JObject();
             foreach (var path in paths)
@@ -174,7 +174,7 @@
             return filteredPaths;
         }
 
-        private static HashSet<string> GetOperationGroups(JObject paths)
+        private HashSet<string> GetOperationGroups(JObject paths)
         {
             var operationGroups = new HashSet<string>();
             foreach (var path in paths.Values())
@@ -193,7 +193,7 @@
             return operationGroups;
         }
 
-        private static string GetOperationId(JObject operation)
+        private string GetOperationId(JObject operation)
         {
             if (operation.TryGetValue("operationId", out JToken value) && value != null)
             {
@@ -202,7 +202,7 @@
             throw new InvalidOperationException($"operationId is not defined in {operation}");
         }
 
-        private static Tuple<string, string> GetOperationGroupPerOperation(JObject operation)
+        private Tuple<string, string> GetOperationGroupPerOperation(JObject operation)
         {
             if (operation.TryGetValue("operationId", out JToken value) && value != null)
             {
@@ -211,19 +211,21 @@
             throw new InvalidOperationException($"operationId is not defined in {operation}");
         }
 
-        private static Tuple<string, string> GetOperationGroupFromOperationId(string operationId)
+        private Tuple<string, string> GetOperationGroupFromOperationId(string operationId)
         {
             var result = operationId.Split('_');
+
+            var groupName = OrgsMappingFile.GroupNameMapping != null && OrgsMappingFile.GroupNameMapping.ContainsKey(result[0])?
+                OrgsMappingFile.GroupNameMapping[result[0]]
+                : result[0];
+
             if (result.Length != 2)
             {
                 // When the operation id doesn't contain '_', treat the whole operation id as Noun and Verb at the same time
-                return Tuple.Create(result[0], result[0]);
+                return Tuple.Create(groupName, groupName);
             }
-            if (result.Length > 2)
-            {
-                throw new InvalidOperationException($"Invalid operation id: {operationId}, it should be Noun_Verb format.");
-            }
-            return Tuple.Create(result[0], result[1]);
+
+            return Tuple.Create(groupName, result[1]);
         }
 
         #endregion
