@@ -1126,27 +1126,29 @@
                 }        
             }
 
-            definitions = definitions.OrderBy(d => string.IsNullOrEmpty(d.Type)? 0 : d.Type.Count()).ToList();
-
             var result = new List<DefinitionEntity>();
             var nameToType = new Dictionary<string, string>();
             typeToName = new Dictionary<string, string>();
 
-            foreach (var definition in definitions)
+            foreach(var group in definitions.GroupBy(d => d.Name))
             {
-                if(!nameToType.ContainsKey(definition.Name))
+                var tempItems = group.OrderBy(d => string.IsNullOrEmpty(d.Type) ? 0 : d.Type.Length).ToList();
+                foreach (var definition in tempItems)
                 {
-                    result.Add(definition);
-                    nameToType[definition.Name] = definition.Type;
-                }
-                else if (!definition.Type.EndsWith(nameToType[definition.Name]) || nameToType[definition.Name] == definition.Name)
-                {
-                    definition.Name = definition.Type;
-                    result.Add(definition);
-                    nameToType[definition.Name] = definition.Type;
-                }
+                    if (!nameToType.ContainsKey(definition.Name))
+                    {
+                        result.Add(definition);
+                        nameToType[definition.Name] = definition.Type;
+                    }
+                    else if (!definition.Type.EndsWith(nameToType[definition.Name]) || nameToType[definition.Name] == definition.Name)
+                    {
+                        definition.Name = definition.Type;
+                        result.Add(definition);
+                        nameToType[definition.Name] = definition.Type;
+                    }
 
-                typeToName[definition.Type] = definition.Name;
+                    typeToName[definition.Type] = definition.Name;
+                }
             }
 
             return result;
