@@ -298,7 +298,7 @@
                             ParameterEntityType = ParameterEntityType.Body,
                             Pattern = bodyDefinitionObject.Pattern,
                             Format = bodyDefinitionObject.Format,
-                            Types = new List<BaseParameterTypeEntity> { new BaseParameterTypeEntity { Id = bodyDefinitionObject.Type, IsArray = bodyDefinitionObject.DefinitionObjectType == DefinitionObjectType.Array } }
+                            Types = new List<BaseParameterTypeEntity> { new BaseParameterTypeEntity { Id = bodyDefinitionObject.ShortType?? bodyDefinitionObject.Type, IsArray = bodyDefinitionObject.DefinitionObjectType == DefinitionObjectType.Array } }
                         });
                     }
                     
@@ -324,7 +324,7 @@
                         {
                             bodies.Add(new RequestBody
                             {
-                                Name = polymorphicDefinition?.Type,
+                                Name = polymorphicDefinition?.ShortType?? polymorphicDefinition?.Type,
                                 Description = polymorphicDefinition?.Description,
                                 RequestBodyParameters = fullBodyParameters
                             });
@@ -360,13 +360,13 @@
                         typesName.Add(new BaseParameterTypeEntity
                         {
                             IsArray = definitionObject.DefinitionObjectType == DefinitionObjectType.Array,
-                            Id = definitionObject.Type
+                            Id = definitionObject.ShortType?? definitionObject.Type
                         });
                     }
                     else if (!string.IsNullOrEmpty(definitionObject.DiscriminatorKey) && !string.IsNullOrEmpty(definitionObject.Type))
                     {
                         var polymorphicDefinitions = GetPolymorphicDefinitions(definitions, definitionObject.Type);
-                        typesTitle = definitionObject.Type;
+                        typesTitle = definitionObject.ShortType?? definitionObject.Type;
                         if (polymorphicDefinitions?.Count > 0)
                         {
                             foreach (var polymorphicDefinition in polymorphicDefinitions)
@@ -374,7 +374,7 @@
                                 typesName.Add(new BaseParameterTypeEntity
                                 {
                                     IsArray = definitionObject.DefinitionObjectType == DefinitionObjectType.Array,
-                                    Id = polymorphicDefinition.Type
+                                    Id = polymorphicDefinition.ShortType?? polymorphicDefinition.Type
                                 });
                             }
                         }
@@ -631,12 +631,13 @@
             {
                 var definition = new Definition
                 {
-                    Name = definitionObject.Type,
+                    Name = definitionObject.ShortType?? definitionObject.Type,
                     Title = definitionObject.Title,
                     SubTitle = definitionObject.SubTitle,
                     Description = definitionObject.Description,
                     SubDescription = definitionObject.SubDescription,
                     Type = definitionObject.Type,
+                    ShortType = definitionObject.ShortType,
                     DefinitionObjectType = definitionObject.DefinitionObjectType,
                     DefinitionProperties = GetDefinitionProperties(definitionObject),
                     DiscriminatorValue = definitionObject.DiscriminatorValue,
@@ -674,7 +675,8 @@
                         DefinitionObjectType = property.DefinitionObjectType,
                         Pattern = property.Pattern,
                         Format = property.Format,
-                        EnumValues = property.EnumValues
+                        EnumValues = property.EnumValues,
+                        ShortType = property.ShortType
                     };
                     definitionProperties.Add(definitionProperty);
                 }
@@ -741,7 +743,7 @@
 
                     var parameterTypeEntity = new BaseParameterTypeEntity
                     {
-                        Id = property.Type,
+                        Id = property.ShortType?? property.Type,
                     };
 
                     if (property.Name == property.DiscriminatorKey && !string.IsNullOrEmpty(property.DiscriminatorValue))
@@ -781,12 +783,12 @@
                             var polymorphicDefinitions = GetPolymorphicDefinitions(allDefinitions, property.Type);
                             if (polymorphicDefinitions?.Count > 0)
                             {
-                                typesTitle = property.Type + (property.DefinitionObjectType == DefinitionObjectType.Array ? "[]" : string.Empty);
+                                typesTitle = (property.ShortType?? property.Type) + (property.DefinitionObjectType == DefinitionObjectType.Array ? "[]" : string.Empty);
                                 foreach (var polymorphicDefinition in polymorphicDefinitions)
                                 {
                                     types.Add(new BaseParameterTypeEntity
                                     {
-                                        Id = polymorphicDefinition.Type,
+                                        Id = polymorphicDefinition.ShortType?? polymorphicDefinition.Type,
                                         IsArray = property.DefinitionObjectType == DefinitionObjectType.Array
                                     });
                                 }
@@ -795,7 +797,7 @@
                             {
                                 types.Add(new BaseParameterTypeEntity
                                 {
-                                    Id = property.Type,
+                                    Id = property.ShortType?? property.Type,
                                     IsArray = property.DefinitionObjectType == DefinitionObjectType.Array
                                 });
                             }
@@ -1174,7 +1176,7 @@
 
         #region Parse JObject to DefinitionObject
 
-        private static void ResolveObject(string key, JObject nodeObject, DefinitionObject definitionObject, string[] requiredFields = null, string discriminatorKey = null, string discriminatorValue = null)
+        private static void ResolveObject(string key, JObject nodeObject, DefinitionObject definitionObject, string[] requiredFields = null, string discriminatorKey = null, string discriminatorValue = null, string parentType = "")
         {
             if (nodeObject.Type == JTokenType.Object)
             {
@@ -1226,7 +1228,7 @@
                     foreach (var property in properties)
                     {
                         var childDefinitionObject = new DefinitionObject();
-                        ResolveObject(property.Key, (JObject)property.Value, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue);
+                        ResolveObject(property.Key, (JObject)property.Value, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue, parentType + "." + (definitionObject.Type?? definitionObject.Name));
                         definitionObject.PropertyItems.Add(childDefinitionObject);
                     }
                 }
@@ -1376,7 +1378,11 @@
                 {
                     if (string.IsNullOrEmpty(definitionObject.Type))
                     {
-                        definitionObject.Type = definitionObject.Name.FirstLetterToUpper();
+                        definitionObject.Type = parentType + "." + definitionObject.Name.FirstLetterToUpper();
+                        if (!string.IsNullOrEmpty(definitionObject.Name))
+                        {
+                            definitionObject.ShortType = definitionObject.Name.FirstLetterToUpper();
+                        }
                     }
                 }
             }
