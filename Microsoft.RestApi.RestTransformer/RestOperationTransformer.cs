@@ -1073,6 +1073,7 @@
                         {
                             Name = selfDefinition.Name,
                             Type = selfDefinition.Type,
+                            ShortType = selfDefinition.ShortType,
                             Description = Utility.GetDefinitionDescription(selfDefinition),
                             Kind = "enum",
                             ParameterItems = selfDefinition.EnumValues.Select(p => new DefinitionParameterEntity
@@ -1096,6 +1097,7 @@
                         {
                             Name = selfDefinition.Name,
                             Type = selfDefinition.Type,
+                            ShortType = selfDefinition.ShortType,
                             Description = Utility.GetDefinitionDescription(selfDefinition),
                             Kind = "object",
                             ParameterItems = parameters?.Select(p => new DefinitionParameterEntity
@@ -1127,7 +1129,7 @@
             }
 
             var result = new List<DefinitionEntity>();
-            var nameToType = new Dictionary<string, string>();
+            var nameToDefinition = new Dictionary<string, DefinitionEntity>();
             typeToName = new Dictionary<string, string>();
 
             foreach(var group in definitions.GroupBy(d => d.Name))
@@ -1135,16 +1137,16 @@
                 var tempItems = group.OrderBy(d => string.IsNullOrEmpty(d.Type) ? 0 : d.Type.Length).ToList();
                 foreach (var definition in tempItems)
                 {
-                    if (!nameToType.ContainsKey(definition.Name))
+                    if (!nameToDefinition.ContainsKey(definition.Name))
                     {
                         result.Add(definition);
-                        nameToType[definition.Name] = definition.Type;
+                        nameToDefinition[definition.Name] = definition;
                     }
-                    else if (!definition.Type.EndsWith(nameToType[definition.Name]) || nameToType[definition.Name] == definition.Name)
+                    else if (!definition.Type.EndsWith(nameToDefinition[definition.Name].Type) || string.IsNullOrEmpty(nameToDefinition[definition.Name].ShortType))
                     {
                         definition.Name = definition.Type;
                         result.Add(definition);
-                        nameToType[definition.Name] = definition.Type;
+                        nameToDefinition[definition.Name] = definition;
                     }
 
                     typeToName[definition.Type] = definition.Name;
