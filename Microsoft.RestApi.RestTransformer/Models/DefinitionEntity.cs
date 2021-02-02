@@ -9,6 +9,12 @@
         [YamlMember(Alias = "name")]
         public string Name { get; set; }
 
+        [YamlIgnore]
+        public string Type { get; set; }
+
+        [YamlIgnore]
+        public string ShortType { get; set; }
+
         [YamlMember(Alias = "description")]
         public string Description { get; set; }
 
