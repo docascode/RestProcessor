@@ -4,7 +4,6 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
-
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
     using Microsoft.DocAsCode.DataContracts.RestApi;
     using Microsoft.RestApi.RestTransformer.Models;
@@ -42,6 +41,13 @@
 
             var responseDefinitionObjects = new List<DefinitionObject>();
             var responses = TransformResponses(viewModel, allDefinitions, ref responseDefinitionObjects);
+            var bodies = TransformRequestBodies(allDefinitions, allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Body).ToList(), bodyDefinitionObject);
+            var typeToName = new Dictionary<string, string>();
+            var referencedDefinitions = TransformDefinitions(allDefinitions, parametersDefinitions, bodyDefinitionObject, responseDefinitionObjects, out typeToName);
+
+            UpdateDefinitions(referencedDefinitions, typeToName);
+            UpdateBodies(bodies, typeToName);
+            UpdateResponses(responses, typeToName);
 
             var basePath = swaggerModel.BasePath;
             var paths = TransformPaths(viewModel, scheme, host, basePath, apiVersion, allSimpleParameters);
@@ -68,16 +74,91 @@
                 Responses = responses,
                 Parameters = Helper.SortParameters(paths, allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Query || p.ParameterEntityType == ParameterEntityType.Path).ToList()),
                 RequestHeaders = allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Header).ToList(),
-                RequestBodies = TransformRequestBodies(allDefinitions, allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Body).ToList(), bodyDefinitionObject),
+                RequestBodies = bodies,
                 Paths = Helper.HandlePathsDefaultValues(paths, apiVersion, allSimpleParameters.Where(p => p.ParameterEntityType == ParameterEntityType.Query || p.ParameterEntityType == ParameterEntityType.Path).ToList()),
                 Produces = viewModel.Metadata.GetArrayFromMetaData<string>("produces"),
                 Consumes = viewModel.Metadata.GetArrayFromMetaData<string>("consumes"),
                 Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
-                Definitions = TransformDefinitions(allDefinitions, parametersDefinitions, bodyDefinitionObject, responseDefinitionObjects),
+                Definitions = referencedDefinitions,
                 Securities = securities,
                 Metadata = TransformMetaData(sourceUrl),
                 ErrorCodes = TransformErrorCodes(viewModel, swaggerModel)
             };
+        }
+
+        private static void UpdateResponses(IList<ResponseEntity> responses, Dictionary<string, string> typeToName)
+        {
+            if (responses == null) return;
+
+            foreach(var response in responses)
+            {
+                UpdateParameter(response, typeToName);
+            }
+        }
+
+        private static void UpdateBodies(IList<RequestBody> bodies, Dictionary<string, string> typeToName)
+        {
+            if (bodies == null) return;
+
+            foreach(var body in bodies)
+            {
+                if (body == null || body.RequestBodyParameters == null) continue;
+
+                foreach(var parameter in body.RequestBodyParameters)
+                {
+                    UpdateParameter(parameter, typeToName);
+                }
+            }
+        }
+
+        private static void UpdateDefinitions(IList<DefinitionEntity> referencedDefinitions, Dictionary<string, string> typeToName)
+        {
+            if (referencedDefinitions == null) return;
+
+            foreach(var definition in referencedDefinitions)
+            {
+                if (definition == null || definition.ParameterItems == null) continue;
+
+                foreach(var parameterItem in definition.ParameterItems)
+                {
+                    UpdateParameter(parameterItem, typeToName);
+                }
+            }
+        }
+
+        private static void UpdateParameter(BaseParameterEntity parameterItem, Dictionary<string, string> typeToName)
+        {
+            if (parameterItem == null) return;
+            if (!string.IsNullOrEmpty(parameterItem.TypesTitle))
+            {
+                if (parameterItem.TypesTitle.EndsWith("[]"))
+                {
+                    var tempTitle = parameterItem.TypesTitle.Substring(0, parameterItem.TypesTitle.Length - 2);
+                    if (typeToName.ContainsKey(tempTitle))
+                    {
+                        parameterItem.TypesTitle = typeToName[tempTitle] + "[]";
+                    }
+                }
+                else
+                {
+                    if (typeToName.ContainsKey(parameterItem.TypesTitle))
+                    {
+                        parameterItem.TypesTitle = typeToName[parameterItem.TypesTitle];
+                    }
+                }
+            }
+
+            if (parameterItem.Types == null) return;
+
+            foreach (var type in parameterItem.Types)
+            {
+                if (type == null || type.Id == null) continue;
+
+                if (typeToName.ContainsKey(type.Id))
+                {
+                    type.Id = typeToName[type.Id];
+                }
+            }
         }
 
         #region Parameters
@@ -298,7 +379,7 @@
                             ParameterEntityType = ParameterEntityType.Body,
                             Pattern = bodyDefinitionObject.Pattern,
                             Format = bodyDefinitionObject.Format,
-                            Types = new List<BaseParameterTypeEntity> { new BaseParameterTypeEntity { Id = bodyDefinitionObject.ShortType?? bodyDefinitionObject.Type, IsArray = bodyDefinitionObject.DefinitionObjectType == DefinitionObjectType.Array } }
+                            Types = new List<BaseParameterTypeEntity> { new BaseParameterTypeEntity { Id = bodyDefinitionObject.Type, IsArray = bodyDefinitionObject.DefinitionObjectType == DefinitionObjectType.Array } }
                         });
                     }
                     
@@ -324,7 +405,7 @@
                         {
                             bodies.Add(new RequestBody
                             {
-                                Name = polymorphicDefinition?.ShortType?? polymorphicDefinition?.Type,
+                                Name = polymorphicDefinition?.Type,
                                 Description = polymorphicDefinition?.Description,
                                 RequestBodyParameters = fullBodyParameters
                             });
@@ -360,13 +441,13 @@
                         typesName.Add(new BaseParameterTypeEntity
                         {
                             IsArray = definitionObject.DefinitionObjectType == DefinitionObjectType.Array,
-                            Id = definitionObject.ShortType?? definitionObject.Type
+                            Id = definitionObject.Type
                         });
                     }
                     else if (!string.IsNullOrEmpty(definitionObject.DiscriminatorKey) && !string.IsNullOrEmpty(definitionObject.Type))
                     {
                         var polymorphicDefinitions = GetPolymorphicDefinitions(definitions, definitionObject.Type);
-                        typesTitle = definitionObject.ShortType?? definitionObject.Type;
+                        typesTitle = definitionObject.Type;
                         if (polymorphicDefinitions?.Count > 0)
                         {
                             foreach (var polymorphicDefinition in polymorphicDefinitions)
@@ -374,7 +455,7 @@
                                 typesName.Add(new BaseParameterTypeEntity
                                 {
                                     IsArray = definitionObject.DefinitionObjectType == DefinitionObjectType.Array,
-                                    Id = polymorphicDefinition.ShortType?? polymorphicDefinition.Type
+                                    Id = polymorphicDefinition.Type
                                 });
                             }
                         }
@@ -743,7 +824,7 @@
 
                     var parameterTypeEntity = new BaseParameterTypeEntity
                     {
-                        Id = property.ShortType?? property.Type,
+                        Id = property.Type,
                     };
 
                     if (property.Name == property.DiscriminatorKey && !string.IsNullOrEmpty(property.DiscriminatorValue))
@@ -783,12 +864,12 @@
                             var polymorphicDefinitions = GetPolymorphicDefinitions(allDefinitions, property.Type);
                             if (polymorphicDefinitions?.Count > 0)
                             {
-                                typesTitle = (property.ShortType?? property.Type) + (property.DefinitionObjectType == DefinitionObjectType.Array ? "[]" : string.Empty);
+                                typesTitle = property.Type + (property.DefinitionObjectType == DefinitionObjectType.Array ? "[]" : string.Empty);
                                 foreach (var polymorphicDefinition in polymorphicDefinitions)
                                 {
                                     types.Add(new BaseParameterTypeEntity
                                     {
-                                        Id = polymorphicDefinition.ShortType?? polymorphicDefinition.Type,
+                                        Id = polymorphicDefinition.Type,
                                         IsArray = property.DefinitionObjectType == DefinitionObjectType.Array
                                     });
                                 }
@@ -797,7 +878,7 @@
                             {
                                 types.Add(new BaseParameterTypeEntity
                                 {
-                                    Id = property.ShortType?? property.Type,
+                                    Id = property.Type,
                                     IsArray = property.DefinitionObjectType == DefinitionObjectType.Array
                                 });
                             }
@@ -903,7 +984,7 @@
             return allDefinitions;
         }
 
-        private static IList<DefinitionEntity> TransformDefinitions(IList<Definition> allDefinitions, List<Definition> parametersDefinitions, DefinitionObject bodyDefinitionObject, IList<DefinitionObject> responseDefinitionObjects)
+        private static IList<DefinitionEntity> TransformDefinitions(IList<Definition> allDefinitions, List<Definition> parametersDefinitions, DefinitionObject bodyDefinitionObject, IList<DefinitionObject> responseDefinitionObjects, out Dictionary<string, string> typeToName)
         {
             var resolvedAllDefinitions = ResolveAllDefinitions(allDefinitions, bodyDefinitionObject, responseDefinitionObjects);
             var definitions = new List<DefinitionEntity>();
@@ -991,6 +1072,7 @@
                         definitions.Add(new DefinitionEntity
                         {
                             Name = selfDefinition.Name,
+                            Type = selfDefinition.Type,
                             Description = Utility.GetDefinitionDescription(selfDefinition),
                             Kind = "enum",
                             ParameterItems = selfDefinition.EnumValues.Select(p => new DefinitionParameterEntity
@@ -1013,6 +1095,7 @@
                         definitions.Add(new DefinitionEntity
                         {
                             Name = selfDefinition.Name,
+                            Type = selfDefinition.Type,
                             Description = Utility.GetDefinitionDescription(selfDefinition),
                             Kind = "object",
                             ParameterItems = parameters?.Select(p => new DefinitionParameterEntity
@@ -1043,7 +1126,30 @@
                 }        
             }
 
-            return definitions.DistinctBy(d => d.Name).ToList();
+            definitions = definitions.OrderBy(d => string.IsNullOrEmpty(d.Type)? 0 : d.Type.Count()).ToList();
+
+            var result = new List<DefinitionEntity>();
+            var nameToType = new Dictionary<string, string>();
+            typeToName = new Dictionary<string, string>();
+
+            foreach (var definition in definitions)
+            {
+                if(!nameToType.ContainsKey(definition.Name))
+                {
+                    result.Add(definition);
+                    nameToType[definition.Name] = definition.Type;
+                }
+                else if (!definition.Type.EndsWith(nameToType[definition.Name]) || nameToType[definition.Name] == definition.Name)
+                {
+                    definition.Name = definition.Type;
+                    result.Add(definition);
+                    nameToType[definition.Name] = definition.Type;
+                }
+
+                typeToName[definition.Type] = definition.Name;
+            }
+
+            return result;
         }
 
         #endregion
@@ -1385,7 +1491,7 @@
                     {
                         var name = definitionObject.Name.FirstLetterToUpper();
                         definitionObject.Type = string.IsNullOrEmpty(parentType)? name : parentType + "." + name;
-                        if (!string.IsNullOrEmpty(definitionObject.Name))
+                        if (!string.IsNullOrEmpty(name))
                         {
                             definitionObject.ShortType = name;
                         }
