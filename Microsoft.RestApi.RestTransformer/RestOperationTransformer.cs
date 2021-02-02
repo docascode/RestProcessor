@@ -8,7 +8,7 @@
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
     using Microsoft.DocAsCode.DataContracts.RestApi;
     using Microsoft.RestApi.RestTransformer.Models;
-
+    using MoreLinq;
     using Newtonsoft.Json.Linq;
 
     public class RestOperationTransformer
@@ -1043,7 +1043,7 @@
                 }        
             }
 
-            return definitions;
+            return definitions.DistinctBy(d => d.Name).ToList();
         }
 
         #endregion
@@ -1228,7 +1228,12 @@
                     foreach (var property in properties)
                     {
                         var childDefinitionObject = new DefinitionObject();
-                        ResolveObject(property.Key, (JObject)property.Value, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue, parentType + "." + (definitionObject.Type?? definitionObject.Name));
+                        var tempParentType = definitionObject.Type ?? definitionObject.Name;
+                        if(!string.IsNullOrEmpty(parentType))
+                        {
+                            tempParentType = parentType + "." + tempParentType;
+                        }
+                        ResolveObject(property.Key, (JObject)property.Value, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue, tempParentType);
                         definitionObject.PropertyItems.Add(childDefinitionObject);
                     }
                 }
@@ -1378,10 +1383,11 @@
                 {
                     if (string.IsNullOrEmpty(definitionObject.Type))
                     {
-                        definitionObject.Type = parentType + "." + definitionObject.Name.FirstLetterToUpper();
+                        var name = definitionObject.Name.FirstLetterToUpper();
+                        definitionObject.Type = string.IsNullOrEmpty(parentType)? name : parentType + "." + name;
                         if (!string.IsNullOrEmpty(definitionObject.Name))
                         {
-                            definitionObject.ShortType = definitionObject.Name.FirstLetterToUpper();
+                            definitionObject.ShortType = name;
                         }
                     }
                 }
