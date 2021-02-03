@@ -25,6 +25,8 @@
 
         public string Type { get; set; }
 
+        public string ShortType { get; set; }
+
         public string AdditionalType { get; set; }
 
         public bool IsReadOnly { get; set; }
@@ -82,6 +84,8 @@
 
         public string Type { get; set; }
 
+        public string ShortType { get; set; }
+
         public DefinitionObjectType DefinitionObjectType { get; set; }
 
         public IList<string> AllOfTypes { get; set; }
@@ -106,6 +110,8 @@
         public string SubDescription { get; set; }
 
         public string Type { get; set; }
+
+        public string ShortType { get; set; }
 
         public string AdditionalType { get; set; }
 
