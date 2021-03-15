@@ -14,7 +14,7 @@
     public class RestOperationTransformer
     {
         private static ConcurrentDictionary<string, IList<Definition>> _cacheDefinitions = new ConcurrentDictionary<string, IList<Definition>>();
-        private static Regex _permissionRegex = new Regex("/providers(?<permission>(/[^/{}]+)+)(/{[^/}]+})*$", RegexOptions.IgnoreCase);
+        private static Regex _permissionRegex = new Regex("/providers(?<permission>(/[^/{}]+)+)(/{[^/}]+})*", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         public static OperationEntity Transform(string groupKey, SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel, bool needPermission = false)
         {
             var scheme = Utility.GetScheme(swaggerModel.Metadata);
@@ -52,7 +52,6 @@
 
             var basePath = swaggerModel.BasePath;
             var paths = TransformPaths(viewModel, scheme, host, basePath, apiVersion, allSimpleParameters);
-            var permission = TransformPermissions(viewModel, paths);
             var serviceId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-id");
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
@@ -83,7 +82,7 @@
                 Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
                 Definitions = referencedDefinitions,
                 Securities = securities,
-                Permission = needPermission ? permission : null,
+                Permission = needPermission ? TransformPermission(viewModel, paths) : null,
                 Metadata = TransformMetaData(sourceUrl),
                 ErrorCodes = TransformErrorCodes(viewModel, swaggerModel)
             };
@@ -351,13 +350,18 @@
             return pathEntities;
         }
 
-        private static string TransformPermissions(RestApiChildItemViewModel viewModel, IList<PathEntity> pathEntities)
+        private static string TransformPermission(RestApiChildItemViewModel viewModel, IList<PathEntity> pathEntities)
         {
                 var pathEntity = pathEntities.FirstOrDefault();
+                if (pathEntity == null || string.IsNullOrEmpty(pathEntity.Content))
+                {
+                    return null;
+                }
+
                 var index = pathEntity.Content.LastIndexOf("/providers/");
                 var lastProvider = pathEntity.Content.Substring(index);
                 index = lastProvider.IndexOf("?");
-                if (-1 != index)
+                if (index != -1)
                 {
                     lastProvider = lastProvider.Substring(0, index);
                 }
@@ -385,7 +389,7 @@
                     } 
                    
                    return permission.TrimStart('/');
-            }
+                }
 
             return null;
         }
