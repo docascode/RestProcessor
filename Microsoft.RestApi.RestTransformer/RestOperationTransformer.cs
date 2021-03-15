@@ -681,29 +681,29 @@
         private static IList<ExampleEntity> TransformExamples(RestApiChildItemViewModel viewModel, IList<PathEntity> paths, IList<ParameterEntity> parameters, DefinitionObject bodyDefinitionObject)
         {
             var examples = new List<ExampleEntity>();
-            //var msExamples = viewModel.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("x-ms-examples");
-            //if (msExamples != null)
-            //{
-            //    foreach (var msExample in msExamples)
-            //    {
-            //        var msExampleValue = ((JObject)msExample.Value).ToObject<Dictionary<string, object>>();
-            //        var msExampleParameters = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("parameters");
-            //        var msExampleResponses = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("responses");
+            var msExamples = viewModel.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("x-ms-examples");
+            if (msExamples != null)
+            {
+                foreach (var msExample in msExamples)
+                {
+                    var msExampleValue = ((JObject)msExample.Value).ToObject<Dictionary<string, object>>();
+                    var msExampleParameters = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("parameters");
+                    var msExampleResponses = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("responses");
 
-            //        var example = new ExampleEntity
-            //        {
-            //            Name = msExample.Key,
-            //            ExampleRequest = new ExampleRequestEntity
-            //            {
-            //                RequestUri = GetExampleRequestUri(paths, msExampleParameters, parameters.Where(p => p.In == "path").ToList()),
-            //                Headers = GetExampleRequestHeader(msExampleParameters, parameters.Where(p => p.In == "header").ToList()),
-            //                RequestBody = GetExampleRequestBody(msExampleParameters, parameters.Where(p => p.In == "body").ToList(), bodyDefinitionObject),
-            //            },
-            //            ExampleResponses = GetExampleResponses(msExampleResponses)
-            //        };
-            //        examples.Add(example);
-            //    }
-            //}
+                    var example = new ExampleEntity
+                    {
+                        Name = msExample.Key,
+                        ExampleRequest = new ExampleRequestEntity
+                        {
+                            RequestUri = GetExampleRequestUri(paths, msExampleParameters, parameters.Where(p => p.In == "path").ToList()),
+                            Headers = GetExampleRequestHeader(msExampleParameters, parameters.Where(p => p.In == "header").ToList()),
+                            RequestBody = GetExampleRequestBody(msExampleParameters, parameters.Where(p => p.In == "body").ToList(), bodyDefinitionObject),
+                        },
+                        ExampleResponses = GetExampleResponses(msExampleResponses)
+                    };
+                    examples.Add(example);
+                }
+            }
             return examples;
         }
 
