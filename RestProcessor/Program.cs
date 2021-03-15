@@ -118,6 +118,7 @@
                         {
                             foreach (var info in fileInfo.ChildrenFileNameInfo)
                             {
+                                info.NeedPermission = restFileInfo.NeedPermission;
                                 var operationFiles = splitedGroupOperationFiles.GetOrAdd(fileInfo.FilePath, new ConcurrentBag<FileNameInfo>());
                                 operationFiles.Add(info);
                             }
@@ -148,7 +149,7 @@
             var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(file.FilePath)}.yml");
             try
             {
-                var operation = RestTransformer.ProcessOperation(groupKey, ymlPath, file.FilePath);
+                var operation = RestTransformer.ProcessOperation(groupKey, ymlPath, file.FilePath, file.NeedPermission);
                 if (operation != null)
                 {
                     var key = string.IsNullOrEmpty(file.Version) ? operation.GroupId : $"{file.Version}_{operation.GroupId}";

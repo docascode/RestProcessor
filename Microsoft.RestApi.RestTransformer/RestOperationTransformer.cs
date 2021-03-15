@@ -4,6 +4,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
     using Microsoft.DocAsCode.DataContracts.RestApi;
     using Microsoft.RestApi.RestTransformer.Models;
@@ -13,8 +14,8 @@
     public class RestOperationTransformer
     {
         private static ConcurrentDictionary<string, IList<Definition>> _cacheDefinitions = new ConcurrentDictionary<string, IList<Definition>>();
-
-        public static OperationEntity Transform(string groupKey, SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel)
+        private static Regex _permissionRegex = new Regex("/providers(?<permission>(/[^/{}]+)+)(/{[^/}]+})*$", RegexOptions.IgnoreCase);
+        public static OperationEntity Transform(string groupKey, SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel, bool needPermission = false)
         {
             var scheme = Utility.GetScheme(swaggerModel.Metadata);
             var hostWithParameters = Utility.GetHostWithParameters(swaggerModel.Host, swaggerModel.Metadata, viewModel.Metadata);
@@ -51,6 +52,7 @@
 
             var basePath = swaggerModel.BasePath;
             var paths = TransformPaths(viewModel, scheme, host, basePath, apiVersion, allSimpleParameters);
+            var permission = TransformPermissions(viewModel, paths);
             var serviceId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-id");
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
@@ -81,6 +83,7 @@
                 Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
                 Definitions = referencedDefinitions,
                 Securities = securities,
+                Permission = needPermission ? permission : null,
                 Metadata = TransformMetaData(sourceUrl),
                 ErrorCodes = TransformErrorCodes(viewModel, swaggerModel)
             };
@@ -347,6 +350,46 @@
             }
             return pathEntities;
         }
+
+        private static string TransformPermissions(RestApiChildItemViewModel viewModel, IList<PathEntity> pathEntities)
+        {
+                var pathEntity = pathEntities.FirstOrDefault();
+                var index = pathEntity.Content.LastIndexOf("/providers/");
+                var lastProvider = pathEntity.Content.Substring(index);
+                index = lastProvider.IndexOf("?");
+                if (-1 != index)
+                {
+                    lastProvider = lastProvider.Substring(0, index);
+                }
+
+                var matches = _permissionRegex.Match(lastProvider);
+                if (matches.Success)
+                {
+                    var permission = matches.Groups["permission"].Value;
+                    switch (viewModel.OperationName.ToUpperInvariant())
+                    {
+                        case "GET":
+                            permission = permission + "/read";
+                            break;
+                        case "PUT":
+                        case "PATCH":
+                            permission = permission + "/write";
+                            break;
+                        case "DELETE":
+                            permission = permission + "/delete";
+                            break;
+                        case "POST":
+                            permission = permission + "/action";
+                            break;
+
+                    } 
+                   
+                   return permission.TrimStart('/');
+            }
+
+            return null;
+        }
+
 
         #endregion
 
@@ -638,29 +681,29 @@
         private static IList<ExampleEntity> TransformExamples(RestApiChildItemViewModel viewModel, IList<PathEntity> paths, IList<ParameterEntity> parameters, DefinitionObject bodyDefinitionObject)
         {
             var examples = new List<ExampleEntity>();
-            var msExamples = viewModel.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("x-ms-examples");
-            if (msExamples != null)
-            {
-                foreach (var msExample in msExamples)
-                {
-                    var msExampleValue = ((JObject)msExample.Value).ToObject<Dictionary<string, object>>();
-                    var msExampleParameters = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("parameters");
-                    var msExampleResponses = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("responses");
+            //var msExamples = viewModel.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("x-ms-examples");
+            //if (msExamples != null)
+            //{
+            //    foreach (var msExample in msExamples)
+            //    {
+            //        var msExampleValue = ((JObject)msExample.Value).ToObject<Dictionary<string, object>>();
+            //        var msExampleParameters = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("parameters");
+            //        var msExampleResponses = msExampleValue.GetDictionaryFromMetaData<Dictionary<string, object>>("responses");
 
-                    var example = new ExampleEntity
-                    {
-                        Name = msExample.Key,
-                        ExampleRequest = new ExampleRequestEntity
-                        {
-                            RequestUri = GetExampleRequestUri(paths, msExampleParameters, parameters.Where(p => p.In == "path").ToList()),
-                            Headers = GetExampleRequestHeader(msExampleParameters, parameters.Where(p => p.In == "header").ToList()),
-                            RequestBody = GetExampleRequestBody(msExampleParameters, parameters.Where(p => p.In == "body").ToList(), bodyDefinitionObject),
-                        },
-                        ExampleResponses = GetExampleResponses(msExampleResponses)
-                    };
-                    examples.Add(example);
-                }
-            }
+            //        var example = new ExampleEntity
+            //        {
+            //            Name = msExample.Key,
+            //            ExampleRequest = new ExampleRequestEntity
+            //            {
+            //                RequestUri = GetExampleRequestUri(paths, msExampleParameters, parameters.Where(p => p.In == "path").ToList()),
+            //                Headers = GetExampleRequestHeader(msExampleParameters, parameters.Where(p => p.In == "header").ToList()),
+            //                RequestBody = GetExampleRequestBody(msExampleParameters, parameters.Where(p => p.In == "body").ToList(), bodyDefinitionObject),
+            //            },
+            //            ExampleResponses = GetExampleResponses(msExampleResponses)
+            //        };
+            //        examples.Add(example);
+            //    }
+            //}
             return examples;
         }
 
