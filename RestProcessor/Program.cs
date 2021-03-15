@@ -118,6 +118,7 @@
                         {
                             foreach (var info in fileInfo.ChildrenFileNameInfo)
                             {
+                                info.NeedPermission = restFileInfo.NeedPermission;
                                 var operationFiles = splitedGroupOperationFiles.GetOrAdd(fileInfo.FilePath, new ConcurrentBag<FileNameInfo>());
                                 operationFiles.Add(info);
                             }
@@ -142,13 +143,13 @@
 
         }
 
-        private static void RestProcessorForOperation(string groupKey, FileNameInfo file, ConcurrentDictionary<string, ConcurrentBag<Operation>> groupOperations)
+        private static void RestProcessorForOperation(string groupKey, FileNameInfo file, ConcurrentDictionary<string, ConcurrentBag<Operation>> groupOperations,bool needPermission=false)
         {
             var folder = Path.GetDirectoryName(file.FilePath);
             var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(file.FilePath)}.yml");
             try
             {
-                var operation = RestTransformer.ProcessOperation(groupKey, ymlPath, file.FilePath);
+                var operation = RestTransformer.ProcessOperation(groupKey, ymlPath, file.FilePath, needPermission);
                 if (operation != null)
                 {
                     var key = string.IsNullOrEmpty(file.Version) ? operation.GroupId : $"{file.Version}_{operation.GroupId}";
@@ -209,11 +210,11 @@
             Parallel.ForEach(groupOperationFiles, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (groupOperationFile) =>
             {
                 var firstOperationFile = groupOperationFile.Value.First();
-                RestProcessorForOperation(groupOperationFile.Key, firstOperationFile, groupOperations);
+                RestProcessorForOperation(groupOperationFile.Key, firstOperationFile, groupOperations, firstOperationFile.NeedPermission);
                 var otherOperationFiles = groupOperationFile.Value.Skip(1);
                 Parallel.ForEach(otherOperationFiles, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (file) =>
                 {
-                    RestProcessorForOperation(groupOperationFile.Key, file, groupOperations);
+                    RestProcessorForOperation(groupOperationFile.Key, file, groupOperations, file.NeedPermission);
                 });
             });
 

@@ -60,6 +60,9 @@
         [YamlMember(Alias = "security")]
         public IList<SecurityEntity> Securities { get; set; }
 
+        [YamlMember(Alias = "permission")]
+        public string[] Permissions { get; set; }
+
         [YamlMember(Alias = "metadata")]
         public MetaDataEntity Metadata { get; set; }
 

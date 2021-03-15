@@ -4,6 +4,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
     using Microsoft.DocAsCode.DataContracts.RestApi;
     using Microsoft.RestApi.RestTransformer.Models;
@@ -14,7 +15,7 @@
     {
         private static ConcurrentDictionary<string, IList<Definition>> _cacheDefinitions = new ConcurrentDictionary<string, IList<Definition>>();
 
-        public static OperationEntity Transform(string groupKey, SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel)
+        public static OperationEntity Transform(string groupKey, SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel, bool needPermission = false)
         {
             var scheme = Utility.GetScheme(swaggerModel.Metadata);
             var hostWithParameters = Utility.GetHostWithParameters(swaggerModel.Host, swaggerModel.Metadata, viewModel.Metadata);
@@ -51,6 +52,7 @@
 
             var basePath = swaggerModel.BasePath;
             var paths = TransformPaths(viewModel, scheme, host, basePath, apiVersion, allSimpleParameters);
+            var permissions = TransformPermissions(viewModel,paths);
             var serviceId = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-id");
             var serviceName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-service-name");
             var groupName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-toc-name");
@@ -81,6 +83,7 @@
                 Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
                 Definitions = referencedDefinitions,
                 Securities = securities,
+                Permissions=needPermission? permissions.ToArray():null,
                 Metadata = TransformMetaData(sourceUrl),
                 ErrorCodes = TransformErrorCodes(viewModel, swaggerModel)
             };
@@ -348,6 +351,55 @@
             return pathEntities;
         }
 
+        private static IList<string> TransformPermissions(RestApiChildItemViewModel viewModel,IList<PathEntity> pathEntities)
+        {
+            var pattern = WildCardToRegex();
+            var permissions = new HashSet<string>();
+
+            foreach (var pathEntity in pathEntities)
+            {
+                var index = pathEntity.Content.LastIndexOf("/providers/");
+                var lastProvider = pathEntity.Content.Substring(index);
+                index = lastProvider.IndexOf("?");
+                if (-1 != index)
+                {
+                    lastProvider = lastProvider.Substring(0, index);
+                }
+
+               var matches=pattern.Match(lastProvider);
+               if (matches.Success)
+               {
+                    var permission = matches.Groups["permission"].Value;
+                    switch (viewModel.OperationName.ToUpperInvariant())
+                    {
+                        case "GET":
+                            permission = permission + "/read";
+                            break;
+                        case "PUT":
+                        case "PATCH":
+                            permission = permission + "/write";
+                            break;
+                        case "DELETE":
+                            permission = permission + "/delete";
+                            break;
+                        case "POST":
+                            permission = permission + "/action";
+                            break;
+                    
+                    }
+
+                    permissions.Add(permission);
+               }
+            }
+
+            return permissions.ToList();
+        }
+
+        public static Regex WildCardToRegex()
+        {
+            var regex = new Regex("/providers(?<permission>(/[^/{}]+)+)(/{[^/}]+})*$", RegexOptions.IgnoreCase);
+            return regex;
+        }
         #endregion
 
         #region Requestbody

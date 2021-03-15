@@ -7,6 +7,8 @@
         public List<FileNameInfo> FileNameInfos { get; set; } = new List<FileNameInfo>();
 
         public string TocTitle { get; set; }
+
+        public bool NeedPermission { get; set; }
     }
 
     public class FileNameInfo
@@ -14,6 +16,8 @@
         public string FileName { get; set; }
 
         public string FilePath { get; set; }
+
+        public bool NeedPermission { get; set; }
 
         public List<FileNameInfo> ChildrenFileNameInfo { get; set; }
 
