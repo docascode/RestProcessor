@@ -4,6 +4,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using Microsoft.DocAsCode.Build.RestApi.Swagger;
     using Microsoft.DocAsCode.DataContracts.RestApi;
     using Microsoft.RestApi.RestTransformer.Models;
@@ -13,8 +14,9 @@
     public class RestOperationTransformer
     {
         private static ConcurrentDictionary<string, IList<Definition>> _cacheDefinitions = new ConcurrentDictionary<string, IList<Definition>>();
-
-        public static OperationEntity Transform(string groupKey, SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel)
+        private static Regex _permissionRegex = new Regex("/providers(?<permission>(/[^/{}]+)+)(/{[^/}]+})*", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static Regex _permissionRegexOfPost = new Regex("/providers(?<permission>(/[^/{}]+)+)(/{[^/}]+}).*(?<action>(/[^/{}]+){1})$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        public static OperationEntity Transform(string groupKey, SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel, bool needPermission = false)
         {
             var scheme = Utility.GetScheme(swaggerModel.Metadata);
             var hostWithParameters = Utility.GetHostWithParameters(swaggerModel.Host, swaggerModel.Metadata, viewModel.Metadata);
@@ -81,6 +83,7 @@
                 Examples = TransformExamples(viewModel, paths, allSimpleParameters, bodyDefinitionObject),
                 Definitions = referencedDefinitions,
                 Securities = securities,
+                Permission = needPermission ? TransformPermission(viewModel, paths) : null,
                 Metadata = TransformMetaData(sourceUrl),
                 ErrorCodes = TransformErrorCodes(viewModel, swaggerModel)
             };
@@ -347,6 +350,64 @@
             }
             return pathEntities;
         }
+
+        private static string TransformPermission(RestApiChildItemViewModel viewModel, IList<PathEntity> pathEntities)
+        {
+                var pathEntity = pathEntities.FirstOrDefault();
+                if (pathEntity == null || string.IsNullOrEmpty(pathEntity.Content))
+                {
+                    return null;
+                }
+
+                var index = pathEntity.Content.ToLowerInvariant().LastIndexOf("/providers/");
+                if (index == -1)
+                {
+                    return null;
+                }
+
+                var lastProvider = pathEntity.Content.Substring(index);
+                index = lastProvider.IndexOf("?");
+                if (index != -1)
+                {
+                    lastProvider = lastProvider.Substring(0, index);
+                }
+
+                if (viewModel.OperationName.ToUpperInvariant()== "POST")
+                {
+                    var matchOfPost = _permissionRegexOfPost.Match(lastProvider);
+                    if (matchOfPost.Success)
+                    {
+                        return matchOfPost.Groups["permission"].Value.TrimStart('/') + matchOfPost.Groups["action"].Value+ "/action";
+                    }
+
+                    Console.WriteLine($"The path doesn't know how to get permission:{pathEntity.Content}");
+                    return null;
+                }
+
+                var matches = _permissionRegex.Match(lastProvider);
+                if (matches.Success)
+                {
+                    var permission = matches.Groups["permission"].Value.TrimStart('/');
+                    switch (viewModel.OperationName.ToUpperInvariant())
+                    {
+                        case "GET":
+                            permission = permission + "/read";
+                            break;
+                        case "PUT":
+                        case "PATCH":
+                            permission = permission + "/write";
+                            break;
+                        case "DELETE":
+                            permission = permission + "/delete";
+                            break;
+                    } 
+                   
+                   return permission;
+                }
+
+            return null;
+        }
+
 
         #endregion
 

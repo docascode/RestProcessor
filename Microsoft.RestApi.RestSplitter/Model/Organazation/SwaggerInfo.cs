@@ -10,6 +10,9 @@
         [JsonProperty("source")]
         public string Source { get; set; }
 
+        [JsonProperty("needPermission")]
+        public bool NeedPermission { get; set; }
+
         [JsonProperty("sub_group_toc_title")]
         public string SubGroupTocTitle { get; set; }
 
