@@ -271,64 +271,69 @@
         private static SortedDictionary<string, List<SwaggerToc>> SplitSwaggers(string sourceRootDir, string targetApiVersionDir, ServiceInfo service, OrgsMappingFile orgsMappingFile, RepoFile repoFile, string version, string lineNumberMappingFilePath)
         {
             var subTocDict = new SortedDictionary<string, List<SwaggerToc>>();
-
-            foreach (var swagger in service.SwaggerInfo)
-            {
-                var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;
-                var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiVersionDir, service.UrlGroup, subGroupName.TrimSubGroupName()));
-                var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
-
-                var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, swagger.Source.TrimEnd(), orgsMappingFile.UseServiceUrlGroup ? service.UrlGroup : service.TocTitle, service.TocTitle, subGroupName, swagger.OperationGroupMapping, orgsMappingFile, repoFile, version);
-                var sourceSwaggerMappingDict = new Dictionary<string, string>();
-
-                if (restFileInfo == null)
+            using (var resetAcrossSwaggerSplitter = new RestAcrossSwaggerSplitter(orgsMappingFile))
+            { 
+                foreach (var swagger in service.SwaggerInfo)
                 {
-                    continue;
-                }
+                    var subGroupName = swagger.SubGroupTocTitle ?? string.Empty;
+                    var targetDir = FileUtility.CreateDirectoryIfNotExist(Path.Combine(targetApiVersionDir, service.UrlGroup, subGroupName.TrimSubGroupName()));
+                    var sourceFile = Path.Combine(sourceRootDir, swagger.Source.TrimEnd());
 
-                restFileInfo.NeedPermission = swagger.NeedPermission;
-                _restFileInfos.Add(restFileInfo);
+                    var restFileInfo = RestSplitHelper.Split(targetDir, sourceFile, swagger.Source.TrimEnd(), orgsMappingFile.UseServiceUrlGroup ? service.UrlGroup : service.TocTitle, service.TocTitle, subGroupName, swagger.OperationGroupMapping, orgsMappingFile, repoFile, version, resetAcrossSwaggerSplitter);
+                    var sourceSwaggerMappingDict = new Dictionary<string, string>();
 
-                var tocTitle = Utility.ExtractPascalNameByRegex(restFileInfo.TocTitle, orgsMappingFile.NoSplitWords);
-                List<SwaggerToc> subTocList;
-                if (!subTocDict.TryGetValue(subGroupName, out subTocList))
-                {
-                    subTocList = new List<SwaggerToc>();
-                    subTocDict.Add(subGroupName, subTocList);
-                }
-
-                foreach (var fileNameInfo in restFileInfo.FileNameInfos)
-                {
-                    var subTocTitle = fileNameInfo.TocName;
-                    var filePath = FileUtility.NormalizePath(Path.Combine(service.UrlGroup, subGroupName.TrimSubGroupName(), fileNameInfo.FileName));
-
-                    if (subTocList.Any(toc => toc.Title == subTocTitle))
+                    if (restFileInfo == null)
                     {
-                        throw new InvalidOperationException($"Sub toc '{subTocTitle}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{swagger.Source}' to avoid conflicting");
+                        continue;
                     }
-        
-                    var childrenToc = new List<SwaggerToc>();
-                    if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
-                    {
-                        foreach (var nameInfo in fileNameInfo.ChildrenFileNameInfo)
-                        {
-                            childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, subGroupName.TrimSubGroupName(), nameInfo.FileName))));
 
-                            var normalizedFileName = FileUtility.NormalizePath(nameInfo.FileName);
-                            
-                            // Write into ref mapping dict
-                            if (!sourceSwaggerMappingDict.ContainsKey(normalizedFileName))
+                    restFileInfo.NeedPermission = swagger.NeedPermission;
+                    _restFileInfos.Add(restFileInfo);
+
+                    var tocTitle = Utility.ExtractPascalNameByRegex(restFileInfo.TocTitle, orgsMappingFile.NoSplitWords);
+                    List<SwaggerToc> subTocList;
+                    if (!subTocDict.TryGetValue(subGroupName, out subTocList))
+                    {
+                        subTocList = new List<SwaggerToc>();
+                        subTocDict.Add(subGroupName, subTocList);
+                    }
+
+                    foreach (var fileNameInfo in restFileInfo.FileNameInfos)
+                    {
+                        var subTocTitle = fileNameInfo.TocName;
+                        var filePath = FileUtility.NormalizePath(Path.Combine(service.UrlGroup, subGroupName.TrimSubGroupName(), fileNameInfo.FileName));
+
+                        if (!orgsMappingFile.IsGroupdedByTag && subTocList.Any(toc => toc.Title == subTocTitle))
+                        {
+                            throw new InvalidOperationException($"Sub toc '{subTocTitle}' under '{tocTitle}' has been added into toc.md, please add operation group name mapping for file '{swagger.Source}' to avoid conflicting");
+                        }
+
+                        var childrenToc = new List<SwaggerToc>();
+                        if (fileNameInfo.ChildrenFileNameInfo != null && fileNameInfo.ChildrenFileNameInfo.Count > 0)
+                        {
+                            foreach (var nameInfo in fileNameInfo.ChildrenFileNameInfo)
                             {
-                                sourceSwaggerMappingDict.Add(normalizedFileName, nameInfo.SwaggerSourceUrl);
+                                childrenToc.Add(new SwaggerToc(nameInfo.TocName, FileUtility.NormalizePath(Path.Combine(service.UrlGroup, subGroupName.TrimSubGroupName(), nameInfo.FileName))));
+
+                                var normalizedFileName = FileUtility.NormalizePath(nameInfo.FileName);
+
+                                // Write into ref mapping dict
+                                if (!sourceSwaggerMappingDict.ContainsKey(normalizedFileName))
+                                {
+                                    sourceSwaggerMappingDict.Add(normalizedFileName, nameInfo.SwaggerSourceUrl);
+                                }
                             }
                         }
-                    }
 
-                    subTocList.Add(new SwaggerToc(subTocTitle, filePath, childrenToc));
+                        subTocList.Add(new SwaggerToc(subTocTitle, filePath, childrenToc));
+                    }
+                   
+                    Console.WriteLine($"Done splitting swagger file from '{swagger.Source}' to '{service.UrlGroup}'");
+                    // Write into source swagger mapping file
+                    Utility.WriteDictToFile(lineNumberMappingFilePath, sourceSwaggerMappingDict);
                 }
-                Console.WriteLine($"Done splitting swagger file from '{swagger.Source}' to '{service.UrlGroup}'");
-                // Write into source swagger mapping file
-                Utility.WriteDictToFile(lineNumberMappingFilePath, sourceSwaggerMappingDict);
+
+                resetAcrossSwaggerSplitter.Serialize();
             }
 
             return subTocDict;
