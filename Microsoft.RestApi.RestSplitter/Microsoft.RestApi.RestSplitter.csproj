@@ -130,6 +130,7 @@
     <Compile Include="Model\Organazation\SwaggerToc.cs" />
     <Compile Include="Model\RepoFile.cs" />
     <Compile Include="Model\RestFileInfo.cs" />
+    <Compile Include="RestAcrossSwaggerSplitter.cs" />
     <Compile Include="RestSplitter.cs" />
     <Compile Include="RefResolver.cs" />
     <Compile Include="RestSplitHelper.cs" />

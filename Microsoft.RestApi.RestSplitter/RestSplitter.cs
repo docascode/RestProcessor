@@ -325,7 +325,15 @@
                             }
                         }
 
-                        subTocList.Add(new SwaggerToc(subTocTitle, filePath, childrenToc));
+                        var subToc = subTocList.Where(toc => toc.Title == subTocTitle).FirstOrDefault();
+                        if (orgsMappingFile.IsGroupdedByTag && subToc != null)
+                        {
+                            subToc.AddChildrenToc(childrenToc);
+                        }
+                        else
+                        {
+                            subTocList.Add(new SwaggerToc(subTocTitle, filePath, childrenToc));
+                        }
                     }
                    
                     Console.WriteLine($"Done splitting swagger file from '{swagger.Source}' to '{service.UrlGroup}'");

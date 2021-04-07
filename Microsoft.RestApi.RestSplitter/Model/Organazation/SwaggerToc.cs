@@ -16,6 +16,13 @@
             FilePath = filePath;
             ChildrenToc = childrenToc;
         }
+        public void AddChildrenToc(List<SwaggerToc> childrenToc)
+        {
+            if (ChildrenToc != null)
+            {
+                ChildrenToc.AddRange(childrenToc);
+            }
+        }
         public override string ToString()
         {
             return $"{Title}, {FilePath}";
