@@ -8,7 +8,7 @@
 
         public string FilePath { get; }
 
-        public List<SwaggerToc> ChildrenToc { get; }
+        public List<SwaggerToc> ChildrenToc { get; set; }
 
         public SwaggerToc(string title, string filePath, List<SwaggerToc> childrenToc = null)
         {
@@ -18,10 +18,17 @@
         }
         public void AddChildrenToc(List<SwaggerToc> childrenToc)
         {
-            if (ChildrenToc != null)
+            if (childrenToc == null)
             {
-                ChildrenToc.AddRange(childrenToc);
+                return;
             }
+            
+            if (ChildrenToc == null)
+            {
+                ChildrenToc = new List<SwaggerToc>();
+            }
+
+            ChildrenToc.AddRange(childrenToc);
         }
         public override string ToString()
         {
