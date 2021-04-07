@@ -12,6 +12,7 @@
 
     public abstract class BaseGenerator : IGenerator
     {
+        protected Dictionary<string, Tuple<JObject, string>> keyValuePairs = new Dictionary<string, Tuple<JObject, string>>();
         protected JObject RootJObj { get; }
 
         protected string TargetDir { get; }
@@ -53,7 +54,10 @@
         #region Public Methods
 
         public abstract IEnumerable<FileNameInfo> Generate();
-
+        public Dictionary<string, Tuple<JObject, string>> GetStoreInfo()
+        {
+            return keyValuePairs;
+        }
         protected abstract string GetOperationName(JObject operation, out string operationId);
 
         #endregion
