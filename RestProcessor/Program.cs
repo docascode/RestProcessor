@@ -1,4 +1,4 @@
-﻿namespace Microsoft.RestApi.RestCI
+namespace Microsoft.RestApi.RestCI
 {
     using System;
     using System.Collections.Concurrent;
