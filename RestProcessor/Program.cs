@@ -55,7 +55,7 @@
 
                 if (mappingFile.UseYamlSchema)
                 {
-                    RestProcessor(restFileInfos);
+                    RestProcessor(restFileInfos, mappingFile);
                 }
 
                 Console.WriteLine("Processor transform end at:" + DateTime.UtcNow);
@@ -101,7 +101,7 @@
             return restFileInfos;
         }
 
-        public static (List<FileNameInfo>, ConcurrentDictionary<string, ConcurrentBag<FileNameInfo>>) ExtractRestFiles(IList<RestFileInfo> restFileInfos)
+        public static (List<FileNameInfo>, ConcurrentDictionary<string, ConcurrentBag<FileNameInfo>>) ExtractRestFiles(IList<RestFileInfo> restFileInfos,OrgsMappingFile orgsMappingFile)
         {
             var splitedGroupFiles = new List<FileNameInfo>();
             var splitedGroupOperationFiles = new ConcurrentDictionary<string, ConcurrentBag<FileNameInfo>>();
@@ -139,8 +139,33 @@
                     }
                 }
             }
+
+            if (orgsMappingFile.IsGroupdedByTag)
+            {
+                splitedGroupFiles = MergeRestFile(splitedGroupFiles);
+            }
+
             return (splitedGroupFiles, splitedGroupOperationFiles);
 
+        }
+
+        private static List<FileNameInfo> MergeRestFile(List<FileNameInfo> fileNameInfos)
+        {
+            var set = new HashSet<FileNameInfo>();
+            foreach (var item in fileNameInfos)
+            {
+                var existFinleNameInfo= set.Where(fileNameInfo=> fileNameInfo.TocName== item.TocName).FirstOrDefault();
+                if (existFinleNameInfo != null)
+                {
+                    existFinleNameInfo.ChildrenFileNameInfo.AddRange(item.ChildrenFileNameInfo);
+                }
+                else
+                {
+                    set.Add(item);
+                }
+            }
+
+            return set.ToList();
         }
 
         private static void RestProcessorForOperation(string groupKey, FileNameInfo file, ConcurrentDictionary<string, ConcurrentBag<Operation>> groupOperations)
@@ -171,9 +196,9 @@
             }
         }
 
-        public static void RestProcessor(IList<RestFileInfo> restFileInfos)
+        public static void RestProcessor(IList<RestFileInfo> restFileInfos, OrgsMappingFile orgsMappingFile)
         {
-            var (groupFiles, groupOperationFiles) = ExtractRestFiles(restFileInfos);
+            var (groupFiles, groupOperationFiles) = ExtractRestFiles(restFileInfos,orgsMappingFile);
             var groupOperations = new ConcurrentDictionary<string, ConcurrentBag<Operation>>();
 
             //foreach (var groupOperationPath in groupOperationPaths)

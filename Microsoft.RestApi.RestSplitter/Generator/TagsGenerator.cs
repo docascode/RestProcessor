@@ -102,10 +102,16 @@
                         RootJObj["x-internal-split-members"] = splitMembers;
                         RootJObj["x-internal-split-type"] = OrgsMappingFile.UseYamlSchema ? SplitType.TagGroup.ToString() : SplitType.OperationGroup.ToString();
                     }
-                    
-                    var file = Utility.Serialize(TargetDir, Utility.TryToFormalizeUrl(newTagName, OrgsMappingFile.FormalizeUrl), RootJObj);
-                    fileNameInfo.FileName = OrgsMappingFile.UseYamlSchema ? Path.ChangeExtension(file.Item1, "yml") : file.Item1;
-                    fileNameInfo.FilePath = file.Item2;
+
+                    //var file = Utility.Serialize(TargetDir, Utility.TryToFormalizeUrl(newTagName, OrgsMappingFile.FormalizeUrl), RootJObj);
+                    if (!keyValuePairs.ContainsKey(newTagName))
+                    {
+                        keyValuePairs.Add(newTagName,Tuple.Create(new JObject(RootJObj), TargetDir));
+                    }
+
+                    var fileName = Utility.TryToFormalizeUrl(newTagName, OrgsMappingFile.FormalizeUrl);
+                    fileNameInfo.FileName = OrgsMappingFile.UseYamlSchema ? Path.ChangeExtension(fileName, "yml") : fileName;
+                    fileNameInfo.FilePath = Path.Combine(TargetDir, $"{fileName}.json");
                     fileNameInfo.Version = Version;
 
                     // Clear up internal data
