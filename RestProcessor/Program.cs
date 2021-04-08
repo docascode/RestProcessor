@@ -247,10 +247,6 @@
             {
                 var folder = Path.GetDirectoryName(file.FilePath);
                 var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(file.FilePath)}.yml");
-                if (ymlPath.Contains("Manage customer accounts"))
-                { 
-                
-                }
                 try
                 {
                     RestTransformer.ProcessGroup(ymlPath, file.FilePath, groupOperations, file.Version);
