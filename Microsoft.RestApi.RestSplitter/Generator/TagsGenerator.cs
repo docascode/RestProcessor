@@ -104,12 +104,12 @@
                     }
 
                     //var file = Utility.Serialize(TargetDir, Utility.TryToFormalizeUrl(newTagName, OrgsMappingFile.FormalizeUrl), RootJObj);
-                    if (!keyValuePairs.ContainsKey(newTagName))
+                    var fileName = Utility.ExtractPascalNameByRegex(Utility.TryToFormalizeUrl(newTagName, OrgsMappingFile.FormalizeUrl), OrgsMappingFile.NoSplitWords, "-");
+                    if (!keyValuePairs.ContainsKey(fileName))
                     {
-                        keyValuePairs.Add(newTagName,Tuple.Create(new JObject(RootJObj), TargetDir));
+                        keyValuePairs.Add(fileName, Tuple.Create(new JObject(RootJObj), TargetDir));
                     }
-
-                    var fileName = Utility.TryToFormalizeUrl(newTagName, OrgsMappingFile.FormalizeUrl);
+                    
                     fileNameInfo.FileName = OrgsMappingFile.UseYamlSchema ? Path.ChangeExtension(fileName, "yml") : fileName;
                     fileNameInfo.FilePath = Path.Combine(TargetDir, $"{fileName}.json");
                     fileNameInfo.Version = Version;
