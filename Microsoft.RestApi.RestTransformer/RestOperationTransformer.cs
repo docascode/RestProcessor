@@ -1306,7 +1306,7 @@
             return new MetaDataEntity
             {
                 SourceUrl = sourceUrl,
-                Description = Utility.FormatMetaDataDescription(Utility.ExtractMetaDataDescription(summary), serviceName)
+                Description = Utility.ExtractMetaDataDescription(summary, serviceName)
             };
         }
 
