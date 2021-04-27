@@ -153,7 +153,7 @@
             return string.Join(" ", result);
         }
 
-        public static string ExtractPascalNameByRegex(string name, List<string> noSplitWords, string splitChar)
+        public static string ExtractPascalFileNameByRegex(string name, List<string> noSplitWords, string splitChar)
         {
             var result = new List<string>();
             foreach (var child in name.Split(' ', '_'))
