@@ -117,8 +117,9 @@
                     }
 
                     var groupNamePath = Utility.TryToFormalizeUrl(groupName, OrgsMappingFile.FormalizeUrl);
+                    groupNamePath = Utility.ExtractPascalFileNameByRegex(groupNamePath, OrgsMappingFile.NoSplitWords, "-");
                     var operationNamePath = Utility.TryToFormalizeUrl(operationId, OrgsMappingFile.FormalizeUrl);
-                    var operationFile = Utility.Serialize(Path.Combine(targetDir, groupNamePath), RemoveTag(operationNamePath, groupNamePath), rootJObj);
+                    var operationFile = Utility.Serialize(Path.Combine(targetDir, groupNamePath), Utility.ExtractPascalFileNameByRegex(RemoveTag(operationNamePath, groupNamePath), OrgsMappingFile.NoSplitWords, "-"), rootJObj);
                     ClearKey(rootJObj, "x-internal-split-type");
                     ClearKey(rootJObj, "x-internal-operation-id");
                     ClearKey(rootJObj, "x-internal-operation-name");

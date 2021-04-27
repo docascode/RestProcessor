@@ -152,7 +152,29 @@
             }
             return string.Join(" ", result);
         }
-        
+
+        public static string ExtractPascalFileNameByRegex(string name, List<string> noSplitWords, string splitChar)
+        {
+            var result = new List<string>();
+            foreach (var child in name.Split(' ', '_'))
+            {
+                var p = string.Format(Pattern, string.Join("|", noSplitWords?.Count > 0 ? Keyword.Concat(noSplitWords).Distinct() : Keyword));
+                var temp = child;
+                while (temp.Length > 0)
+                {
+                    var m = Regex.Match(temp, p);
+                    if (!m.Success)
+                    {
+                        return name;
+                    }
+                    result.Add(m.Value);
+                    temp = temp.Substring(m.Length);
+                }
+            }
+
+            return string.Join(splitChar, result);
+        }
+
         public static string ExtractPascalName(string name)
         {
             if (name.Contains(" "))
