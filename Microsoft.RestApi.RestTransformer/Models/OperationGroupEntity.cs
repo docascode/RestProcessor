@@ -15,6 +15,9 @@
         [YamlMember(Alias = "service")]
         public string Service { get; set; }
 
+        [YamlMember(Alias = "metadata")]
+        public MetaDataEntity Metadata { get; set; }
+
         [YamlMember(Alias = "operations")]
         public IList<Operation> Operations { get; set; }
     }
@@ -23,6 +26,8 @@
     {
         [YamlIgnore]
         public string GroupId { get; set; }
+        [YamlIgnore]
+        public string Name { get; set; }
 
         [YamlMember(Alias = "summary")]
         public string Summary { get; set; }
