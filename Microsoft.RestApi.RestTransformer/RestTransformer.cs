@@ -36,6 +36,7 @@
                             return new Operation
                             {
                                 Id = operationInfo.Id,
+                                Name=operationInfo.Name,
                                 GroupId = operationInfo.GroupId,
                                 Summary = operationInfo.Summary
                             };

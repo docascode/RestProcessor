@@ -134,6 +134,41 @@
             };
         }
 
+        public static string ExtractMetaDataDescription(string str, string serviceName)
+        {
+            const string cannedSuffixedFormat = "Learn more about <{0}> service{1}";
+            if (!string.IsNullOrEmpty(str))
+            {
+                return string.Format(cannedSuffixedFormat, serviceName,str);
+            }
+
+            if (str.Length <= 100)
+            {
+                return string.Format(cannedSuffixedFormat, serviceName, " - " +str);
+            }
+
+            if (str.Length <= 180)
+            {
+                return str;
+            }
+           
+            var metaDataDescription = "";
+            while (metaDataDescription.Length <= 100 && str.Length > 0)
+             {
+                var index = str.IndexOf('.');
+                if (index == -1)
+                {
+                    metaDataDescription += str;
+                    break;
+                }
+
+                var sentence = str.Substring(0, index + 1);
+                metaDataDescription += sentence;
+                str = str.Substring(sentence.Length);
+             }
+
+             return metaDataDescription;
+        }
         public static string GetSummary(string summary, string description)
         {
             var content = summary;
