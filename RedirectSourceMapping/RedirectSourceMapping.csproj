@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Source\Redirection\New\**" />
+    <EmbeddedResource Remove="Source\Redirection\New\**" />
+    <None Remove="Source\Redirection\New\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Source\Redirection\New\.openpublishing.redirection.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Source\Legacy\" />
+    <Folder Include="Source\Modern\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+    <PackageReference Include="System.Runtime" Version="4.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="App.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
