@@ -137,14 +137,14 @@
         public static string ExtractMetaDataDescription(string str, string serviceName)
         {
             const string cannedSuffixedFormat = "Learn more about <{0}> service{1}";
-            if (string.IsNullOrEmpty(str))
+            if (!string.IsNullOrEmpty(str))
             {
                 return string.Format(cannedSuffixedFormat, serviceName,str);
             }
 
             if (str.Length <= 100)
             {
-                return string.Format(cannedSuffixedFormat, " - "+str);
+                return string.Format(cannedSuffixedFormat, serviceName, " - " +str);
             }
 
             if (str.Length <= 180)
