@@ -24,14 +24,14 @@
             Console.WriteLine(dirPath+ "Start Extract");
             if (string.IsNullOrEmpty(dirPath))
             {
-                var erroeMsg = "Error:PuslichFile Path is Empty";
+                var erroeMsg = "Error: PuslichFile Path is Empty";
                 Console.WriteLine(erroeMsg);
                 throw new Exception(erroeMsg);
             }
 
             if (!Directory.Exists(dirPath))
             {
-                var erroeMsg = string.Format("Error:PuslichFile Path {0} destn't exist", dirPath);
+                var erroeMsg = string.Format("Error: PuslichFile Path {0} destn't exist", dirPath);
                 Console.WriteLine(erroeMsg);
                 throw new Exception(erroeMsg);
             }
@@ -39,7 +39,7 @@
             var files = Directory.GetFiles(dirPath);
             if (files.Length !=1)
             {
-                var erroeMsg = "Error:PuslichFile can only have one file, not empty or multiple files";
+                var erroeMsg = "Error: PuslichFile can only have one file, not empty or multiple files";
                 Console.WriteLine(erroeMsg);
                 throw new Exception(erroeMsg);
             }
@@ -88,7 +88,6 @@
                             continue;
                         }
                         var key = obj.ContentGitUrl.Substring(index+ Constants.SplitFolder.Length+1);
-                        //key = key.Replace("-", "");
                         if (!string.IsNullOrEmpty(key))
                         {
                             keyValuePairs.Add(key, obj);
@@ -146,26 +145,22 @@
 
         public static Encoding GetType(FileStream fs)
         {
-            byte[] Unicode = new byte[] { 0xFF, 0xFE, 0x41 };
-            byte[] UnicodeBIG = new byte[] { 0xFE, 0xFF, 0x00 };
-            byte[] UTF8 = new byte[] { 0xEF, 0xBB, 0xBF }; //BOM
             var reVal = Encoding.Default;
-
             var r = new BinaryReader(fs, Encoding.Default);
             int i;
             int.TryParse(fs.Length.ToString(), out i);
             byte[] ss = r.ReadBytes(i);
             if (IsUTF8Bytes(ss) || (ss[0] == 0xEF && ss[1] == 0xBB && ss[2] == 0xBF))
             {
-                reVal = System.Text.Encoding.UTF8;
+                reVal = Encoding.UTF8;
             }
             else if (ss[0] == 0xFE && ss[1] == 0xFF && ss[2] == 0x00)
             {
-                reVal = System.Text.Encoding.BigEndianUnicode;
+                reVal = Encoding.BigEndianUnicode;
             }
             else if (ss[0] == 0xFF && ss[1] == 0xFE && ss[2] == 0x41)
             {
-                reVal = System.Text.Encoding.Unicode;
+                reVal = Encoding.Unicode;
             }
             r.Close();
             return reVal;

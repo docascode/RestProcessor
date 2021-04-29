@@ -42,14 +42,14 @@
             var oldDirPath = Path.Combine(dirPath,"Old");
             if (string.IsNullOrEmpty(oldDirPath))
             {
-                var erroeMsg = "Error:Target Path is Empty";
+                var erroeMsg = "Error: Redirection Old Path is Empty";
                 Console.WriteLine(erroeMsg);
                 throw new Exception(erroeMsg);
             }
 
             if (!Directory.Exists(oldDirPath))
             {
-                var erroeMsg = string.Format("Error:Target Path {0} destn't exist", dirPath);
+                var erroeMsg = string.Format("Error: Redirection Old Path {0} destn't exist", dirPath);
                 Console.WriteLine(erroeMsg);
                 throw new Exception(erroeMsg);
             }
@@ -57,7 +57,7 @@
             var files = Directory.GetFiles(oldDirPath);
             if (files.Length != 1)
             {
-                var erroeMsg = "Error:Target can only have one file, not empty or multiple files";
+                var erroeMsg = "Error: Redirection in old Path can only have one file, not empty or multiple files";
                 Console.WriteLine(erroeMsg);
                 throw new Exception(erroeMsg);
             }
