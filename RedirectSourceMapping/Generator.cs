@@ -37,7 +37,7 @@
                 {
                     Console.WriteLine("No change:------------------------------");
                     Console.WriteLine("Legacy:" + legacyInfo[item.Key].ToString());
-                    Console.WriteLine("Modern:" + legacyInfo[item.Key].ToString());
+                    Console.WriteLine("Modern:" + item.ToString());
                 }
                 else
                 {
