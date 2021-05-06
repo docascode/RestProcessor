@@ -137,7 +137,7 @@
         public static string ExtractMetaDataDescription(string str, string serviceName)
         {
             const string cannedSuffixedFormat = "Learn more about <{0}> service{1}";
-            if (!string.IsNullOrEmpty(str))
+            if (string.IsNullOrEmpty(str))
             {
                 return string.Format(cannedSuffixedFormat, serviceName,str);
             }
