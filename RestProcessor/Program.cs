@@ -108,11 +108,12 @@
 
             foreach (var restFileInfo in restFileInfos)
             {
+                var restFileInfoSplitedGroupFiles = new List<FileNameInfo>();
                 foreach (var fileInfo in restFileInfo.FileNameInfos)
                 {
                     if (fileInfo != null && !string.IsNullOrEmpty(fileInfo.FilePath) && File.Exists(fileInfo.FilePath))
                     {
-                        splitedGroupFiles.Add(fileInfo);
+                        restFileInfoSplitedGroupFiles.Add(fileInfo);
 
                         if (fileInfo.ChildrenFileNameInfo != null && fileInfo.ChildrenFileNameInfo.Count > 0)
                         {
@@ -138,11 +139,13 @@
                         }
                     }
                 }
-            }
 
-            if (orgsMappingFile.IsGroupdedByTag)
-            {
-                splitedGroupFiles = MergeRestFile(splitedGroupFiles);
+                if (orgsMappingFile.IsGroupdedByTag)
+                {
+                    restFileInfoSplitedGroupFiles = MergeRestFile(restFileInfoSplitedGroupFiles);
+                }
+
+                splitedGroupFiles.AddRange(restFileInfoSplitedGroupFiles);
             }
 
             return (splitedGroupFiles, splitedGroupOperationFiles);
