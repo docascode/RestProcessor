@@ -179,11 +179,11 @@
             {
                 return summary;
             }
-            else if (description.ToLowerInvariant().TrimEnd('.').Contains(summary.ToLowerInvariant().TrimEnd('.')))
+            else if (description.ToLowerInvariant().Trim(' ').TrimEnd('.').TrimEnd(' ').Contains(summary.ToLowerInvariant().Trim(' ').TrimEnd('.').TrimEnd(' ')))
             {
                 return description;
             }
-            else if (summary.ToLowerInvariant().TrimEnd('.').Contains(description.ToLowerInvariant().TrimEnd('.')))
+            else if (summary.ToLowerInvariant().Trim(' ').TrimEnd('.').TrimEnd(' ').Contains(description.ToLowerInvariant().Trim(' ').TrimEnd('.').TrimEnd(' ')))
             {
                 return summary;
             }
