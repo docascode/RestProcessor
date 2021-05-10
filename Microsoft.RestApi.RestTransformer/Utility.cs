@@ -171,12 +171,26 @@
         }
         public static string GetSummary(string summary, string description)
         {
-            var content = summary;
-            if (!string.IsNullOrEmpty(description) && summary != description)
+            if (string.IsNullOrEmpty(summary))
             {
-                content = string.IsNullOrEmpty(summary) ? description : ContactDescription(summary, description);
+                return description;
             }
-            return content;
+            else if (string.IsNullOrEmpty(description))
+            {
+                return summary;
+            }
+            else if (description.ToLowerInvariant().TrimEnd('.').Contains(summary.ToLowerInvariant().TrimEnd('.')))
+            {
+                return description;
+            }
+            else if (summary.ToLowerInvariant().TrimEnd('.').Contains(description.ToLowerInvariant().TrimEnd('.')))
+            {
+                return summary;
+            }
+            else
+            {
+                return ContactDescription(summary, description);
+            }
         }
 
         public static string ContactDescription(string str1, string str2)
