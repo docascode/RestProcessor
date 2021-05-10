@@ -56,7 +56,7 @@
 
         private string GenerateMetaDataDescription(ConcurrentBag<Operation> operations, string serviceName, string groupName)
         {
-            const string formatStr= "Learn more about[{0} {1} Operations]. How to[{2}].";
+            const string formatStr= "Learn more about [{0} {1} Operations]. How to [{2}].";
             var names=operations.Select(p=>p.Name);
             return string.Format(formatStr, serviceName, groupName, string.Join(",", names));
         }
