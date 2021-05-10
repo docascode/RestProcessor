@@ -108,12 +108,12 @@
 
             foreach (var restFileInfo in restFileInfos)
             {
-                var restFileInfoSplitedGroupFiles = new List<FileNameInfo>();
+                var serviceSplitedGroupFiles = new List<FileNameInfo>();
                 foreach (var fileInfo in restFileInfo.FileNameInfos)
                 {
                     if (fileInfo != null && !string.IsNullOrEmpty(fileInfo.FilePath) && File.Exists(fileInfo.FilePath))
                     {
-                        restFileInfoSplitedGroupFiles.Add(fileInfo);
+                        serviceSplitedGroupFiles.Add(fileInfo);
 
                         if (fileInfo.ChildrenFileNameInfo != null && fileInfo.ChildrenFileNameInfo.Count > 0)
                         {
@@ -142,10 +142,10 @@
 
                 if (orgsMappingFile.IsGroupdedByTag)
                 {
-                    restFileInfoSplitedGroupFiles = MergeRestFile(restFileInfoSplitedGroupFiles);
+                    serviceSplitedGroupFiles = MergeRestFile(serviceSplitedGroupFiles);
                 }
 
-                splitedGroupFiles.AddRange(restFileInfoSplitedGroupFiles);
+                splitedGroupFiles.AddRange(serviceSplitedGroupFiles);
             }
 
             return (splitedGroupFiles, splitedGroupOperationFiles);
