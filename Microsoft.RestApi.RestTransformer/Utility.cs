@@ -175,22 +175,25 @@
             {
                 return description;
             }
-            else if (string.IsNullOrEmpty(description))
+
+            if (string.IsNullOrEmpty(description))
             {
                 return summary;
             }
-            else if (description.ToLowerInvariant().Trim(' ').TrimEnd('.').TrimEnd(' ').Contains(summary.ToLowerInvariant().Trim(' ').TrimEnd('.').TrimEnd(' ')))
+
+            var normalizedSummary = summary.ToLowerInvariant().Trim(' ').TrimEnd('.').TrimEnd(' ');
+            var normalizedDescription = description.ToLowerInvariant().Trim(' ').TrimEnd('.').TrimEnd(' ');
+            if(normalizedDescription.Contains(normalizedSummary))
             {
                 return description;
             }
-            else if (summary.ToLowerInvariant().Trim(' ').TrimEnd('.').TrimEnd(' ').Contains(description.ToLowerInvariant().Trim(' ').TrimEnd('.').TrimEnd(' ')))
+
+            if (normalizedSummary.Contains(normalizedDescription))
             {
                 return summary;
             }
-            else
-            {
-                return ContactDescription(summary, description);
-            }
+
+            return ContactDescription(summary, description);
         }
 
         public static string ContactDescription(string str1, string str2)
