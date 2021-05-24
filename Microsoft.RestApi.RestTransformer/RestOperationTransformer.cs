@@ -1279,7 +1279,7 @@
                 {
                     var security = securityModel.ToObject<Dictionary<string, object>>().FirstOrDefault();
                     var foundSecurity = allSecurities.FirstOrDefault(s => s.Key == security.Key);
-                    var scopes = ((JArray)security.Value).ToObject<string[]>();
+                    var scopes = security.Value ==null ? null :((JArray)security.Value).ToObject<string[]>();
                     var securityEntity = new SecurityEntity
                     {
                         Name = foundSecurity?.Name ?? security.Key,
