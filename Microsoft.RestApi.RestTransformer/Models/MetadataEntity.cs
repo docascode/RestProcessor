@@ -6,5 +6,8 @@
     {
         [YamlMember(Alias = "source_url")]
         public string SourceUrl { get; set; }
+
+        [YamlMember(Alias = "description")]
+        public string Description { get; set; }
     }
 }

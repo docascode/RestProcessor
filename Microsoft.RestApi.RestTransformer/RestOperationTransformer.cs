@@ -61,13 +61,13 @@
             var operationName = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-operation-name");
             var sourceUrl = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-swagger-source-url");
             var productUid = swaggerModel.Metadata.GetValueFromMetaData<string>("x-internal-product-uid");
-
+            var summary = Utility.GetSummary(viewModel.Summary, viewModel.Description);
             return new OperationEntity
             {
                 Id = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{subgroupName}.{groupName}.{operationId}")?.ToLower(),
                 Name = operationName,
                 Service = serviceName,
-                Summary = Utility.GetSummary(viewModel.Summary, viewModel.Description),
+                Summary = summary,
                 ApiVersion = apiVersion,
                 GroupId = Utility.TrimUId($"{Utility.GetHostWithBasePathUId(swaggerModel.Host, productUid, basePath)}.{serviceId}.{subgroupName}.{groupName}")?.ToLower(),
                 GroupName = groupName,
@@ -84,7 +84,7 @@
                 Definitions = referencedDefinitions,
                 Securities = securities,
                 Permission = needPermission ? TransformPermission(viewModel, paths) : null,
-                Metadata = TransformMetaData(sourceUrl),
+                Metadata = TransformMetaData(sourceUrl, summary, serviceName),
                 ErrorCodes = TransformErrorCodes(viewModel, swaggerModel)
             };
         }
@@ -1279,7 +1279,7 @@
                 {
                     var security = securityModel.ToObject<Dictionary<string, object>>().FirstOrDefault();
                     var foundSecurity = allSecurities.FirstOrDefault(s => s.Key == security.Key);
-                    var scopes = ((JArray)security.Value).ToObject<string[]>();
+                    var scopes = security.Value ==null ? null :((JArray)security.Value).ToObject<string[]>();
                     var securityEntity = new SecurityEntity
                     {
                         Name = foundSecurity?.Name ?? security.Key,
@@ -1301,14 +1301,13 @@
         #endregion
 
         #region MetaData
-        private static MetaDataEntity TransformMetaData(string sourceUrl)
+        private static MetaDataEntity TransformMetaData(string sourceUrl,string summary,string serviceName)
         {
-            return sourceUrl != null ? new MetaDataEntity
+            return new MetaDataEntity
             {
-                SourceUrl = sourceUrl
-            }
-            :
-            null;
+                SourceUrl = sourceUrl,
+                Description = Utility.ExtractMetaDataDescription(summary, serviceName)
+            };
         }
 
         #endregion

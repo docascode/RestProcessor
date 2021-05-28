@@ -109,7 +109,7 @@
                         RootJObj["x-internal-split-members"] = splitMembers;
                         RootJObj["x-internal-split-type"] = SplitType.OperationGroup.ToString();
                     }
-                    var file = Utility.Serialize(TargetDir, Utility.TryToFormalizeUrl(newOperationGroupName, OrgsMappingFile.FormalizeUrl), RootJObj);
+                    var file = Utility.Serialize(TargetDir, Utility.ExtractPascalFileNameByRegex(Utility.TryToFormalizeUrl(newOperationGroupName, OrgsMappingFile.FormalizeUrl), OrgsMappingFile.NoSplitWords, "-"), RootJObj);
                     fileNameInfo.FileName = OrgsMappingFile.UseYamlSchema ? Path.ChangeExtension(file.Item1, "yml") : file.Item1;
                     fileNameInfo.FilePath = file.Item2;
                     fileNameInfo.Version = Version;

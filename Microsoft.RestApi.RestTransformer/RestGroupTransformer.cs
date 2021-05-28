@@ -30,6 +30,12 @@
             {
                 if (operations.Count() > 0)
                 {
+                    var summary = GetSummary(swaggerModel, viewModel);
+                    var metadataDesc = Utility.ExtractMetaDataDescription(summary, serviceName);
+                    if (string.IsNullOrEmpty(summary)) {
+                        metadataDesc = GenerateMetaDataDescription(operations, serviceName, groupName);
+                    }
+
                     return new OperationGroupEntity
                     {
                         Id = groupId,
@@ -37,12 +43,22 @@
                         Name = groupName,
                         Operations = operations.OrderBy(p => p.Id).ToList(),
                         Service = serviceName,
-                        Summary = GetSummary(swaggerModel, viewModel)
+                        Summary = summary,
+                        Metadata = new MetaDataEntity() {
+                            Description = metadataDesc
+                        }
                     };
                 }
             }
             
             return null;
+        }
+
+        private string GenerateMetaDataDescription(ConcurrentBag<Operation> operations, string serviceName, string groupName)
+        {
+            const string formatStr= "Learn more about [{0} {1} Operations]. How to [{2}].";
+            var names=operations.Select(p=>p.Name);
+            return string.Format(formatStr, serviceName, groupName, string.Join(",", names));
         }
     }
 }
