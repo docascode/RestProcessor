@@ -156,7 +156,7 @@
         public static string ExtractPascalFileNameByRegex(string name, List<string> noSplitWords, string splitChar)
         {
             var result = new List<string>();
-            foreach (var child in name.Split(' ', '_'))
+            foreach (var child in name.Split(' ', '_','-'))
             {
                 var p = string.Format(Pattern, string.Join("|", noSplitWords?.Count > 0 ? Keyword.Concat(noSplitWords).Distinct() : Keyword));
                 var temp = child;
