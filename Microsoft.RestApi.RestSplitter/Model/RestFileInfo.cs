@@ -8,6 +8,7 @@
 
         public string TocTitle { get; set; }
 
+        public ServiceInfo ServiceInfo { get; set; }
         public bool NeedPermission { get; set; }
     }
 
@@ -16,6 +17,7 @@
         public string FileName { get; set; }
 
         public string FilePath { get; set; }
+        public ServiceInfo ServiceInfo { get; set; }
 
         public bool NeedPermission { get; set; }
 
