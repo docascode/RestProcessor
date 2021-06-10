@@ -31,6 +31,8 @@
             var modernInfo = modernPublishFilesExtractor.GetPulishFileStoreInfo();
             redirectionExtractor.Extract();
 
+            Console.WriteLine("Total link: " + modernInfo.Count);
+            Console.WriteLine("Total Rules: " + redirectionExtractor.obj.List.Count);
             foreach (var item in modernInfo)
             {
                 var key = item.Key;
@@ -49,7 +51,7 @@
                     {
                         var instance = new Redirection()
                         {
-                            Source_path = prefix + "/" + guessKey.Replace("yml", "md"),
+                            Source_path = prefix + "/" + guessKey.Replace("%20", " ").Replace("yml", "md"),
                             Redirect_url = modernInfo[item.Key].PublishUrl.Replace(Constants.PublishPrefix, "").Replace(Constants.PublishSuffix, "").TrimEnd('&'),
                             Redirect_document_id = true
                         };
@@ -63,7 +65,7 @@
                     {
                         var instance = new Redirection()
                         {
-                            Source_path = prefix + "/" + tempStr.Replace("yml", "md"),
+                            Source_path = prefix + "/" + tempStr.Replace("%20", " ").Replace("yml", "md"),
                             Redirect_url = modernInfo[item.Key].PublishUrl.Replace(Constants.PublishPrefix, "").Replace(Constants.PublishSuffix, "").TrimEnd('&'),
                             Redirect_document_id = true
                         };
@@ -75,7 +77,7 @@
                     }
                 }
             }
-
+            Console.WriteLine("Total Rules: " + redirectionExtractor.obj.List.Count);
             redirectionExtractor.Serilize();
         }
         private bool Check(Dictionary<string, PublishFile> dic, string target, out string str)
@@ -98,12 +100,31 @@
         {
             var sourceList = source.Split("/");
             var targetList = target.Split("/");
+
             var bl = true;
+            if (source.Length != target.Length)
+            {
+                bl = false;
+                return "";
+            }
+
             for (var i = 0; i < sourceList.Length; i++)
             {
                 var guessKey = targetList[i];
                 var item = sourceList[i];
-                if (item == guessKey || item == guessKey.Replace("-", "") || item.Replace(" ", "") == guessKey || item.Replace(" ", "") == guessKey.Replace("-", ""))
+                if ( string.Compare(item, guessKey, true) == 0
+                    || string.Compare(item, guessKey.Replace("-", ""), true) == 0
+                    || string.Compare(item, guessKey.Replace("-", " "), true) == 0
+                    || string.Compare(item, guessKey.Replace("-", "%20"), true) == 0
+                    || string.Compare(item.Replace("%20", ""), guessKey, true) == 0
+                    || string.Compare(item.Replace("%20", ""), guessKey.Replace("-", ""), true) == 0
+                    || string.Compare(item.Replace("%20", ""), guessKey.Replace("-", " "), true) == 0
+                    || string.Compare(item.Replace("%20", ""), guessKey.Replace("-", "%20"), true) == 0
+                    || string.Compare(item.Replace(" ", ""), guessKey.Replace("-", ""), true) == 0
+                    || string.Compare(item.Replace(" ", ""), guessKey.Replace("-", " "), true) == 0
+                    || string.Compare(item.Replace(" ", ""), guessKey.Replace("-", "%20"), true) == 0
+                    || string.Compare(item.Replace(" ", ""), guessKey, true) == 0)
+                //if (item == guessKey || item == guessKey.Replace("-", "") || item.Replace(" ", "") == guessKey || item.Replace(" ", "") == guessKey.Replace("-", ""))
                 {
 
                 }
