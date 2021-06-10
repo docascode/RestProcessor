@@ -288,6 +288,7 @@
                     }
 
                     restFileInfo.NeedPermission = swagger.NeedPermission;
+                    restFileInfo.ServiceInfo = service;
                     _restFileInfos.Add(restFileInfo);
 
                     var tocTitle = Utility.ExtractPascalNameByRegex(restFileInfo.TocTitle, orgsMappingFile.NoSplitWords);

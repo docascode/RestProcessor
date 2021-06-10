@@ -105,16 +105,15 @@
         {
             var splitedGroupFiles = new List<FileNameInfo>();
             var splitedGroupOperationFiles = new ConcurrentDictionary<string, ConcurrentBag<FileNameInfo>>();
-
             foreach (var restFileInfo in restFileInfos)
-            {
+            { 
                 var serviceSplitedGroupFiles = new List<FileNameInfo>();
                 foreach (var fileInfo in restFileInfo.FileNameInfos)
                 {
-                    if (fileInfo != null && !string.IsNullOrEmpty(fileInfo.FilePath) && File.Exists(fileInfo.FilePath))
+                    if (fileInfo != null && !string.IsNullOrEmpty(fileInfo.FilePath) && File.Exists(fileInfo.FilePath)) 
                     {
                         serviceSplitedGroupFiles.Add(fileInfo);
-
+                        fileInfo.ServiceInfo = restFileInfo.ServiceInfo;
                         if (fileInfo.ChildrenFileNameInfo != null && fileInfo.ChildrenFileNameInfo.Count > 0)
                         {
                             foreach (var info in fileInfo.ChildrenFileNameInfo)
@@ -142,22 +141,22 @@
 
                 if (orgsMappingFile.IsGroupdedByTag)
                 {
-                    serviceSplitedGroupFiles = MergeRestFile(serviceSplitedGroupFiles);
+                    splitedGroupFiles = MergeRestFile(splitedGroupFiles, serviceSplitedGroupFiles, restFileInfo);
                 }
-
-                splitedGroupFiles.AddRange(serviceSplitedGroupFiles);
+                else {
+                    splitedGroupFiles.AddRange(serviceSplitedGroupFiles);
+                }
             }
 
             return (splitedGroupFiles, splitedGroupOperationFiles);
 
         }
-
-        private static List<FileNameInfo> MergeRestFile(List<FileNameInfo> fileNameInfos)
+        private static List<FileNameInfo> MergeRestFile(List<FileNameInfo> splitedGroupFiles, List<FileNameInfo> fileNameInfos, RestFileInfo restFileInfo)
         {
-            var set = new HashSet<FileNameInfo>();
+            var set = new HashSet<FileNameInfo>(splitedGroupFiles);
             foreach (var item in fileNameInfos)
             {
-                var existFinleNameInfo= set.Where(fileNameInfo=> fileNameInfo.TocName== item.TocName).FirstOrDefault();
+                var existFinleNameInfo= set.Where(fileNameInfo=> fileNameInfo.TocName== item.TocName && restFileInfo.ServiceInfo.TocTitle== fileNameInfo.ServiceInfo.TocTitle).FirstOrDefault();
                 if (existFinleNameInfo != null)
                 {
                     existFinleNameInfo.ChildrenFileNameInfo.AddRange(item.ChildrenFileNameInfo);
