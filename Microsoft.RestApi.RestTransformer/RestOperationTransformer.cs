@@ -1481,7 +1481,7 @@
                             definitionObject.PropertyItems.Add(childDefinitionObject);
                         }
                     }
-                    else if (itemsDefine.TryGetValue("type", out var itemType))
+                    else if (itemsDefine.TryGetValue("type", out var itemType) && itemType.ToString().ToLowerInvariant() != "object")
                     {
                         definitionObject.Type = (string)itemType;
                     }
