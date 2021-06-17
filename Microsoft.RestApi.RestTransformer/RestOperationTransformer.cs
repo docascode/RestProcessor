@@ -1481,9 +1481,16 @@
                             definitionObject.PropertyItems.Add(childDefinitionObject);
                         }
                     }
-                    else if (itemsDefine.TryGetValue("type", out var itemType) && itemType.ToString().ToLowerInvariant() != "object")
+                    else if (itemsDefine.TryGetValue("type", out var itemType))
                     {
-                        definitionObject.Type = (string)itemType;
+                        if (allOfsNode != null && itemType.ToString().ToLowerInvariant() == "object")
+                        {
+
+                        }
+                        else
+                        {
+                            definitionObject.Type = (string)itemType;
+                        }
                     }
                 }
                 else
