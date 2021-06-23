@@ -1,0 +1,1059 @@
+{
+  "redirections": [
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/AddPowerBIEncryptionKey.md",
+      "redirect_url": "/rest/api/power-bi/admin/add-power-bi-encryption-key",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Apps_GetAppsAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/apps-get-apps-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Apps_GetAppUsersAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/apps-get-app-users-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Capacities_AssignWorkspacesToCapacity.md",
+      "redirect_url": "/rest/api/power-bi/admin/capacities-assign-workspaces-to-capacity",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Capacities_GetCapacityUsersAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/capacities-get-capacity-users-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Capacities_UnassignWorkspacesFromCapacity.md",
+      "redirect_url": "/rest/api/power-bi/admin/capacities-unassign-workspaces-from-capacity",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Dashboards_GetDashboardsAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/dashboards-get-dashboards-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Dashboards_GetDashboardsInGroupAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/dashboards-get-dashboards-in-group-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Dashboards_GetDashboardUsersAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/dashboards-get-dashboard-users-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Dashboards_GetTilesAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/dashboards-get-tiles-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Dataflows_ExportDataflowAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/dataflows-export-dataflow-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Dataflows_GetDataflowDatasourcesAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/dataflows-get-dataflow-datasources-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Dataflows_GetDataflowsAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/dataflows-get-dataflows-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Dataflows_GetDataflowsInGroupAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/dataflows-get-dataflows-in-group-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Dataflows_GetDataflowUsersAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/dataflows-get-dataflow-users-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Dataflows_GetUpstreamDataflowsInGroupAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/dataflows-get-upstream-dataflows-in-group-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Datasets_GetDatasetsAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/datasets-get-datasets-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Datasets_GetDatasetsInGroupAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/datasets-get-datasets-in-group-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Datasets_GetDatasetToDataflowsLinksInGroupAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/datasets-get-dataset-to-dataflows-links-in-group-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Datasets_GetDatasetUsersAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/datasets-get-dataset-users-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Datasets_GetDatasourcesAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/datasets-get-datasources-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/GetActivityEvents.md",
+      "redirect_url": "/rest/api/power-bi/admin/get-activity-events",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/GetCapacitiesAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/get-capacities-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/GetPowerBIEncryptionKeys.md",
+      "redirect_url": "/rest/api/power-bi/admin/get-power-bi-encryption-keys",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/GetRefreshableForCapacity.md",
+      "redirect_url": "/rest/api/power-bi/admin/get-refreshable-for-capacity",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/GetRefreshables.md",
+      "redirect_url": "/rest/api/power-bi/admin/get-refreshables",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/GetRefreshablesForCapacity.md",
+      "redirect_url": "/rest/api/power-bi/admin/get-refreshables-for-capacity",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Groups_AddUserAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/groups-add-user-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Groups_DeleteUserAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/groups-delete-user-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Groups_GetGroupsAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/groups-get-groups-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Groups_GetGroupUsersAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/groups-get-group-users-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Groups_RestoreDeletedGroupAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/groups-restore-deleted-group-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Groups_UpdateGroupAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/groups-update-group-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Imports_GetImportsAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/imports-get-imports-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/InformationProtection_RemoveLabelsAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/information-protection-remove-labels-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/InformationProtection_SetLabelsAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/information-protection-set-labels-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/PatchCapacityAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/patch-capacity-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Reports_GetReportsAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/reports-get-reports-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Reports_GetReportsInGroupAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/reports-get-reports-in-group-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/Reports_GetReportUsersAsAdmin.md",
+      "redirect_url": "/rest/api/power-bi/admin/reports-get-report-users-as-admin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/RotatePowerBIEncryptionKey.md",
+      "redirect_url": "/rest/api/power-bi/admin/rotate-power-bi-encryption-key",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/WorkspaceInfo_GetModifiedWorkspaces.md",
+      "redirect_url": "/rest/api/power-bi/admin/workspace-info-get-modified-workspaces",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/WorkspaceInfo_GetScanResult.md",
+      "redirect_url": "/rest/api/power-bi/admin/workspace-info-get-scan-result",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/WorkspaceInfo_GetScanStatus.md",
+      "redirect_url": "/rest/api/power-bi/admin/workspace-info-get-scan-status",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Admin/WorkspaceInfo_PostWorkspaceInfo.md",
+      "redirect_url": "/rest/api/power-bi/admin/workspace-info-post-workspace-info",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Apps/GetApp.md",
+      "redirect_url": "/rest/api/power-bi/apps/get-app",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Apps/GetApps.md",
+      "redirect_url": "/rest/api/power-bi/apps/get-apps",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Apps/GetDashboard.md",
+      "redirect_url": "/rest/api/power-bi/apps/get-dashboard",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Apps/GetDashboards.md",
+      "redirect_url": "/rest/api/power-bi/apps/get-dashboards",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Apps/GetReport.md",
+      "redirect_url": "/rest/api/power-bi/apps/get-report",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Apps/GetReports.md",
+      "redirect_url": "/rest/api/power-bi/apps/get-reports",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Apps/GetTile.md",
+      "redirect_url": "/rest/api/power-bi/apps/get-tile",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Apps/GetTiles.md",
+      "redirect_url": "/rest/api/power-bi/apps/get-tiles",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/AvailableFeatures.md",
+      "redirect_url": "/rest/api/power-bi/available-features",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/AvailableFeatures/GetAvailableFeatureByName.md",
+      "redirect_url": "/rest/api/power-bi/available-features/available-features-get-available-feature-by-name",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/AvailableFeatures/GetAvailableFeatures.md",
+      "redirect_url": "/rest/api/power-bi/available-features/available-features-get-available-features",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Capacities/GetCapacities.md",
+      "redirect_url": "/rest/api/power-bi/capacities/get-capacities",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Capacities/GetRefreshableForCapacity.md",
+      "redirect_url": "/rest/api/power-bi/capacities/get-refreshable-for-capacity",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Capacities/GetRefreshables.md",
+      "redirect_url": "/rest/api/power-bi/capacities/get-refreshables",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Capacities/GetRefreshablesForCapacity.md",
+      "redirect_url": "/rest/api/power-bi/capacities/get-refreshables-for-capacity",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Capacities/GetWorkload.md",
+      "redirect_url": "/rest/api/power-bi/capacities/get-workload",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Capacities/GetWorkloads.md",
+      "redirect_url": "/rest/api/power-bi/capacities/get-workloads",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Capacities/Groups_AssignMyWorkspaceToCapacity.md",
+      "redirect_url": "/rest/api/power-bi/capacities/groups-assign-my-workspace-to-capacity",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Capacities/Groups_AssignToCapacity.md",
+      "redirect_url": "/rest/api/power-bi/capacities/groups-assign-to-capacity",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Capacities/Groups_CapacityAssignmentStatus.md",
+      "redirect_url": "/rest/api/power-bi/capacities/groups-capacity-assignment-status",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Capacities/Groups_CapacityAssignmentStatusMyWorkspace.md",
+      "redirect_url": "/rest/api/power-bi/capacities/groups-capacity-assignment-status-my-workspace",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Capacities/PatchWorkload.md",
+      "redirect_url": "/rest/api/power-bi/capacities/patch-workload",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dashboards/AddDashboard.md",
+      "redirect_url": "/rest/api/power-bi/dashboards/add-dashboard",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dashboards/AddDashboardInGroup.md",
+      "redirect_url": "/rest/api/power-bi/dashboards/add-dashboard-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dashboards/CloneTile.md",
+      "redirect_url": "/rest/api/power-bi/dashboards/clone-tile",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dashboards/CloneTileInGroup.md",
+      "redirect_url": "/rest/api/power-bi/dashboards/clone-tile-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dashboards/GetDashboard.md",
+      "redirect_url": "/rest/api/power-bi/dashboards/get-dashboard",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dashboards/GetDashboardInGroup.md",
+      "redirect_url": "/rest/api/power-bi/dashboards/get-dashboard-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dashboards/GetDashboards.md",
+      "redirect_url": "/rest/api/power-bi/dashboards/get-dashboards",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dashboards/GetDashboardsInGroup.md",
+      "redirect_url": "/rest/api/power-bi/dashboards/get-dashboards-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dashboards/GetTile.md",
+      "redirect_url": "/rest/api/power-bi/dashboards/get-tile",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dashboards/GetTileInGroup.md",
+      "redirect_url": "/rest/api/power-bi/dashboards/get-tile-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dashboards/GetTiles.md",
+      "redirect_url": "/rest/api/power-bi/dashboards/get-tiles",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dashboards/GetTilesInGroup.md",
+      "redirect_url": "/rest/api/power-bi/dashboards/get-tiles-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dataflows/CancelDataflowTransaction.md",
+      "redirect_url": "/rest/api/power-bi/dataflows/cancel-dataflow-transaction",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dataflows/DeleteDataflow.md",
+      "redirect_url": "/rest/api/power-bi/dataflows/delete-dataflow",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dataflows/GetDataflow.md",
+      "redirect_url": "/rest/api/power-bi/dataflows/get-dataflow",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dataflows/GetDataflowDataSources.md",
+      "redirect_url": "/rest/api/power-bi/dataflows/get-dataflow-data-sources",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dataflows/GetDataflows.md",
+      "redirect_url": "/rest/api/power-bi/dataflows/get-dataflows",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dataflows/GetDataflowTransactions.md",
+      "redirect_url": "/rest/api/power-bi/dataflows/get-dataflow-transactions",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dataflows/GetUpstreamDataflowsInGroup.md",
+      "redirect_url": "/rest/api/power-bi/dataflows/get-upstream-dataflows-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dataflows/RefreshDataflow.md",
+      "redirect_url": "/rest/api/power-bi/dataflows/refresh-dataflow",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dataflows/UpdateDataflow.md",
+      "redirect_url": "/rest/api/power-bi/dataflows/update-dataflow",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Dataflows/UpdateRefreshSchedule.md",
+      "redirect_url": "/rest/api/power-bi/dataflows/update-refresh-schedule",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/DataflowStorageAccounts.md",
+      "redirect_url": "/rest/api/power-bi/dataflow-storage-accounts",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/DataflowStorageAccounts/GetDataflowStorageAccounts.md",
+      "redirect_url": "/rest/api/power-bi/dataflow-storage-accounts/dataflow-storage-accounts-get-dataflow-storage-accounts",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/DataflowStorageAccounts/Groups_AssignToDataflowStorage.md",
+      "redirect_url": "/rest/api/power-bi/dataflow-storage-accounts/groups-assign-to-dataflow-storage",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/BindToGateway.md",
+      "redirect_url": "/rest/api/power-bi/datasets/bind-to-gateway",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/BindToGatewayInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/bind-to-gateway-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/DeleteDataset.md",
+      "redirect_url": "/rest/api/power-bi/datasets/delete-dataset",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/DeleteDatasetInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/delete-dataset-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/DiscoverGateways.md",
+      "redirect_url": "/rest/api/power-bi/datasets/discover-gateways",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/DiscoverGatewaysInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/discover-gateways-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetDataset.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-dataset",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetDatasetInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-dataset-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetDatasets.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-datasets",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetDatasetsInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-datasets-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetDatasetToDataflowsLinksInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-dataset-to-dataflows-links-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetDatasources.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-datasources",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetDatasourcesInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-datasources-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetDirectQueryRefreshSchedule.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-direct-query-refresh-schedule",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetDirectQueryRefreshScheduleInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-direct-query-refresh-schedule-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetGatewayDatasources.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-gateway-datasources",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetGatewayDatasourcesInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-gateway-datasources-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetParameters.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-parameters",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetParametersInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-parameters-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetRefreshHistory.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-refresh-history",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetRefreshHistoryInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-refresh-history-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetRefreshSchedule.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-refresh-schedule",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/GetRefreshScheduleInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/get-refresh-schedule-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/RefreshDataset.md",
+      "redirect_url": "/rest/api/power-bi/datasets/refresh-dataset",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/RefreshDatasetInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/refresh-dataset-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/SetAllDatasetConnections.md",
+      "redirect_url": "/rest/api/power-bi/datasets/set-all-dataset-connections",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/SetAllDatasetConnectionsInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/set-all-dataset-connections-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/TakeOverInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/take-over-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/UpdateDatasources.md",
+      "redirect_url": "/rest/api/power-bi/datasets/update-datasources",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/UpdateDatasourcesInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/update-datasources-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/UpdateDirectQueryRefreshSchedule.md",
+      "redirect_url": "/rest/api/power-bi/datasets/update-direct-query-refresh-schedule",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/UpdateDirectQueryRefreshScheduleInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/update-direct-query-refresh-schedule-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/UpdateParameters.md",
+      "redirect_url": "/rest/api/power-bi/datasets/update-parameters",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/UpdateParametersInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/update-parameters-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/UpdateRefreshSchedule.md",
+      "redirect_url": "/rest/api/power-bi/datasets/update-refresh-schedule",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Datasets/UpdateRefreshScheduleInGroup.md",
+      "redirect_url": "/rest/api/power-bi/datasets/update-refresh-schedule-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/EmbedToken.md",
+      "redirect_url": "/rest/api/power-bi/embed-token",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/EmbedToken/Dashboards_GenerateTokenInGroup.md",
+      "redirect_url": "/rest/api/power-bi/embed-token/dashboards-generate-token-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/EmbedToken/Datasets_GenerateTokenInGroup.md",
+      "redirect_url": "/rest/api/power-bi/embed-token/datasets-generate-token-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/EmbedToken/GenerateToken.md",
+      "redirect_url": "/rest/api/power-bi/embed-token/embed-token-generate-token",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/EmbedToken/Reports_GenerateTokenForCreateInGroup.md",
+      "redirect_url": "/rest/api/power-bi/embed-token/reports-generate-token-for-create-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/EmbedToken/Reports_GenerateTokenInGroup.md",
+      "redirect_url": "/rest/api/power-bi/embed-token/reports-generate-token-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/EmbedToken/Tiles_GenerateTokenInGroup.md",
+      "redirect_url": "/rest/api/power-bi/embed-token/tiles-generate-token-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Gateways/AddDatasourceUser.md",
+      "redirect_url": "/rest/api/power-bi/gateways/add-datasource-user",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Gateways/CreateDatasource.md",
+      "redirect_url": "/rest/api/power-bi/gateways/create-datasource",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Gateways/DeleteDatasource.md",
+      "redirect_url": "/rest/api/power-bi/gateways/delete-datasource",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Gateways/DeleteDatasourceUser.md",
+      "redirect_url": "/rest/api/power-bi/gateways/delete-datasource-user",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Gateways/GetDatasource.md",
+      "redirect_url": "/rest/api/power-bi/gateways/get-datasource",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Gateways/GetDatasources.md",
+      "redirect_url": "/rest/api/power-bi/gateways/get-datasources",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Gateways/GetDatasourceStatus.md",
+      "redirect_url": "/rest/api/power-bi/gateways/get-datasource-status",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Gateways/GetDatasourceUsers.md",
+      "redirect_url": "/rest/api/power-bi/gateways/get-datasource-users",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Gateways/GetGateway.md",
+      "redirect_url": "/rest/api/power-bi/gateways/get-gateway",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Gateways/GetGateways.md",
+      "redirect_url": "/rest/api/power-bi/gateways/get-gateways",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Gateways/UpdateDatasource.md",
+      "redirect_url": "/rest/api/power-bi/gateways/update-datasource",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Groups/AddGroupUser.md",
+      "redirect_url": "/rest/api/power-bi/groups/add-group-user",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Groups/CreateGroup.md",
+      "redirect_url": "/rest/api/power-bi/groups/create-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Groups/DeleteGroup.md",
+      "redirect_url": "/rest/api/power-bi/groups/delete-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Groups/DeleteUserInGroup.md",
+      "redirect_url": "/rest/api/power-bi/groups/delete-user-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Groups/GetGroups.md",
+      "redirect_url": "/rest/api/power-bi/groups/get-groups",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Groups/GetGroupUsers.md",
+      "redirect_url": "/rest/api/power-bi/groups/get-group-users",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Groups/UpdateGroupUser.md",
+      "redirect_url": "/rest/api/power-bi/groups/update-group-user",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Imports/CreateTemporaryUploadLocation.md",
+      "redirect_url": "/rest/api/power-bi/imports/create-temporary-upload-location",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Imports/CreateTemporaryUploadLocationInGroup.md",
+      "redirect_url": "/rest/api/power-bi/imports/create-temporary-upload-location-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Imports/GetImport.md",
+      "redirect_url": "/rest/api/power-bi/imports/get-import",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Imports/GetImportInGroup.md",
+      "redirect_url": "/rest/api/power-bi/imports/get-import-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Imports/GetImports.md",
+      "redirect_url": "/rest/api/power-bi/imports/get-imports",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Imports/GetImportsInGroup.md",
+      "redirect_url": "/rest/api/power-bi/imports/get-imports-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Imports/PostImport.md",
+      "redirect_url": "/rest/api/power-bi/imports/post-import",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Imports/PostImportInGroup.md",
+      "redirect_url": "/rest/api/power-bi/imports/post-import-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Pipelines/DeployAll.md",
+      "redirect_url": "/rest/api/power-bi/pipelines/deploy-all",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Pipelines/GetPipeline.md",
+      "redirect_url": "/rest/api/power-bi/pipelines/get-pipeline",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Pipelines/GetPipelineOperation.md",
+      "redirect_url": "/rest/api/power-bi/pipelines/get-pipeline-operation",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Pipelines/GetPipelineOperations.md",
+      "redirect_url": "/rest/api/power-bi/pipelines/get-pipeline-operations",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Pipelines/GetPipelines.md",
+      "redirect_url": "/rest/api/power-bi/pipelines/get-pipelines",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Pipelines/GetPipelineStageArtifacts.md",
+      "redirect_url": "/rest/api/power-bi/pipelines/get-pipeline-stage-artifacts",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Pipelines/SelectiveDeploy.md",
+      "redirect_url": "/rest/api/power-bi/pipelines/selective-deploy",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/PushDatasets.md",
+      "redirect_url": "/rest/api/power-bi/push-datasets",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/PushDatasets/Datasets_DeleteRows.md",
+      "redirect_url": "/rest/api/power-bi/push-datasets/datasets-delete-rows",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/PushDatasets/Datasets_DeleteRowsInGroup.md",
+      "redirect_url": "/rest/api/power-bi/push-datasets/datasets-delete-rows-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/PushDatasets/Datasets_GetTables.md",
+      "redirect_url": "/rest/api/power-bi/push-datasets/datasets-get-tables",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/PushDatasets/Datasets_GetTablesInGroup.md",
+      "redirect_url": "/rest/api/power-bi/push-datasets/datasets-get-tables-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/PushDatasets/Datasets_PostDataset.md",
+      "redirect_url": "/rest/api/power-bi/push-datasets/datasets-post-dataset",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/PushDatasets/Datasets_PostDatasetInGroup.md",
+      "redirect_url": "/rest/api/power-bi/push-datasets/datasets-post-dataset-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/PushDatasets/Datasets_PostRows.md",
+      "redirect_url": "/rest/api/power-bi/push-datasets/datasets-post-rows",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/PushDatasets/Datasets_PostRowsInGroup.md",
+      "redirect_url": "/rest/api/power-bi/push-datasets/datasets-post-rows-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/PushDatasets/Datasets_PutTable.md",
+      "redirect_url": "/rest/api/power-bi/push-datasets/datasets-put-table",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/PushDatasets/Datasets_PutTableInGroup.md",
+      "redirect_url": "/rest/api/power-bi/push-datasets/datasets-put-table-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/CloneReport.md",
+      "redirect_url": "/rest/api/power-bi/reports/clone-report",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/CloneReportInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/clone-report-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/DeleteReport.md",
+      "redirect_url": "/rest/api/power-bi/reports/delete-report",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/DeleteReportInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/delete-report-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/ExportReport.md",
+      "redirect_url": "/rest/api/power-bi/reports/export-report",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/ExportReportInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/export-report-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/ExportToFile.md",
+      "redirect_url": "/rest/api/power-bi/reports/export-to-file",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/ExportToFileInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/export-to-file-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetDatasources.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-datasources",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetDatasourcesInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-datasources-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetExportToFileStatus.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-export-to-file-status",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetExportToFileStatusInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-export-to-file-status-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetFileOfExportToFile.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-file-of-export-to-file",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetFileOfExportToFileInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-file-of-export-to-file-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetPage.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-page",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetPageInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-page-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetPages.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-pages",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetPagesInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-pages-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetReport.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-report",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetReportInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-report-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetReports.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-reports",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/GetReportsInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/get-reports-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/RebindReport.md",
+      "redirect_url": "/rest/api/power-bi/reports/rebind-report",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/RebindReportInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/rebind-report-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/TakeOverInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/take-over-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/UpdateDatasources.md",
+      "redirect_url": "/rest/api/power-bi/reports/update-datasources",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/UpdateDatasourcesInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/update-datasources-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/UpdateReportContent.md",
+      "redirect_url": "/rest/api/power-bi/reports/update-report-content",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Reports/UpdateReportContentInGroup.md",
+      "redirect_url": "/rest/api/power-bi/reports/update-report-content-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/TemplateApps.md",
+      "redirect_url": "/rest/api/power-bi/template-apps",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/TemplateApps/CreateInstallTicket.md",
+      "redirect_url": "/rest/api/power-bi/template-apps/template-apps-create-install-ticket",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/power-bi/Users/RefreshUserPermissions.md",
+      "redirect_url": "/rest/api/power-bi/users/refresh-user-permissions",
+      "redirect_document_id": true
+    }
+  ]
+}

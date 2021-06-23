@@ -1,0 +1,169 @@
+{
+  "redirections": [
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Authentication APIs.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/authentication-ap-is",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Authentication APIs/GenerateAccessToken.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/authentication-ap-is/generate-access-token",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Authentication APIs/GeneratePin.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/authentication-ap-is/generate-pin",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Authentication APIs/GetRefreshToken.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/authentication-ap-is/get-refresh-token",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Content Creation APIs.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/content-creation-ap-is",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Content Creation APIs/PostCustomActionSubscriber.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/content-creation-ap-is/post-custom-action-subscriber",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Content Creation APIs/PostingActionResponse.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/content-creation-ap-is/posting-action-response",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Content Creation APIs/PostingSurveyResponse.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/content-creation-ap-is/posting-survey-response",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Content Creation APIs/SendMessage.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/content-creation-ap-is/send-message",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Content Creation APIs/SendMessageToSubscriber.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/content-creation-ap-is/send-message-to-subscriber",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Content Creation APIs/SendSurvey.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/content-creation-ap-is/send-survey",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Content Creation APIs/UploadMedia.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/content-creation-ap-is/upload-media",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Content Query APIs.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/content-query-ap-is",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Content Query APIs/FetchingSurveyResponses.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/content-query-ap-is/fetching-survey-responses",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Content Query APIs/FetchJobs.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/content-query-ap-is/fetch-jobs",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs/AddMembers.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is/add-members",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs/AddSubgroup.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is/add-subgroup",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs/AddSubscribers.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is/add-subscribers",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs/CreateGroup.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is/create-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs/CreateSubgroup.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is/create-subgroup",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs/FetchDirectGroups.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is/fetch-direct-groups",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs/FetchGroupDetails.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is/fetch-group-details",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs/FetchMembers.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is/fetch-members",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs/FetchSubgroup.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is/fetch-subgroup",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs/GetSubscribers.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is/get-subscribers",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs/RemoveGroupAsSubgroup.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is/remove-group-as-subgroup",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs/RemoveMembers.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is/remove-members",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Group Management APIs/RemoveSubscribers.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/group-management-ap-is/remove-subscribers",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Subscription Webhooks.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/subscription-webhooks",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Subscription Webhooks/GetAllWebhooks.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/subscription-webhooks/get-all-webhooks",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Subscription Webhooks/SubscribeToAllEvents.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/subscription-webhooks/subscribe-to-all-events",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/kaizala.microsoft.com/Subscription Webhooks/UnsubscribingAWebhook.md",
+      "redirect_url": "/rest/api/kaizala.microsoft.com/subscription-webhooks/unsubscribing-a-webhook",
+      "redirect_document_id": true
+    }
+  ]
+}

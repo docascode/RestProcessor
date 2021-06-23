@@ -1,0 +1,954 @@
+{
+  "redirections": [
+    {
+      "source_path": "structured/2020/biztalk/Agreements/GetAgreement.md",
+      "redirect_url": "/rest/api/biztalk/agreements/get-agreement?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Agreements/GetAgreement.md",
+      "redirect_url": "/rest/api/biztalk/agreements/get-agreement?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Agreements/GetAgreementsBetweenPartners.md",
+      "redirect_url": "/rest/api/biztalk/agreements/get-agreements-between-partners?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Agreements/GetAgreementsBetweenPartners.md",
+      "redirect_url": "/rest/api/biztalk/agreements/get-agreements-between-partners?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Applications/GetApplication.md",
+      "redirect_url": "/rest/api/biztalk/applications/get-application?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Applications/GetApplication.md",
+      "redirect_url": "/rest/api/biztalk/applications/get-application?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Batches/GetBatch.md",
+      "redirect_url": "/rest/api/biztalk/batches/get-batch?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Batches/GetBatch.md",
+      "redirect_url": "/rest/api/biztalk/batches/get-batch?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Batches/GetBatchActivationStatus.md",
+      "redirect_url": "/rest/api/biztalk/batches/get-batch-activation-status?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Batches/GetBatchActivationStatus.md",
+      "redirect_url": "/rest/api/biztalk/batches/get-batch-activation-status?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Batches/GetBatches.md",
+      "redirect_url": "/rest/api/biztalk/batches/get-batches?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Batches/GetBatches.md",
+      "redirect_url": "/rest/api/biztalk/batches/get-batches?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Batches/SendControlMessage.md",
+      "redirect_url": "/rest/api/biztalk/batches/send-control-message?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Batches/SendControlMessage.md",
+      "redirect_url": "/rest/api/biztalk/batches/send-control-message?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/BusinessProfiles.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/BusinessProfiles.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/BusinessProfiles/AddBusinessIdentity.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-add-business-identity?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/BusinessProfiles/AddBusinessIdentity.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-add-business-identity?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/BusinessProfiles/Create.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-create?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/BusinessProfiles/Create.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-create?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/BusinessProfiles/Delete.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-delete?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/BusinessProfiles/Delete.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-delete?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/BusinessProfiles/DeleteBusinessIdentity.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-delete-business-identity?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/BusinessProfiles/DeleteBusinessIdentity.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-delete-business-identity?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/BusinessProfiles/GetBusinessProfile.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-get-business-profile?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/BusinessProfiles/GetBusinessProfile.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-get-business-profile?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/BusinessProfiles/GetBusinessProfiles.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-get-business-profiles?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/BusinessProfiles/GetBusinessProfiles.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-get-business-profiles?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/BusinessProfiles/Update.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-update?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/BusinessProfiles/Update.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-update?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/BusinessProfiles/UpdateBusinessIdentity.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-update-business-identity?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/BusinessProfiles/UpdateBusinessIdentity.md",
+      "redirect_url": "/rest/api/biztalk/business-profiles/business-profiles-update-business-identity?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/FallbackSettings.md",
+      "redirect_url": "/rest/api/biztalk/fallback-settings?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/FallbackSettings.md",
+      "redirect_url": "/rest/api/biztalk/fallback-settings?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/FallbackSettings/Get.md",
+      "redirect_url": "/rest/api/biztalk/fallback-settings/fallback-settings-get?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/FallbackSettings/Get.md",
+      "redirect_url": "/rest/api/biztalk/fallback-settings/fallback-settings-get?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/FallbackSettings/Update.md",
+      "redirect_url": "/rest/api/biztalk/fallback-settings/fallback-settings-update?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/FallbackSettings/Update.md",
+      "redirect_url": "/rest/api/biztalk/fallback-settings/fallback-settings-update?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Group/GetGroupSettings.md",
+      "redirect_url": "/rest/api/biztalk/group/get-group-settings?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/HostInstances.md",
+      "redirect_url": "/rest/api/biztalk/host-instances?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/HostInstances/Get.md",
+      "redirect_url": "/rest/api/biztalk/host-instances/host-instances-get?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/HostInstances/GetHostInstanceSettings.md",
+      "redirect_url": "/rest/api/biztalk/host-instances/host-instances-get-host-instance-settings?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/HostInstances/Put.md",
+      "redirect_url": "/rest/api/biztalk/host-instances/host-instances-put?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/HostInstances/StartHostInstance.md",
+      "redirect_url": "/rest/api/biztalk/host-instances/host-instances-start-host-instance?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/HostInstances/StopHostInstance.md",
+      "redirect_url": "/rest/api/biztalk/host-instances/host-instances-stop-host-instance?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Hosts/GetHostSettings.md",
+      "redirect_url": "/rest/api/biztalk/hosts/get-host-settings?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData.md",
+      "redirect_url": "/rest/api/biztalk/operational-data?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData.md",
+      "redirect_url": "/rest/api/biztalk/operational-data?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/GetAS2StatusRecords.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-as2-status-records?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/GetAS2StatusRecords.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-as2-status-records?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/GetBatches.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-batches?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/GetBatches.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-batches?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/GetBatchStatus.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-batch-status?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/GetBatchStatus.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-batch-status?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/GetInstances.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-instances?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/GetInstances.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-instances?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/GetInterchangeAggregationRecords.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-interchange-aggregation-records?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/GetInterchangeAggregationRecords.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-interchange-aggregation-records?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/GetInterchangeStatusRecords.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-interchange-status-records?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/GetInterchangeStatusRecords.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-interchange-status-records?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/GetMessages.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-messages?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/GetMessages.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-messages?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/GetSubscription.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-subscription?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/GetSubscription.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-subscription?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/GetTrackedMessageEvent.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-tracked-message-event?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/GetTrackedMessageEvent.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-tracked-message-event?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/GetTrackedServiceInstances.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-tracked-service-instances?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/GetTrackedServiceInstances.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-tracked-service-instances?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/GetTransactionSetAggregationReports.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-transaction-set-aggregation-reports?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/GetTransactionSetAggregationReports.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-transaction-set-aggregation-reports?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/GetTransactionSets.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-transaction-sets?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/GetTransactionSets.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-get-transaction-sets?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/ResumeInstance.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-resume-instance?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/ResumeInstance.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-resume-instance?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/SuspendInstance.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-suspend-instance?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/SuspendInstance.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-suspend-instance?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/OperationalData/TerminateInstance.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-terminate-instance?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/OperationalData/TerminateInstance.md",
+      "redirect_url": "/rest/api/biztalk/operational-data/operational-data-terminate-instance?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Orchestrations/EnlistOrchestration.md",
+      "redirect_url": "/rest/api/biztalk/orchestrations/enlist-orchestration?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Orchestrations/EnlistOrchestration.md",
+      "redirect_url": "/rest/api/biztalk/orchestrations/enlist-orchestration?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Orchestrations/GetOrchestration.md",
+      "redirect_url": "/rest/api/biztalk/orchestrations/get-orchestration?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Orchestrations/GetOrchestration.md",
+      "redirect_url": "/rest/api/biztalk/orchestrations/get-orchestration?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Orchestrations/StartOrchestration.md",
+      "redirect_url": "/rest/api/biztalk/orchestrations/start-orchestration?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Orchestrations/StartOrchestration.md",
+      "redirect_url": "/rest/api/biztalk/orchestrations/start-orchestration?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Orchestrations/StopOrchestration.md",
+      "redirect_url": "/rest/api/biztalk/orchestrations/stop-orchestration?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Orchestrations/StopOrchestration.md",
+      "redirect_url": "/rest/api/biztalk/orchestrations/stop-orchestration?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Orchestrations/UnenlistOrchestration.md",
+      "redirect_url": "/rest/api/biztalk/orchestrations/unenlist-orchestration?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Orchestrations/UnenlistOrchestration.md",
+      "redirect_url": "/rest/api/biztalk/orchestrations/unenlist-orchestration?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Parties/AddPartyAlias.md",
+      "redirect_url": "/rest/api/biztalk/parties/add-party-alias?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Parties/AddPartyAlias.md",
+      "redirect_url": "/rest/api/biztalk/parties/add-party-alias?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Parties/DeletePartyAlias.md",
+      "redirect_url": "/rest/api/biztalk/parties/delete-party-alias?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Parties/DeletePartyAlias.md",
+      "redirect_url": "/rest/api/biztalk/parties/delete-party-alias?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Parties/GetParty.md",
+      "redirect_url": "/rest/api/biztalk/parties/get-party?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Parties/GetParty.md",
+      "redirect_url": "/rest/api/biztalk/parties/get-party?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Parties/UpdatePartyAlias.md",
+      "redirect_url": "/rest/api/biztalk/parties/update-party-alias?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Parties/UpdatePartyAlias.md",
+      "redirect_url": "/rest/api/biztalk/parties/update-party-alias?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Pipelines/GetPipeline.md",
+      "redirect_url": "/rest/api/biztalk/pipelines/get-pipeline?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Pipelines/GetPipeline.md",
+      "redirect_url": "/rest/api/biztalk/pipelines/get-pipeline?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Policies/AddToApplication.md",
+      "redirect_url": "/rest/api/biztalk/policies/add-to-application?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Policies/RemoveFromApplication.md",
+      "redirect_url": "/rest/api/biztalk/policies/remove-from-application?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ProtocolTypes.md",
+      "redirect_url": "/rest/api/biztalk/protocol-types?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ProtocolTypes.md",
+      "redirect_url": "/rest/api/biztalk/protocol-types?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ProtocolTypes/Get.md",
+      "redirect_url": "/rest/api/biztalk/protocol-types/protocol-types-get?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ProtocolTypes/Get.md",
+      "redirect_url": "/rest/api/biztalk/protocol-types/protocol-types-get?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceiveLocations.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceiveLocations.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceiveLocations/Create.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-create?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceiveLocations/Create.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-create?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceiveLocations/Delete.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-delete?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceiveLocations/Delete.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-delete?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceiveLocations/Disable.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-disable?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceiveLocations/Disable.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-disable?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceiveLocations/Enable.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-enable?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceiveLocations/Enable.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-enable?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceiveLocations/Get.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-get?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceiveLocations/Get.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-get?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceiveLocations/GetReceiveLocation.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-get-receive-location?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceiveLocations/GetReceiveLocation.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-get-receive-location?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceiveLocations/SetPrimary.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-set-primary?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceiveLocations/SetPrimary.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-set-primary?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceiveLocations/Update.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-update?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceiveLocations/Update.md",
+      "redirect_url": "/rest/api/biztalk/receive-locations/receive-locations-update?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceivePorts.md",
+      "redirect_url": "/rest/api/biztalk/receive-ports?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceivePorts.md",
+      "redirect_url": "/rest/api/biztalk/receive-ports?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceivePorts/Create.md",
+      "redirect_url": "/rest/api/biztalk/receive-ports/receive-ports-create?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceivePorts/Create.md",
+      "redirect_url": "/rest/api/biztalk/receive-ports/receive-ports-create?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceivePorts/Delete.md",
+      "redirect_url": "/rest/api/biztalk/receive-ports/receive-ports-delete?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceivePorts/Delete.md",
+      "redirect_url": "/rest/api/biztalk/receive-ports/receive-ports-delete?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceivePorts/Get.md",
+      "redirect_url": "/rest/api/biztalk/receive-ports/receive-ports-get?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceivePorts/Get.md",
+      "redirect_url": "/rest/api/biztalk/receive-ports/receive-ports-get?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceivePorts/GetReceivePort.md",
+      "redirect_url": "/rest/api/biztalk/receive-ports/receive-ports-get-receive-port?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceivePorts/GetReceivePort.md",
+      "redirect_url": "/rest/api/biztalk/receive-ports/receive-ports-get-receive-port?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/ReceivePorts/Update.md",
+      "redirect_url": "/rest/api/biztalk/receive-ports/receive-ports-update?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/ReceivePorts/Update.md",
+      "redirect_url": "/rest/api/biztalk/receive-ports/receive-ports-update?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/RoleLinks.md",
+      "redirect_url": "/rest/api/biztalk/role-links?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/RoleLinks.md",
+      "redirect_url": "/rest/api/biztalk/role-links?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/RoleLinks/AddEnlistedParties.md",
+      "redirect_url": "/rest/api/biztalk/role-links/role-links-add-enlisted-parties?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/RoleLinks/AddEnlistedParties.md",
+      "redirect_url": "/rest/api/biztalk/role-links/role-links-add-enlisted-parties?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/RoleLinks/Get.md",
+      "redirect_url": "/rest/api/biztalk/role-links/role-links-get?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/RoleLinks/Get.md",
+      "redirect_url": "/rest/api/biztalk/role-links/role-links-get?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/RoleLinks/GetRoleLink.md",
+      "redirect_url": "/rest/api/biztalk/role-links/role-links-get-role-link?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/RoleLinks/GetRoleLink.md",
+      "redirect_url": "/rest/api/biztalk/role-links/role-links-get-role-link?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/RoleLinks/RemoveEnlistedParties.md",
+      "redirect_url": "/rest/api/biztalk/role-links/role-links-remove-enlisted-parties?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/RoleLinks/RemoveEnlistedParties.md",
+      "redirect_url": "/rest/api/biztalk/role-links/role-links-remove-enlisted-parties?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Schemas/GetSchema.md",
+      "redirect_url": "/rest/api/biztalk/schemas/get-schema?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Schemas/GetSchema.md",
+      "redirect_url": "/rest/api/biztalk/schemas/get-schema?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Schemas/UpdateTracking.md",
+      "redirect_url": "/rest/api/biztalk/schemas/update-tracking?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Schemas/UpdateTracking.md",
+      "redirect_url": "/rest/api/biztalk/schemas/update-tracking?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPortGroups.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPortGroups.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPortGroups/Create.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-create?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPortGroups/Create.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-create?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPortGroups/Delete.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-delete?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPortGroups/Delete.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-delete?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPortGroups/EnlistSendPortGroup.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-enlist-send-port-group?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPortGroups/EnlistSendPortGroup.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-enlist-send-port-group?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPortGroups/Get.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-get?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPortGroups/Get.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-get?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPortGroups/GetSendPortGroup.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-get-send-port-group?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPortGroups/GetSendPortGroup.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-get-send-port-group?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPortGroups/StartSendPortGroup.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-start-send-port-group?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPortGroups/StartSendPortGroup.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-start-send-port-group?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPortGroups/StopSendPortGroup.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-stop-send-port-group?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPortGroups/StopSendPortGroup.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-stop-send-port-group?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPortGroups/UnenlistSendPortGroup.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-unenlist-send-port-group?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPortGroups/UnenlistSendPortGroup.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-unenlist-send-port-group?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPortGroups/Update.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-update?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPortGroups/Update.md",
+      "redirect_url": "/rest/api/biztalk/send-port-groups/send-port-groups-update?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPorts.md",
+      "redirect_url": "/rest/api/biztalk/send-ports?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPorts.md",
+      "redirect_url": "/rest/api/biztalk/send-ports?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPorts/Create.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-create?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPorts/Create.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-create?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPorts/Delete.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-delete?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPorts/Delete.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-delete?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPorts/EnlistSendPort.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-enlist-send-port?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPorts/EnlistSendPort.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-enlist-send-port?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPorts/Get.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-get?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPorts/Get.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-get?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPorts/GetSendPort.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-get-send-port?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPorts/GetSendPort.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-get-send-port?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPorts/StartSendPort.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-start-send-port?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPorts/StartSendPort.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-start-send-port?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPorts/StopSendPort.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-stop-send-port?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPorts/StopSendPort.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-stop-send-port?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPorts/UnenlistSendPort.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-unenlist-send-port?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPorts/UnenlistSendPort.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-unenlist-send-port?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/SendPorts/Update.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-update?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/SendPorts/Update.md",
+      "redirect_url": "/rest/api/biztalk/send-ports/send-ports-update?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2020/biztalk/Transforms/GetTransform.md",
+      "redirect_url": "/rest/api/biztalk/transforms/get-transform?view=rest-biztalk-2020",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "structured/2016/biztalk/Transforms/GetTransform.md",
+      "redirect_url": "/rest/api/biztalk/transforms/get-transform?view=rest-biztalk-2016",
+      "redirect_document_id": true
+    }
+  ]
+}

@@ -102,7 +102,7 @@
             var targetList = target.Split("/");
 
             var bl = true;
-            if (source.Length != target.Length)
+            if (sourceList.Length != targetList.Length)
             {
                 bl = false;
                 return "";
@@ -123,7 +123,12 @@
                     || string.Compare(item.Replace(" ", ""), guessKey.Replace("-", ""), true) == 0
                     || string.Compare(item.Replace(" ", ""), guessKey.Replace("-", " "), true) == 0
                     || string.Compare(item.Replace(" ", ""), guessKey.Replace("-", "%20"), true) == 0
-                    || string.Compare(item.Replace(" ", ""), guessKey, true) == 0)
+                    || string.Compare(item.Replace("_", ""), guessKey.Replace("-", ""), true) == 0
+                    || string.Compare(item.Replace("_", ""), guessKey.Replace("-", " "), true) == 0
+                    || string.Compare(item.Replace("_", ""), guessKey.Replace("-", "%20"), true) == 0
+                    || string.Compare(item.Replace(" ", ""), guessKey, true) == 0 
+                    || (i== sourceList.Length-1 && HandlerRemove_tag_from_operationId(guessKey, sourceList[i-1]+item))
+                    )
                 //if (item == guessKey || item == guessKey.Replace("-", "") || item.Replace(" ", "") == guessKey || item.Replace(" ", "") == guessKey.Replace("-", ""))
                 {
 
@@ -142,5 +147,33 @@
 
             return source;
         }
+
+        private bool HandlerRemove_tag_from_operationId(string modernKey, string compositeKey)
+        {
+            if (string.Compare(modernKey.Replace("-", ""),compositeKey,true)==0
+                || string.Compare(modernKey.Replace("-", " "),compositeKey,true)==0
+                || string.Compare(modernKey.Replace("-", "%20"),compositeKey, true) == 0
+                || string.Compare(modernKey.Replace("-", ""),compositeKey.Replace("%20", ""), true) == 0
+                || string.Compare(modernKey.Replace("-", " "),compositeKey.Replace("%20", ""), true) == 0
+                || string.Compare(modernKey.Replace("-", "%20"),compositeKey.Replace("%20", ""), true) == 0
+                || string.Compare(modernKey,compositeKey.Replace("%20", ""), true) == 0
+                || string.Compare(modernKey.Replace("-", ""),compositeKey.Replace(" ", ""), true) == 0
+                || string.Compare(modernKey.Replace("-", " "),compositeKey.Replace(" ", ""), true) == 0
+                || string.Compare(modernKey.Replace("-", "%20"),compositeKey.Replace(" ", ""), true) == 0
+                || string.Compare(compositeKey.Replace("_", ""), modernKey.Replace("-", ""), true) == 0
+                || string.Compare(compositeKey.Replace("_", ""), modernKey.Replace("-", " "), true) == 0
+                || string.Compare(compositeKey.Replace("_", ""), modernKey.Replace("-", "%20"), true) == 0
+                || string.Compare(modernKey,compositeKey,true)== 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        
+
+
     }
+    
+   
 }

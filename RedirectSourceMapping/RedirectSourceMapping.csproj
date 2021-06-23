@@ -18,6 +18,8 @@
   <ItemGroup>
     <Folder Include="Source\Legacy\" />
     <Folder Include="Source\Modern\" />
+    <Folder Include="vsts-docs-rest-apis\Legacy\" />
+    <Folder Include="vsts-docs-rest-apis\Modern\" />
   </ItemGroup>
 
   <ItemGroup>

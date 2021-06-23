@@ -1,0 +1,214 @@
+{
+  "redirections": [
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/AccessControl.md",
+      "redirect_url": "/rest/api/azure-sphere/access-control",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/AccessControl/AssignRole.md",
+      "redirect_url": "/rest/api/azure-sphere/access-control/access-control-assign-role",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/AccessControl/InviteUser.md",
+      "redirect_url": "/rest/api/azure-sphere/access-control/access-control-invite-user",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/AccessControl/ListAvailableRoles.md",
+      "redirect_url": "/rest/api/azure-sphere/access-control/access-control-list-available-roles",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/AccessControl/ListRolesByUser.md",
+      "redirect_url": "/rest/api/azure-sphere/access-control/access-control-list-roles-by-user",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/AccessControl/ListUsers.md",
+      "redirect_url": "/rest/api/azure-sphere/access-control/access-control-list-users",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/AccessControl/UnassignRole.md",
+      "redirect_url": "/rest/api/azure-sphere/access-control/access-control-unassign-role",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Async Operations.md",
+      "redirect_url": "/rest/api/azure-sphere/async-operations",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Async Operations/AsyncOperations_Get.md",
+      "redirect_url": "/rest/api/azure-sphere/async-operations/async-operations-get",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Async Operations/AsyncOperations_GetBulkClaimDetails.md",
+      "redirect_url": "/rest/api/azure-sphere/async-operations/async-operations-get-bulk-claim-details",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Async Operations/AsyncOperations_GetGlobal.md",
+      "redirect_url": "/rest/api/azure-sphere/async-operations/async-operations-get-global",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Async Operations/AsyncOperations_GetImageUploadDetails.md",
+      "redirect_url": "/rest/api/azure-sphere/async-operations/async-operations-get-image-upload-details",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Deployments/GetByDevice.md",
+      "redirect_url": "/rest/api/azure-sphere/deployments/get-by-device",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/DeviceCapability.md",
+      "redirect_url": "/rest/api/azure-sphere/device-capability",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/DeviceCapability/Create.md",
+      "redirect_url": "/rest/api/azure-sphere/device-capability/device-capability-create",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/DeviceGroup.md",
+      "redirect_url": "/rest/api/azure-sphere/device-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/DeviceGroup/Create.md",
+      "redirect_url": "/rest/api/azure-sphere/device-group/device-group-create",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/DeviceGroup/CreateDefaults.md",
+      "redirect_url": "/rest/api/azure-sphere/device-group/device-group-create-defaults",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/DeviceGroup/Delete.md",
+      "redirect_url": "/rest/api/azure-sphere/device-group/device-group-delete",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/DeviceGroup/Get.md",
+      "redirect_url": "/rest/api/azure-sphere/device-group/device-group-get",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/DeviceGroup/GetInProduct.md",
+      "redirect_url": "/rest/api/azure-sphere/device-group/device-group-get-in-product",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/DeviceGroup/List.md",
+      "redirect_url": "/rest/api/azure-sphere/device-group/device-group-list",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/DeviceGroup/ListByName.md",
+      "redirect_url": "/rest/api/azure-sphere/device-group/device-group-list-by-name",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/DeviceGroup/Patch.md",
+      "redirect_url": "/rest/api/azure-sphere/device-group/device-group-patch",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Devices/BulkClaim.md",
+      "redirect_url": "/rest/api/azure-sphere/devices/bulk-claim",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Devices/CountInGroup.md",
+      "redirect_url": "/rest/api/azure-sphere/devices/count-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Devices/CountInProduct.md",
+      "redirect_url": "/rest/api/azure-sphere/devices/count-in-product",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Devices/ListInGroup.md",
+      "redirect_url": "/rest/api/azure-sphere/devices/list-in-group",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Devices/ListInProduct.md",
+      "redirect_url": "/rest/api/azure-sphere/devices/list-in-product",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/ErrorReporting.md",
+      "redirect_url": "/rest/api/azure-sphere/error-reporting",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/ErrorReporting/List.md",
+      "redirect_url": "/rest/api/azure-sphere/error-reporting/error-reporting-list",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Image/GetMetadata.md",
+      "redirect_url": "/rest/api/azure-sphere/image/get-metadata",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Image/GetStatus.md",
+      "redirect_url": "/rest/api/azure-sphere/image/get-status",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Image/GetUrl.md",
+      "redirect_url": "/rest/api/azure-sphere/image/get-url",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Image/ListComponentIds.md",
+      "redirect_url": "/rest/api/azure-sphere/image/list-component-ids",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Product/GetByName.md",
+      "redirect_url": "/rest/api/azure-sphere/product/get-by-name",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Product/ListGroups.md",
+      "redirect_url": "/rest/api/azure-sphere/product/list-groups",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Tenants/BlockLegacy.md",
+      "redirect_url": "/rest/api/azure-sphere/tenants/block-legacy",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Tenants/GetCertificate.md",
+      "redirect_url": "/rest/api/azure-sphere/tenants/get-certificate",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Tenants/GetCertificateChain.md",
+      "redirect_url": "/rest/api/azure-sphere/tenants/get-certificate-chain",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Tenants/GetProofOfPossession.md",
+      "redirect_url": "/rest/api/azure-sphere/tenants/get-proof-of-possession",
+      "redirect_document_id": true
+    },
+    {
+      "source_path": "docs-ref-autogen/azure-sphere/Tenants/ListCertificateMetadata.md",
+      "redirect_url": "/rest/api/azure-sphere/tenants/list-certificate-metadata",
+      "redirect_document_id": true
+    }
+  ]
+}

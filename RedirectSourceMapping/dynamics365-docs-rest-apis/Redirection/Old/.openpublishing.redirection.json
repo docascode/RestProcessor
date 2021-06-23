@@ -1,0 +1,229 @@
+{
+    "redirections": [
+        {
+            "source_path": "docs-ref-index/dynamics365/index.md",
+            "redirect_url": "/rest/dynamics365/customer-engagement",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/backupinstance/BackupInstance.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/instancebackups/backupinstance",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/BackupInstance.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/instancebackups/backupinstance",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/DeleteInstance.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Instances/DeleteInstance",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/DeleteInstance/DeleteInstance.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Instances/DeleteInstance",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetCurrencies.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Currencies/GetCurrencies",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetCurrencies/GetCurrencies.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Currencies/GetCurrencies",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetInstance.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Instances/GetInstance",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetInstance/GetInstance.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Instances/GetInstance",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetInstanceBackup.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/InstanceBackups/GetInstanceBackup",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetInstanceBackup/GetInstanceBackup.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/InstanceBackups/GetInstanceBackup",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetInstanceBackups.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/InstanceBackups/GetInstanceBackups",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetInstanceBackups/GetInstanceBackups.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/InstanceBackups/GetInstanceBackups",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetInstanceTypeInfo.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/InstanceTypeInfo/GetInstanceTypeInfo",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetInstanceTypeInfo/GetInstanceTypeInfo.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/InstanceTypeInfo/GetInstanceTypeInfo",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetInstanceTypesInfo.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/InstanceTypeInfo/GetInstanceTypesInfo",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetInstanceTypesInfo/GetInstanceTypesInfo.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/InstanceTypeInfo/GetInstanceTypesInfo",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetInstances.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Instances/GetInstances",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetInstances/GetInstances.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Instances/GetInstances",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetLanguages.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Languages/GetLanguages",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetLanguages/GetLanguages.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Languages/GetLanguages",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetOperationStatus.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/OperationStatus/GetOperationStatus",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetOperationStatus/GetOperationStatus.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/OperationStatus/GetOperationStatus",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetServiceVersions.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/ServiceVersions/GetServiceVersions",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetServiceVersions/GetServiceVersions.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/ServiceVersions/GetServiceVersions",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetTemplates.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Templates/GetTemplates",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetTemplates/GetTemplates.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Templates/GetTemplates",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/ProvisionInstance.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Instances/ProvisionInstance",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/ProvisionInstance/ProvisionInstance.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Instances/ProvisionInstance",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/RestoreInstance.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Instances/RestoreInstance",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/RestoreInstance/RestoreInstance.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Instances/RestoreInstance",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/UpdateInstanceAdminMode.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Instances/UpdateInstanceAdminMode",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/UpdateInstanceAdminMode/UpdateInstanceAdminMode.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/Instances/UpdateInstanceAdminMode",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/CreateTenantApplicationIdentity.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/TenantApplicationIdentities/CreateTenantApplicationIdentity",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/CreateTenantApplicationIdentity/CreateTenantApplicationIdentity.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/TenantApplicationIdentities/CreateTenantApplicationIdentity",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/DeleteTenantApplicationIdentity.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/TenantApplicationIdentities/DeleteTenantApplicationIdentity",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/DeleteTenantApplicationIdentity/DeleteTenantApplicationIdentity.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/TenantApplicationIdentities/DeleteTenantApplicationIdentity",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/DisableTenantApplicationIdentity.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/TenantApplicationIdentities/DisableTenantApplicationIdentity",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/DisableTenantApplicationIdentity/DisableTenantApplicationIdentity.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/TenantApplicationIdentities/DisableTenantApplicationIdentity",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/EnableTenantApplicationIdentity.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/TenantApplicationIdentities/EnableTenantApplicationIdentity",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/EnableTenantApplicationIdentity/EnableTenantApplicationIdentity.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/TenantApplicationIdentities/EnableTenantApplicationIdentity",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetTenantApplicationIdentities.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/TenantApplicationIdentities/GetTenantApplicationIdentities",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetTenantApplicationIdentities/GetTenantApplicationIdentities.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/TenantApplicationIdentities/GetTenantApplicationIdentities",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetTenantApplicationIdentity.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/TenantApplicationIdentities/GetTenantApplicationIdentity",
+            "redirect_document_id": false
+        },
+        {
+            "source_path": "docs-ref-autogen/admin.services.crm.dynamics.com/GetTenantApplicationIdentity/GetTenantApplicationIdentity.md",
+            "redirect_url": "/rest/api/admin.services.crm.dynamics.com/TenantApplicationIdentities/GetTenantApplicationIdentity",
+            "redirect_document_id": false
+        }
+    ]
+}
