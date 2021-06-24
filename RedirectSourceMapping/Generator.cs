@@ -3,6 +3,9 @@
     using RedirectSourceMapping.Model;
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Web;
 
     public interface IGenerator
     {
@@ -30,12 +33,13 @@
             var legacyInfo = legacyPublishFilesExtractor.GetPulishFileStoreInfo();
             var modernInfo = modernPublishFilesExtractor.GetPulishFileStoreInfo();
             redirectionExtractor.Extract();
-
+            RemoveModernPublishedFileMD(modernInfo);
             Console.WriteLine("Total link: " + modernInfo.Count);
             Console.WriteLine("Total Rules: " + redirectionExtractor.obj.List.Count);
             foreach (var item in modernInfo)
             {
                 var key = item.Key;
+   
                 if (legacyInfo.ContainsKey(item.Key))
                 {
                     Console.WriteLine("No change:------------------------------");
@@ -51,7 +55,7 @@
                     {
                         var instance = new Redirection()
                         {
-                            Source_path = prefix + "/" + guessKey.Replace("%20", " ").Replace("yml", "md"),
+                            Source_path = prefix + "/" + decode(guessKey).Replace("yml", "md"),
                             Redirect_url = modernInfo[item.Key].PublishUrl.Replace(Constants.PublishPrefix, "").Replace(Constants.PublishSuffix, "").TrimEnd('&'),
                             Redirect_document_id = true
                         };
@@ -65,7 +69,7 @@
                     {
                         var instance = new Redirection()
                         {
-                            Source_path = prefix + "/" + tempStr.Replace("%20", " ").Replace("yml", "md"),
+                            Source_path = prefix + "/" + decode(tempStr).Replace("yml", "md"),
                             Redirect_url = modernInfo[item.Key].PublishUrl.Replace(Constants.PublishPrefix, "").Replace(Constants.PublishSuffix, "").TrimEnd('&'),
                             Redirect_document_id = true
                         };
@@ -79,6 +83,29 @@
             }
             Console.WriteLine("Total Rules: " + redirectionExtractor.obj.List.Count);
             redirectionExtractor.Serilize();
+        }
+
+        public static void RemoveModernPublishedFileMD(Dictionary<string, PublishFile> dict)
+       {
+            for (int i = 0; i < dict.Count;)
+            {
+                var item = dict.ElementAt(i);
+                Console.WriteLine(item.Key.ToString() + "   " + item.Value.ToString());
+                if (item.Key.EndsWith(".md"))
+                {
+                    dict.Remove(item.Key);
+                }
+                else
+                {
+                    i++;
+                }
+            }
+        }
+
+        public static string decode(string text)
+        {
+            string decodedUrl = HttpUtility.UrlDecode(text);
+            return decodedUrl;
         }
         private bool Check(Dictionary<string, PublishFile> dic, string target, out string str)
         {
@@ -126,7 +153,10 @@
                     || string.Compare(item.Replace("_", ""), guessKey.Replace("-", ""), true) == 0
                     || string.Compare(item.Replace("_", ""), guessKey.Replace("-", " "), true) == 0
                     || string.Compare(item.Replace("_", ""), guessKey.Replace("-", "%20"), true) == 0
-                    || string.Compare(item.Replace(" ", ""), guessKey, true) == 0 
+                    || string.Compare(item.Replace(" ", ""), guessKey, true) == 0
+                    || string.Compare(item.Replace("%20", "").Replace("-", ""), guessKey.Replace("-", ""), true) == 0
+                    || string.Compare(item.Replace("%20", "").Replace("-", ""), guessKey.Replace("-", " "), true) == 0
+                    || string.Compare(item.Replace("%20", "").Replace("-", ""), guessKey.Replace("-", "%20"), true) == 0
                     || (i== sourceList.Length-1 && HandlerRemove_tag_from_operationId(guessKey, sourceList[i-1]+item))
                     )
                 //if (item == guessKey || item == guessKey.Replace("-", "") || item.Replace(" ", "") == guessKey || item.Replace(" ", "") == guessKey.Replace("-", ""))
