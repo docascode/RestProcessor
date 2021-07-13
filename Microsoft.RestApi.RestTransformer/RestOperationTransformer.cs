@@ -1483,11 +1483,7 @@
                     }
                     else if (itemsDefine.TryGetValue("type", out var itemType))
                     {
-                        if (allOfsNode != null && itemType.ToString().ToLowerInvariant() == "object")
-                        {
-
-                        }
-                        else
+                        if (!(allOfsNode != null && itemType.ToString().ToLowerInvariant() == "object"))
                         {
                             definitionObject.Type = (string)itemType;
                         }
