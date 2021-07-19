@@ -5,7 +5,7 @@
     using System;
     using System.IO;
     public class RedirectionExtractor { 
-        private Redirections obj = new Redirections();
+        public Redirections obj = new Redirections();
         protected string dirPath;
         protected string fileName;
         public RedirectionExtractor(string dirPath)
@@ -71,6 +71,10 @@
             {
                 JsonSerializer serializer = new JsonSerializer();
                 obj = (Redirections)serializer.Deserialize(file, typeof(Redirections));
+                if (obj.List == null)
+                {
+                    obj.List = new System.Collections.Generic.HashSet<Redirection>();
+                }
             }
         }
     }
