@@ -582,7 +582,15 @@
             {
                 var contents = pathContent.Split('?');
                 var queries = contents[1].Split('&');
-                contents[1] = string.Join("&", queries.Where(q => !q.Contains("={")));
+                if (msExampleParameters != null)
+                {
+                    contents[1] = string.Join("&", queries.Where(q => msExampleParameters.Any(p => q.Contains(Convert.ToString(p.Value))) || !q.Contains("={")));
+                }
+                else
+                {
+                    contents[1] = string.Join("&", queries.Where(q => !q.Contains("={")));
+                }
+                
                 if (string.IsNullOrEmpty(contents[1]))
                 {
                     pathContent = contents[0];
