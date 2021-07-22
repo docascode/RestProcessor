@@ -57,8 +57,8 @@
     <Reference Include="Microsoft.DocAsCode.Plugins, Version=2.56.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.DocAsCode.Plugins.2.56.3\lib\net472\Microsoft.DocAsCode.Plugins.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.DocAsCode.YamlSerialization, Version=2.56.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.DocAsCode.YamlSerialization.2.56.3\lib\net472\Microsoft.DocAsCode.YamlSerialization.dll</HintPath>
+    <Reference Include="Microsoft.DocAsCode.YamlSerialization, Version=2.57.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.DocAsCode.YamlSerialization.2.57.2\lib\net472\Microsoft.DocAsCode.YamlSerialization.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -92,8 +92,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="YamlDotNet, Version=4.2.2.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-      <HintPath>..\packages\YamlDotNet.Signed.4.2.2\lib\net35\YamlDotNet.dll</HintPath>
+    <Reference Include="YamlDotNet, Version=5.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.Signed.5.1.0\lib\net45\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
