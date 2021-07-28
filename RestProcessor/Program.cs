@@ -156,7 +156,7 @@
             var set = new HashSet<FileNameInfo>(splitedGroupFiles);
             foreach (var item in fileNameInfos)
             {
-                var existFinleNameInfo= set.Where(fileNameInfo=> fileNameInfo.TocName== item.TocName && restFileInfo.ServiceInfo.TocTitle== fileNameInfo.ServiceInfo.TocTitle).FirstOrDefault();
+                var existFinleNameInfo= set.Where(fileNameInfo=> fileNameInfo.TocName== item.TocName && fileNameInfo.Version == item.Version && restFileInfo.ServiceInfo.TocTitle== fileNameInfo.ServiceInfo.TocTitle).FirstOrDefault();
                 if (existFinleNameInfo != null)
                 {
                     existFinleNameInfo.ChildrenFileNameInfo.AddRange(item.ChildrenFileNameInfo);
