@@ -51,7 +51,7 @@
             if (entityType == null && modelName == null)
             {
                 //first call to the recursive function. Hence we will process file references only.
-                references = currentDoc.SelectTokens("$..$ref").Where(p => !((string)p).StartsWith("#") && !((string)p).Contains("example/"));
+                references = currentDoc.SelectTokens("$..$ref").Where(p => !((string)p).StartsWith("#") && (!((string)p).Contains("examples")));
             }
             else
             {
@@ -143,7 +143,7 @@
             IEnumerable<JToken> references;
             var sourceDoc = externalFiles[sourceFilePath];
             var currentDoc = externalFiles[sourceFilePath];
-            references = currentDoc.SelectTokens("$..$ref").Where(p => !((string)p).StartsWith("#") && ((string)p).Contains("example/"));
+            references = currentDoc.SelectTokens("$..$ref").Where(p => !((string)p).StartsWith("#") && ((string)p).Contains("examples"));
             while (references.Count() >0)
             {
                 var value = references.ElementAt(0);
@@ -151,12 +151,12 @@
                 string[] splitReference = path.Split(new[] { '#' }, StringSplitOptions.RemoveEmptyEntries);
                 string filePath = null, entityPath = path;
 
-                if (path.Contains("example/"))
+                if (path.Contains("examples"))
                 {
-                    //Fix Bug: for example:"$ref": "examples/edge-modules-delete.json"
-                    if (!path.Contains("/example/"))
+                    //Fix Bug: for example:"$ref": "examples/oms-get-example.json"
+                    if (!path.StartsWith("examples/"))
                     {
-                        path=path.Replace("example/", "./example/");
+                        path=path.Replace("examples/", "./examples/");
                     }
                     filePath = path;
                     // Make sure the filePath is either an absolute uri, or a rooted path

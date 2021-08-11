@@ -28,22 +28,25 @@
             {
                 foreach (var action in path.Children())
                 {
-                    foreach (var item in action.Children<JObject>())
+                    foreach (var item in action.Children())
                     {
-                        foreach (var child in item.Children())
+                        var keyValues = JObject.Parse("{" + item.ToString() + "}");
+                        if (keyValues.ContainsKey("post") || keyValues.ContainsKey("get") || keyValues.ContainsKey("put") || keyValues.ContainsKey("delete"))
                         {
-                            var count = child.Children().Count();
-
-                            if (count > 0)
+                            foreach (var child in item.Children())
                             {
-                                var token = child.ElementAt(count - 1);
-                                if (null == child["consumes"] && consumes!=null)
+                                var count = child.Children().Count();
+                                if (count > 0)
                                 {
-                                    token.AddAfterSelf(new JProperty("consumes", consumes));
-                                }
-                                if (null == child["produces"] && produces!=null)
-                                {
-                                    token.AddAfterSelf(new JProperty("produces", produces));
+                                    var token = child.ElementAt(count - 1);
+                                    if (null == child["consumes"] && consumes != null)
+                                    {
+                                        token.AddAfterSelf(new JProperty("consumes", consumes));
+                                    }
+                                    if (null == child["produces"] && produces != null)
+                                    {
+                                        token.AddAfterSelf(new JProperty("produces", produces));
+                                    }
                                 }
                             }
                         }
