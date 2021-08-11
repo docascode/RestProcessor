@@ -153,6 +153,7 @@
 
                 if (path.Contains("example"))
                 {
+                    //Fix Bug: for example:"$ref": "examples/edge-modules-delete.json"
                     if (!path.Contains("/example"))
                     {
                         path=path.Replace("example", "./example");
