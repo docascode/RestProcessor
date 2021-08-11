@@ -54,6 +54,7 @@
     <Compile Include="Core\Utilities\FileSystem.cs" />
     <Compile Include="Core\Utilities\Fixable.cs" />
     <Compile Include="Core\Utilities\JsonExtensions.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runner.cs" />
     <Compile Include="Settings.cs" />
