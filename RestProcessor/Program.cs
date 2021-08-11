@@ -44,7 +44,13 @@
                 {
                     mappingFile = YamlConverter.ConvertYamls(args[0], mappingFile);
                 }
-               
+
+                var paths = RestProcessorUtilities.Utilities.ExtractFilePath(args[0], mappingFile);
+                var result = SwaggerResolver.Runner.Run(paths.ToArray());
+                if (result == 1)
+                {
+                    return 1;
+                }
                 var outputDir = args.Length < 4 ? Path.Combine(args[1], mappingFile.TargetApiRootDir) : args[3];
 
                 Console.WriteLine("Processor split begin at:" + DateTime.UtcNow);
