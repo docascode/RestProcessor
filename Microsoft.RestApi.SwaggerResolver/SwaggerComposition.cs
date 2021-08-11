@@ -7,8 +7,8 @@
     {
         public static void Travel(JObject jObj)
         {
-            var consumes = jObj.SelectToken("consumes").DeepClone();
-            var produces = jObj.SelectToken("produces").DeepClone();
+            var consumes = jObj.SelectToken("consumes")?.DeepClone();
+            var produces = jObj.SelectToken("produces")?.DeepClone();
             jObj.Property("consumes").Remove();
             jObj.Property("produces").Remove();
             var paths = jObj.SelectToken("paths");
@@ -25,11 +25,11 @@
                             if (count > 0)
                             {
                                 var token = child.ElementAt(count - 1);
-                                if (null == child["consumes"])
+                                if (null == child["consumes"] && consumes!=null)
                                 {
                                     token.AddAfterSelf(new JProperty("consumes", consumes));
                                 }
-                                if (null == child["produces"])
+                                if (null == child["produces"] && produces!=null)
                                 {
                                     token.AddAfterSelf(new JProperty("produces", produces)); ;
                                 }
