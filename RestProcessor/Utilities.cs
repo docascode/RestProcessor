@@ -14,13 +14,26 @@ namespace RestProcessorUtilities
             }
 
             var result = new List<string>();
-            foreach (var info in mappingFile.OrgInfos)
+            foreach (var orgInfo in mappingFile.OrgInfos)
             {
-                foreach (var service in info.Services)
+                if (orgInfo == null)
                 {
+                    continue;
+                }
+
+                foreach (var service in orgInfo.Services)
+                {
+                    if (service == null)
+                    {
+                        continue;
+                    }
+
                     foreach (var swagger in service.SwaggerInfo)
                     {
-                        result.Add(Path.Combine(rootPath, swagger.Source));
+                        if (swagger.Source != null)
+                        {
+                            result.Add(Path.Combine(rootPath, swagger.Source));
+                        }
                     }
                 }
             }
