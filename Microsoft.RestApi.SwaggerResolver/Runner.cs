@@ -1,6 +1,7 @@
 ﻿namespace Microsoft.RestApi.SwaggerResolver
 {
     using System;
+    using System.IO;
 
     public static class Runner
     {
@@ -11,10 +12,11 @@
             {
                 foreach (var path in paths)
                 {
-                    Console.WriteLine($"Resolving swagger file by SwaggerResolver {path}");
-                    var result = SwaggerParser.Resolver(path);
-                    Settings.FileSystem.WriteAllText(path, result);
-                    Console.WriteLine($"Done resolving swagger file by AutoRest{path}");
+                    var formatPath = Path.GetFullPath(path);
+                    Console.WriteLine($"Resolving swagger file by SwaggerResolver {formatPath}");
+                    var result = SwaggerParser.Resolver(formatPath);
+                    Settings.FileSystem.WriteAllText(formatPath, result);
+                    Console.WriteLine($"Done resolving swagger file by AutoRest{formatPath}");
                 }
 
                 return 0;
