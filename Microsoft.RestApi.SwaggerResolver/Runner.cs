@@ -12,8 +12,8 @@
             {
                 foreach (var path in paths)
                 {
+                    Console.WriteLine($"Resolving swagger file by SwaggerResolver {path}");
                     var formatPath = Path.GetFullPath(path);
-                    Console.WriteLine($"Resolving swagger file by SwaggerResolver {formatPath}");
                     var result = SwaggerParser.Resolver(formatPath);
                     Settings.FileSystem.WriteAllText(formatPath, result);
                     Console.WriteLine($"Done resolving swagger file by AutoRest{formatPath}");
