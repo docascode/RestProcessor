@@ -9,6 +9,11 @@
         {
             var consumes = jObj.SelectToken("consumes")?.DeepClone();
             var produces = jObj.SelectToken("produces")?.DeepClone();
+
+			if(consumes==null && produces != null)
+			{
+				return;
+			}
             if (consumes != null)
             {
                 jObj.Property("consumes").Remove();
