@@ -120,6 +120,10 @@
       <Project>{4622E5AC-C0D5-402F-BD9E-19ED61076627}</Project>
       <Name>Microsoft.RestApi.RestTransformer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Microsoft.RestApi.SwaggerResolver\Microsoft.RestApi.SwaggerResolver.csproj">
+      <Project>{8e66a762-1a65-47e3-8ef0-22daea6283c8}</Project>
+      <Name>Microsoft.RestApi.SwaggerResolver</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
