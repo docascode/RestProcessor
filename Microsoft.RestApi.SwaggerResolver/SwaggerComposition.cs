@@ -9,8 +9,15 @@
         {
             var consumes = jObj.SelectToken("consumes")?.DeepClone();
             var produces = jObj.SelectToken("produces")?.DeepClone();
-            jObj.Property("consumes").Remove();
-            jObj.Property("produces").Remove();
+            if (consumes != null)
+            {
+                jObj.Property("consumes").Remove();
+            }
+            if (produces != null)
+            {
+                jObj.Property("produces").Remove();
+            }
+            
             var paths = jObj.SelectToken("paths");
             foreach (var path in paths.Children())
             {
@@ -31,7 +38,7 @@
                                 }
                                 if (null == child["produces"] && produces!=null)
                                 {
-                                    token.AddAfterSelf(new JProperty("produces", produces)); ;
+                                    token.AddAfterSelf(new JProperty("produces", produces));
                                 }
                             }
                         }
