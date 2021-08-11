@@ -28,8 +28,16 @@
             {
                 foreach (var action in path.Children())
                 {
-                    foreach (var item in action.Children())
+                    foreach (var item in action.Children<JObject>())
                     {
+                        if (item.Properties() == null || 
+                            !item.Properties().Any(key=>string.Compare(key.Name, "get",true)==0 || 
+                                                    string.Compare(key.Name, "delete", true) == 0 || 
+                                                    string.Compare(key.Name, "post", true) == 0 || 
+                                                    string.Compare(key.Name, "put", true) == 0))
+                        {
+                            return;
+                        }
                         foreach (var child in item.Children())
                         {
                             var count = child.Children().Count();
