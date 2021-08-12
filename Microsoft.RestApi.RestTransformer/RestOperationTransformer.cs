@@ -16,7 +16,7 @@
         private static ConcurrentDictionary<string, IList<Definition>> _cacheDefinitions = new ConcurrentDictionary<string, IList<Definition>>();
         private static Regex _permissionRegex = new Regex("/providers(?<permission>(/[^/{}]+)+)(/{[^/}]+})*", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static Regex _permissionRegexOfPost = new Regex("/providers(?<permission>(/[^/{}]+)+)(/{[^/}]+}).*(?<action>(/[^/{}]+){1})$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        public static OperationEntity Transform(string groupKey, SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel, bool needPermission = false)
+        public static OperationEntity Transform(string groupKey, SwaggerModel swaggerModel, RestApiChildItemViewModel viewModel, bool needPermission = false,string path="")
         {
             var scheme = Utility.GetScheme(swaggerModel.Metadata);
             var hostWithParameters = Utility.GetHostWithParameters(swaggerModel.Host, swaggerModel.Metadata, viewModel.Metadata);
@@ -33,7 +33,7 @@
             IList<Definition> allDefinitions;
             if (!_cacheDefinitions.TryGetValue(groupKey, out allDefinitions))
             {
-                allDefinitions = GetAllDefinitions(GetAllDefinitionObjects(swaggerModel));
+                allDefinitions = GetAllDefinitions(GetAllDefinitionObjects(swaggerModel, path));
                 _cacheDefinitions.TryAdd(groupKey, allDefinitions);
             }
 
@@ -280,7 +280,7 @@
                         }
                         else if (parameter.Metadata.TryGetValue("schema", out var schema))
                         {
-                            definitionObject = ResolveSchema((JObject)schema);
+                            definitionObject = ResolveSchema((JObject)schema,"");
                             definitionObject.Name = parameter.Name;
                             definitionObject.Description = parameter.Description;
                         }
@@ -492,7 +492,7 @@
                 var schema = response.Metadata.GetDictionaryFromMetaData<Dictionary<string, object>>("schema");
                 if (schema != null)
                 {
-                    var definitionObject = ResolveSchema(response.Metadata.GetValueFromMetaData<JObject>("schema"));
+                    var definitionObject = ResolveSchema(response.Metadata.GetValueFromMetaData<JObject>("schema"),"");
                     //todo: will resolve responses and parameters
                     definitionObject.Type = string.IsNullOrEmpty(definitionObject.Type) ? response.Metadata.GetValueFromMetaData<string>("x-internal-ref-name") : definitionObject.Type;
                     definitionObjects.Add(definitionObject);
@@ -729,7 +729,7 @@
 
         #region Definitions
 
-        private static IList<DefinitionObject> GetAllDefinitionObjects(SwaggerModel swaggerModel)
+        private static IList<DefinitionObject> GetAllDefinitionObjects(SwaggerModel swaggerModel,string path)
         {
             var allDefinitionObjects = new List<DefinitionObject>();
             if (swaggerModel.Definitions != null)
@@ -737,7 +737,7 @@
                 var definitions = ((JObject)swaggerModel.Definitions).ToObject<Dictionary<string, JObject>>();
                 foreach (var definition in definitions)
                 {
-                    var definitionObject = ResolveSchema(definition.Value);
+                    var definitionObject = ResolveSchema(definition.Value, path);
                     definitionObject.Name = definition.Key;
                     definitionObject.Type = definition.Key;
                     var flattenDefinitionObjects = FlattenDefinitionObject(definitionObject);
@@ -1346,7 +1346,7 @@
 
         #region Parse JObject to DefinitionObject
 
-        private static void ResolveObject(string key, JObject nodeObject, DefinitionObject definitionObject, string[] requiredFields = null, string discriminatorKey = null, string discriminatorValue = null, string parentType = "")
+        private static void ResolveObject(string key, JObject nodeObject, DefinitionObject definitionObject, string[] requiredFields = null, string discriminatorKey = null, string discriminatorValue = null, string parentType = "",string path="")
         {
             if (nodeObject.Type == JTokenType.Object)
             {
@@ -1407,7 +1407,7 @@
                         definitionObject.PropertyItems.Add(childDefinitionObject);
                     }
                 }
-                else if (nodeObjectDict.GetValueFromMetaData<JObject>("additionalProperties") != null)
+                else if (nodeObjectDict.GetValueFromMetaData<JObject>("additionalProperties",path:path) != null)
                 {
                     definitionObject.DefinitionObjectType = DefinitionObjectType.Object;
                     var additionalPropertiesNode = nodeObjectDict.GetValueFromMetaData<JObject>("additionalProperties");
@@ -1607,10 +1607,10 @@
             }
         }
 
-        private static DefinitionObject ResolveSchema(JObject nodeObject)
+        private static DefinitionObject ResolveSchema(JObject nodeObject,string path)
         {
             DefinitionObject definitionObject = new DefinitionObject();
-            ResolveObject(string.Empty, nodeObject, definitionObject);
+            ResolveObject(string.Empty, nodeObject, definitionObject,path:path);
             ResolveDefinitionClientFlatten(definitionObject);
             return definitionObject;
         }

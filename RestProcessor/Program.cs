@@ -27,6 +27,7 @@
         static int Main(string[] args)
         {
             Console.WriteLine("Processor begin at:" + DateTime.UtcNow);
+            
             try
             {
                 if (args.Length < 3)
@@ -240,18 +241,18 @@
             //    }
             //}
 
-            Parallel.ForEach(groupOperationFiles, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (groupOperationFile) =>
+            Parallel.ForEach(groupOperationFiles, new ParallelOptions { MaxDegreeOfParallelism = 1 }, (groupOperationFile) =>
             {
                 var firstOperationFile = groupOperationFile.Value.First();
                 RestProcessorForOperation(groupOperationFile.Key, firstOperationFile, groupOperations);
                 var otherOperationFiles = groupOperationFile.Value.Skip(1);
-                Parallel.ForEach(otherOperationFiles, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (file) =>
+                Parallel.ForEach(otherOperationFiles, new ParallelOptions { MaxDegreeOfParallelism = 1 }, (file) =>
                 {
                     RestProcessorForOperation(groupOperationFile.Key, file, groupOperations);
                 });
             });
 
-            Parallel.ForEach(groupFiles, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (file) =>
+            Parallel.ForEach(groupFiles, new ParallelOptions { MaxDegreeOfParallelism = 1 }, (file) =>
             {
                 var folder = Path.GetDirectoryName(file.FilePath);
                 var ymlPath = Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(file.FilePath)}.yml");

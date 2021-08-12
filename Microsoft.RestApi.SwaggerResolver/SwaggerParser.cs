@@ -89,9 +89,21 @@
                 {
                     sourceDoc[referencedEntityType] = new JObject();
                 }
-                if (sourceDoc[referencedEntityType][referencedModelName] == null && !visitedEntities.Contains(referencedModelName))
+                //Fix Bug: For example:(in vstsrestapispecs\azure-rest-api-specs\specification\cognitiveservices\data-plane\Common\Parameters.json file)
+                        //"ImageUrl": {
+                        //      "name": "ImageUrl",
+                        //      "in": "body",
+                        //      "required": true,
+                        //      "x-ms-parameter-location": "method",
+                        //      "x-ms-client-flatten": true,
+                        //      "description": "A JSON document with a URL pointing to the image that is to be analyzed.",
+                        //      "schema": {
+                        //                        "$ref": "#/definitions/ImageUrl"
+                        //      }
+                        //}
+                if (sourceDoc[referencedEntityType][referencedModelName] == null && !visitedEntities.Contains(referencedEntityType+referencedModelName))
                 {
-                    visitedEntities.Add(referencedModelName);
+                    visitedEntities.Add(referencedEntityType+referencedModelName);
                     if (filePath != null)
                     {
                         //recursively check if the model is completely defined.

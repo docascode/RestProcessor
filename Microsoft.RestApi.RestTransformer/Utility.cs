@@ -13,7 +13,7 @@
 
     public static class Utility
     {
-        public static T GetValueFromMetaData<T>(this Dictionary<string, object> metadata, string key, T defaultValue=default(T))
+        public static T GetValueFromMetaData<T>(this Dictionary<string, object> metadata, string key, T defaultValue=default(T),string path="")
         {
             Guard.ArgumentNotNull(metadata, nameof(metadata));
             Guard.ArgumentNotNullOrEmpty(key, nameof(key));
@@ -26,7 +26,7 @@
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"can not convert the metadata[{key}], detail: {ex}");
+                    Console.WriteLine($"can not convert the metadata[{key}+{path}], detail: {ex}");
                     return defaultValue;
                 }
             }

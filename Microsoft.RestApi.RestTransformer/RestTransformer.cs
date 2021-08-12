@@ -61,7 +61,7 @@
                 if (currentFileType == "OperationGroup" || currentFileType == "TagGroup")
                 {
                     var restGroupTransformer = RestGroupTransformerFactory.CreateRestGroupTransformer(currentFileType);
-                    var groupInfo = restGroupTransformer.Transform(swaggerModel, viewModel, groupOperations, version);
+                    var groupInfo = restGroupTransformer.Transform(swaggerModel, viewModel, groupOperations, version,filePath: filePath);
                     if (groupInfo != null)
                     {
                         using (var writer = new StreamWriter(ymlPath))
