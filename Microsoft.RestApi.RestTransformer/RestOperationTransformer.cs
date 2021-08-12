@@ -1384,7 +1384,7 @@
                     {
                         var childDefinitionObject = new DefinitionObject();
                         childDefinitionObject.IsFlatten = definitionObject.IsFlatten;
-                        ResolveObject(string.Empty, oneAllOf, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue);
+                        ResolveObject(string.Empty, oneAllOf, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue,path:path);
                         definitionObject.AllOfs.Add(childDefinitionObject);
                     }
                 }
@@ -1403,7 +1403,7 @@
                         {
                             tempParentType = parentType + "." + tempParentType;
                         }
-                        ResolveObject(property.Key, (JObject)property.Value, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue, tempParentType);
+                        ResolveObject(property.Key, (JObject)property.Value, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue, tempParentType,path:path);
                         definitionObject.PropertyItems.Add(childDefinitionObject);
                     }
                 }
@@ -1419,7 +1419,7 @@
                     {
                         var childDefinitionObject = new DefinitionObject();
                         definitionObject.AdditionalType = additionalProperties.GetValueFromMetaData<string>("x-internal-ref-name");
-                        ResolveObject(string.Empty, additionalPropertiesNode, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue);
+                        ResolveObject(string.Empty, additionalPropertiesNode, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue, path: path);
                         definitionObject.PropertyItems.Add(childDefinitionObject);
                     }
                     else
@@ -1466,7 +1466,7 @@
                         foreach (var oneAllOf in allOfsNode.ToObject<JArray>())
                         {
                             var childDefinitionObject = new DefinitionObject();
-                            ResolveObject(string.Empty, (JObject)oneAllOf, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue);
+                            ResolveObject(string.Empty, (JObject)oneAllOf, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue, path: path);
                             definitionObject.AllOfs.Add(childDefinitionObject);
                         }
                     }
@@ -1477,7 +1477,7 @@
                         {
                             var childDefinitionObject = new DefinitionObject();
 
-                            ResolveObject(property.Key, (JObject)property.Value, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue);
+                            ResolveObject(property.Key, (JObject)property.Value, childDefinitionObject, requiredProperties, discriminatorPropertyKey, discriminatorPropertyValue, path: path);
                             definitionObject.PropertyItems.Add(childDefinitionObject);
                         }
                     }

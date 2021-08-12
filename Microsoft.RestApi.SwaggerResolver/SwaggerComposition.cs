@@ -23,9 +23,13 @@
                 {
                     JProperty typeProp = props.Property("type");
                     JProperty additionalPropertiesProp = props.Property("additionalProperties");
-                    if (typeProp?.Value?.ToString() == "object" && additionalPropertiesProp != null)
+                    if (additionalPropertiesProp != null)
                     {
-                        typeProp.Remove();
+                        if (typeProp?.Value?.ToString() == "object")
+                        {
+                            typeProp.Remove();
+                        }
+
                         additionalPropertiesProp.Remove();
                         var prop = (JObject)JsonConvert.DeserializeObject("{'type':'object'}");
                         props.Add("additionalProperties", prop);
