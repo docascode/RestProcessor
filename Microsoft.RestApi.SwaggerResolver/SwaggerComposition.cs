@@ -15,19 +15,23 @@
         private static void FormatAdditionalProperties(JObject jObj)
         {
             IEnumerable<JToken> additionalPropertiesList = jObj.SelectTokens("$..additionalProperties").Where(p => ((object)p).ToString()=="True");
-            while (additionalPropertiesList.Count() > 0)
+            var count =0;
+            while (count< additionalPropertiesList.Count())
             {
-                var additionalProperties = additionalPropertiesList.ElementAt(0);
+                var additionalProperties = additionalPropertiesList.ElementAt(count);
                 foreach (var props in additionalProperties.Parent?.Parent?.Parent?.Children<JObject>())
                 {
                     JProperty typeProp = props.Property("type");
                     JProperty additionalPropertiesProp = props.Property("additionalProperties");
-                    if (typeProp.Value?.ToString() == "object" && additionalPropertiesProp != null)
+                    if (typeProp?.Value?.ToString() == "object" && additionalPropertiesProp != null)
                     {
                         typeProp.Remove();
                         additionalPropertiesProp.Remove();
-                        var prop=(JObject)JsonConvert.DeserializeObject("{'type':'object'}");
-                        props.Add("additionalProperties", prop); 
+                        var prop = (JObject)JsonConvert.DeserializeObject("{'type':'object'}");
+                        props.Add("additionalProperties", prop);
+                    }
+                    else {
+                        count++;
                     }
                 }
             }
