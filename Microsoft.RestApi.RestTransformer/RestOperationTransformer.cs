@@ -39,7 +39,7 @@
 
             var bodyDefinitionObject = new DefinitionObject();
             var parametersDefinitions = new List<Definition>();
-            var allSimpleParameters = TransformAllSimpleParameters(securities, hostParameters, viewModel, ref bodyDefinitionObject, ref parametersDefinitions);
+            var allSimpleParameters = TransformAllSimpleParameters(securities, hostParameters, viewModel, ref bodyDefinitionObject, ref parametersDefinitions,path: path);
 
             var responseDefinitionObjects = new List<DefinitionObject>();
             var responses = TransformResponses(viewModel, allDefinitions, ref responseDefinitionObjects);
@@ -166,7 +166,7 @@
 
         #region Parameters
 
-        private static IList<ParameterEntity> TransformAllSimpleParameters(IList<SecurityEntity> securities ,List<ParameterEntity> hostParameters, RestApiChildItemViewModel viewModel, ref DefinitionObject definitionObject, ref List<Definition> definitions)
+        private static IList<ParameterEntity> TransformAllSimpleParameters(IList<SecurityEntity> securities ,List<ParameterEntity> hostParameters, RestApiChildItemViewModel viewModel, ref DefinitionObject definitionObject, ref List<Definition> definitions,string path="")
         {
             var parameters = hostParameters == null ? new List<ParameterEntity>() : new List<ParameterEntity>(hostParameters);
             if (securities != null && securities.Count == 1 && securities.First().Type == "apiKey")
@@ -242,7 +242,7 @@
                                         foreach (var v in values)
                                         {
                                             var keyValueEnum = v.ToObject<Dictionary<string, object>>();
-                                            var enumV = keyValueEnum.GetValueFromMetaData<string>("value");
+                                            var enumV = keyValueEnum.GetValueFromMetaData<string>("value", path);
                                             var enumObject = enumObjects.FirstOrDefault(q => q.Value == enumV);
                                             if (enumV != null && enumObject != null)
                                             {
@@ -1520,7 +1520,7 @@
                                 foreach (var v in values)
                                 {
                                     var keyValueEnum = v.ToObject<Dictionary<string, object>>();
-                                    var enumV = keyValueEnum.GetValueFromMetaData<string>("value");
+                                    var enumV = keyValueEnum.GetValueFromMetaData<string>("value",path);
                                     var enumObject = enumObjects.FirstOrDefault(q => q.Value == enumV);
                                     if (enumV != null && enumObject != null)
                                     {

@@ -1,19 +1,47 @@
 ﻿namespace Microsoft.RestApi.SwaggerResolver
 {
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using System.Collections.Generic;
     using System.Linq;
 
     public static class SwaggerComposition
     {
         public static void Travel(JObject jObj)
         {
+            FormatAdditionalProperties(jObj);
+            FormatConsumesAndProduces(jObj);
+        }
+        private static void FormatAdditionalProperties(JObject jObj)
+        {
+            IEnumerable<JToken> additionalPropertiesList = jObj.SelectTokens("$..additionalProperties").Where(p => ((object)p).ToString()=="True");
+            while (additionalPropertiesList.Count() > 0)
+            {
+                var additionalProperties = additionalPropertiesList.ElementAt(0);
+                foreach (var props in additionalProperties.Parent?.Parent?.Parent?.Children<JObject>())
+                {
+                    JProperty typeProp = props.Property("type");
+                    JProperty additionalPropertiesProp = props.Property("additionalProperties");
+                    if (typeProp.Value?.ToString() == "object" && additionalPropertiesProp != null)
+                    {
+                        typeProp.Remove();
+                        additionalPropertiesProp.Remove();
+                        var prop=(JObject)JsonConvert.DeserializeObject("{'type':'object'}");
+                        props.Add("additionalProperties", prop); 
+                    }
+                }
+            }
+        }
+
+        private static void FormatConsumesAndProduces(JObject jObj)
+        {
             var consumes = jObj.SelectToken("consumes")?.DeepClone();
             var produces = jObj.SelectToken("produces")?.DeepClone();
 
-			if(consumes==null && produces != null)
-			{
-				return;
-			}
+            if (consumes == null && produces != null)
+            {
+                return;
+            }
             if (consumes != null)
             {
                 jObj.Property("consumes").Remove();
@@ -22,7 +50,7 @@
             {
                 jObj.Property("produces").Remove();
             }
-            
+
             var paths = jObj.SelectToken("paths");
             foreach (var path in paths.Children())
             {

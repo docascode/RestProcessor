@@ -25,7 +25,7 @@
                 {
                     if (viewModel.Children?.Count == 1)
                     {
-                        var operationInfo = RestOperationTransformer.Transform(groupKey, swaggerModel, viewModel.Children.First(), needPermission);
+                        var operationInfo = RestOperationTransformer.Transform(groupKey, swaggerModel, viewModel.Children.First(), needPermission,path: filePath);
                         if (operationInfo != null)
                         {
                             using (var writer = new StreamWriter(ymlPath))
