@@ -27,9 +27,6 @@
 
         static int Main(string[] args)
         {
-            args = new string[] { @"D:\repos\apex\vstsrestapispecs",
-                @"D:\repos\apex\vstsrestapispecs\azure-docs-rest-apis",
-                @"D:\repos\apex\vstsrestapispecs\azure-docs-rest-apis\mapping.json"};
             Console.WriteLine("Processor begin at:" + DateTime.UtcNow);
             try
             {

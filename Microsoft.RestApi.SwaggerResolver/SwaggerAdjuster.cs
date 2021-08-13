@@ -67,7 +67,7 @@
                     foreach (var item in action.Children())
                     {
                         var keyValues = JObject.Parse("{" + item.ToString() + "}");
-                        if (keyValues.ContainsKey("post") || keyValues.ContainsKey("get") || keyValues.ContainsKey("put") || keyValues.ContainsKey("delete") || keyValues.ContainsKey("patch"))
+                        if (keyValues.ContainsKey("post") || keyValues.ContainsKey("get") || keyValues.ContainsKey("put") || keyValues.ContainsKey("delete") || keyValues.ContainsKey("patch") || keyValues.ContainsKey("head"))
                         {
                             foreach (var child in item.Children())
                             {
