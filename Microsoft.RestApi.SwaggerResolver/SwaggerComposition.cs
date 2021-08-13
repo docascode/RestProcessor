@@ -14,7 +14,7 @@
         }
         private static void FormatAdditionalProperties(JObject jObj)
         {
-            IEnumerable<JToken> additionalPropertiesList = jObj.SelectTokens("$..additionalProperties").Where(p => ((object)p).ToString()=="True");
+            IEnumerable<JToken> additionalPropertiesList = jObj.SelectTokens("$..additionalProperties").Where(p => ((object)p).ToString()=="True" || ((object)p).ToString() == "False");
             var count =0;
             while (count< additionalPropertiesList.Count())
             {

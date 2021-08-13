@@ -242,7 +242,7 @@
                                         foreach (var v in values)
                                         {
                                             var keyValueEnum = v.ToObject<Dictionary<string, object>>();
-                                            var enumV = keyValueEnum.GetValueFromMetaData<string>("value", path);
+                                            var enumV = keyValueEnum.GetValueFromMetaData<string>("value", path: path);
                                             var enumObject = enumObjects.FirstOrDefault(q => q.Value == enumV);
                                             if (enumV != null && enumObject != null)
                                             {
@@ -1520,7 +1520,7 @@
                                 foreach (var v in values)
                                 {
                                     var keyValueEnum = v.ToObject<Dictionary<string, object>>();
-                                    var enumV = keyValueEnum.GetValueFromMetaData<string>("value",path);
+                                    var enumV = keyValueEnum.GetValueFromMetaData<string>("value",path:path);
                                     var enumObject = enumObjects.FirstOrDefault(q => q.Value == enumV);
                                     if (enumV != null && enumObject != null)
                                     {
