@@ -14,7 +14,7 @@
         }
         private static void AdjustAdditionalProperties(JObject jObj)
         {
-            IEnumerable<JToken> additionalPropertiesList = jObj.SelectTokens("$..additionalProperties").Where(p => ((object)p).ToString()=="True" || ((object)p).ToString() == "False");
+            IEnumerable<JToken> additionalPropertiesList = jObj.SelectTokens("$..additionalProperties").Where(p => ((object)p).ToString()=="True"/* || ((object)p).ToString() == "False"*/);
             var count =0;
             while (count< additionalPropertiesList.Count())
             {
@@ -59,7 +59,20 @@
                 jObj.Property("produces").Remove();
             }
 
-            var paths = jObj.SelectToken("paths");
+            AdjustConsumesAndProduces(jObj, "paths", consumes, produces);
+            AdjustConsumesAndProduces(jObj, "x-ms-paths", consumes, produces);
+        }
+        private static void AdjustConsumesAndProduces(JObject jObj,string pathName, JToken consumes, JToken produces)
+        {
+            if (string.IsNullOrEmpty(pathName) || jObj == null)
+            {
+                return;
+            }
+            var paths = jObj.SelectToken(pathName);
+            if (paths == null)
+            {
+                return;
+            }
             foreach (var path in paths.Children())
             {
                 foreach (var action in path.Children())

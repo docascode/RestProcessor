@@ -2,9 +2,11 @@
 {
     using Microsoft.RestApi.SwaggerResolver.Core.Parsing;
     using Microsoft.RestApi.SwaggerResolver.Core.Utilities;
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
 
     public static class SwaggerParser
@@ -123,15 +125,16 @@
 
             //ensure that all the models that are an allOf on the current model in the external doc are also included
             if (entityType != null && modelName != null)
-            {
+            {    
                 var reference = "#/" + entityType + "/" + modelName;
-                IEnumerable<JToken> dependentRefs = currentDoc.SelectTokens("$..allOf[*].$ref").Where(r => ((string)r).Contains(reference) && !((string)r).StartsWith(reference));
+                IEnumerable<JToken> dependentRefs = currentDoc.SelectTokens("$..allOf[*].$ref").Where(r => ((string)r).Contains(reference) && !visitedEntities.Contains(r.Path.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries)[0]+ r.Path.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries)[1]));
                 foreach (JToken dependentRef in dependentRefs)
                 {
                     //the JSON Path "definitions.ModelName.allOf[0].$ref" provides the name of the model that is an allOf on the current model
                     string[] refs = dependentRef.Path.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (refs[1] != null && !visitedEntities.Contains(refs[1]))
+                    if (refs[1] != null && !visitedEntities.Contains(refs[0] + refs[1]))
                     {
+                        visitedEntities.Add(refs[0] + refs[1]);
                         //recursively check if the model is completely defined.
                         EnsureCompleteDefinitionIsPresent(visitedEntities, externalFiles, sourceFilePath, currentFilePath, refs[0], refs[1]);
                         sourceDoc[refs[0]][refs[1]] = currentDoc[refs[0]][refs[1]];
@@ -143,7 +146,6 @@
         {
             if (!swaggerDocument.IsYaml()) // try parse as markdown if it is not YAML
             {
-                //Logger.Instance.Log(Category.Info, "Parsing as literate Swagger");
                 swaggerDocument = LiterateYamlParser.Parse(swaggerDocument);
             }
             // normalize YAML to JSON since that's what we process
@@ -181,7 +183,11 @@
                     if (!externalFiles.ContainsKey(filePath))
                     {
                         var externalDefinitionString = Settings.FileSystem.ReadAllText(filePath);
-                        externalFiles[filePath] = JObject.Parse(externalDefinitionString);
+                        var jsonLoadSetting = new JsonLoadSettings();
+                        var settings = new JsonSerializerSettings { 
+                            DateParseHandling = DateParseHandling.None,
+                        };
+                        externalFiles[filePath] = JsonConvert.DeserializeObject<JObject>(externalDefinitionString, settings);
                     }
                 }
 
