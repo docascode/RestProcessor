@@ -35,7 +35,7 @@
             HashSet<string> visitedEntities = new HashSet<string>();
             EnsureCompleteDefinitionIsPresent(visitedEntities, externalFiles, path);
             EnsureCompleteExampleIsPresent(visitedEntities, externalFiles, path);
-            SwaggerComposition.Travel(swaggerObject);
+            SwaggerAdjuster.Travel(swaggerObject);
             return swaggerObject.ToString();
         }
         public static void EnsureCompleteDefinitionIsPresent(HashSet<string> visitedEntities, Dictionary<string, JObject> externalFiles, string sourceFilePath, string currentFilePath = null, string entityType = null, string modelName = null)

@@ -5,14 +5,14 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public static class SwaggerComposition
+    public static class SwaggerAdjuster
     {
         public static void Travel(JObject jObj)
         {
-            FormatAdditionalProperties(jObj);
-            FormatConsumesAndProduces(jObj);
+            AdjustAdditionalProperties(jObj);
+            AdjustConsumesAndProduces(jObj);
         }
-        private static void FormatAdditionalProperties(JObject jObj)
+        private static void AdjustAdditionalProperties(JObject jObj)
         {
             IEnumerable<JToken> additionalPropertiesList = jObj.SelectTokens("$..additionalProperties").Where(p => ((object)p).ToString()=="True" || ((object)p).ToString() == "False");
             var count =0;
@@ -41,7 +41,7 @@
             }
         }
 
-        private static void FormatConsumesAndProduces(JObject jObj)
+        private static void AdjustConsumesAndProduces(JObject jObj)
         {
             var consumes = jObj.SelectToken("consumes")?.DeepClone();
             var produces = jObj.SelectToken("produces")?.DeepClone();
@@ -67,7 +67,7 @@
                     foreach (var item in action.Children())
                     {
                         var keyValues = JObject.Parse("{" + item.ToString() + "}");
-                        if (keyValues.ContainsKey("post") || keyValues.ContainsKey("get") || keyValues.ContainsKey("put") || keyValues.ContainsKey("delete"))
+                        if (keyValues.ContainsKey("post") || keyValues.ContainsKey("get") || keyValues.ContainsKey("put") || keyValues.ContainsKey("delete") || keyValues.ContainsKey("patch"))
                         {
                             foreach (var child in item.Children())
                             {
