@@ -6,8 +6,10 @@
     using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
+    using System.Runtime.Serialization;
+    using System.Text;
+    using System.Text.RegularExpressions;
 
     public static class SwaggerParser
     {
@@ -104,9 +106,9 @@
                                 //      }
                                 //}
                 #endregion
-                if (sourceDoc[referencedEntityType][referencedModelName] == null && !visitedEntities.Contains(referencedEntityType+referencedModelName))
+                if (sourceDoc[referencedEntityType][referencedModelName] == null && !visitedEntities.Contains(referencedEntityType + referencedModelName))
                 {
-                    visitedEntities.Add(referencedEntityType+referencedModelName);
+                    visitedEntities.Add(referencedEntityType + referencedModelName);
                     if (filePath != null)
                     {
                         //recursively check if the model is completely defined.
@@ -125,9 +127,9 @@
 
             //ensure that all the models that are an allOf on the current model in the external doc are also included
             if (entityType != null && modelName != null)
-            {    
+            {
                 var reference = "#/" + entityType + "/" + modelName;
-                IEnumerable<JToken> dependentRefs = currentDoc.SelectTokens("$..allOf[*].$ref").Where(r => ((string)r).Contains(reference) && !visitedEntities.Contains(r.Path.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries)[0]+ r.Path.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries)[1]));
+                IEnumerable<JToken> dependentRefs = currentDoc.SelectTokens("$..allOf[*].$ref").Where(r => ((string)r).Contains(reference) && !visitedEntities.Contains(r.Path.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries)[0] + r.Path.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries)[1]));
                 foreach (JToken dependentRef in dependentRefs)
                 {
                     //the JSON Path "definitions.ModelName.allOf[0].$ref" provides the name of the model that is an allOf on the current model
@@ -159,7 +161,7 @@
             var sourceDoc = externalFiles[sourceFilePath];
             var currentDoc = externalFiles[sourceFilePath];
             references = currentDoc.SelectTokens("$..$ref").Where(p => !((string)p).StartsWith("#") && ((string)p).Contains("examples"));
-            while (references.Count() >0)
+            while (references.Count() > 0)
             {
                 var value = references.ElementAt(0);
                 var path = (string)value;
@@ -171,7 +173,7 @@
                     //Fix Bug: for example:"$ref": "examples/oms-get-example.json"
                     if (!path.StartsWith("examples/"))
                     {
-                        path=path.Replace("examples/", "./examples/");
+                        path = path.Replace("examples/", "./examples/");
                     }
                     filePath = path;
                     // Make sure the filePath is either an absolute uri, or a rooted path
@@ -182,10 +184,18 @@
                     }
                     if (!externalFiles.ContainsKey(filePath))
                     {
+                        if (filePath.Contains("Costs_CreateOrUpdate.json"))
+                        {
+
+                        }
                         var externalDefinitionString = Settings.FileSystem.ReadAllText(filePath);
                         var jsonLoadSetting = new JsonLoadSettings();
-                        var settings = new JsonSerializerSettings { 
+                        var settings = new JsonSerializerSettings
+                        {
                             DateParseHandling = DateParseHandling.None,
+                            Converters ={
+                                            new FloatValueJsonConverter()
+                                        }
                         };
                         externalFiles[filePath] = JsonConvert.DeserializeObject<JObject>(externalDefinitionString, settings);
                     }
