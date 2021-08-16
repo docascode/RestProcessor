@@ -43,8 +43,12 @@
                                 var jProperty = props.ElementAt(count);
                                 var name = jProperty.Name;
                                 var value = jProperty.Value;
-                                jProperty.Remove();
-                                item.Add(name, Utilities.Double_str(value.ToString()));
+                                string res;
+                                if(!Utilities.Double_str(value.ToString(),out res))
+                                {
+                                    jProperty.Remove();
+                                    item.Add(name, int.Parse(res));
+                                }
                                 count++;
                             }
                         }

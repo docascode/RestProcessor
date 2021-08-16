@@ -5,16 +5,18 @@
 
     public static class Utilities
     {
-        public static string Double_str(string master)
+        public static bool Double_str(string master, out string target)
         {
             Regex reg = new Regex(@"^\d+\.\d+$");
             if (reg.IsMatch(master))
             {
-                return Convert.ToString(Convert.ToDouble(master)); 
+                target= Convert.ToString(Convert.ToDouble(master));
+                return true;
             }
             else
             {
-                return master;
+                target= master;
+                return false;
             }
         }
     }
