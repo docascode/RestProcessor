@@ -24,6 +24,10 @@
             reader = new JObject(jObject).CreateReader();
             while (reader.Read())
             {
+                if (reader.Path.EndsWith("value"))
+                { 
+                
+                }
                 switch (reader.TokenType)
                 {
                     case JsonToken.Float:
@@ -32,11 +36,6 @@
                         foreach (var item in keyValue?.Children<JObject>())
                         {
                             var props = item.Properties();
-                            if (props.Count() != 1)
-                            {
-                                continue;
-                            }
-
                             var count = 0;
                             while (count < props.Count())
                             {
@@ -44,7 +43,7 @@
                                 var name = jProperty.Name;
                                 var value = jProperty.Value;
                                 string res;
-                                if(!Utilities.Double_str(value.ToString(),out res))
+                                if(string.Compare(reader.Path,jProperty.Path,true)==0 && !Utilities.Double_str(value.ToString(),out res))
                                 {
                                     jProperty.Remove();
                                     item.Add(name, int.Parse(res));
