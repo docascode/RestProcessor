@@ -32,7 +32,7 @@
                 {
                     case JsonToken.Float:
                         var obj = jObject.SelectToken(reader.Path);
-                        var keyValue = obj.Parent?.Parent?.Parent;
+                        var keyValue = obj?.Parent?.Parent?.Parent;
                         foreach (var item in keyValue?.Children<JObject>())
                         {
                             var props = item.Properties();

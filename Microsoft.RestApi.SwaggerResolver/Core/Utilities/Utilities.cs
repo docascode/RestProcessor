@@ -7,7 +7,7 @@
     {
         public static bool Double_str(string master, out string target)
         {
-            Regex reg = new Regex(@"^\d+\.\d+$");
+            Regex reg = new Regex(@"^(-)?\d+\.\d+$");
             if (reg.IsMatch(master))
             {
                 target= Convert.ToString(Convert.ToDouble(master));
