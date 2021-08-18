@@ -38,12 +38,11 @@
                                 var jProperty = props.ElementAt(count);
                                 var name = jProperty.Name;
                                 var value = jProperty.Value;
-                                string res;
-                                if(string.Compare(reader.Path,jProperty.Path,true)==0 && !Utilities.Double_str(value.ToString(),out res))
+                                if(string.Compare(reader.Path,jProperty.Path,true)==0 && !Utilities.EnsureRemoveDecimalEndZero(value.Value<double>()))
                                 {
                                     try
                                     {
-                                        var convert = Convert.ToInt32(res);
+                                        var convert = Convert.ToInt32(value.Value<string>());
                                         jProperty.Remove();
                                         item.Add(name, convert);
                                     }

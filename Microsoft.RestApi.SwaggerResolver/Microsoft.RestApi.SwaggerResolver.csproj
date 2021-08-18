@@ -50,7 +50,6 @@
     <Compile Include="Core\Parsing\LiterateYamlParser.cs" />
     <Compile Include="Core\Parsing\YamlExtensions.cs" />
     <Compile Include="Core\Utilities\Collections\ICopyFrom.cs" />
-    <Compile Include="Core\Utilities\CustomDecimalJsonConverter.cs" />
     <Compile Include="Core\Utilities\DecimalJsonConverter.cs" />
     <Compile Include="Core\Utilities\Extensions.cs" />
     <Compile Include="Core\Utilities\FileSystem.cs" />
