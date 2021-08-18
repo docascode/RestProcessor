@@ -40,7 +40,16 @@
             EnsureCompleteDefinitionIsPresent(visitedEntities, externalFiles, path);
             EnsureCompleteExampleIsPresent(visitedEntities, externalFiles, path);
             SwaggerAdjuster.Travel(swaggerObject);
-            return swaggerObject.ToString();
+            var settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                Converters ={
+                                new DecimalJsonConverter()
+                            }
+            };
+            string json = JsonConvert.SerializeObject(swaggerObject, settings);
+            return json;
+            //return swaggerObject.ToString();
         }
         public static void EnsureCompleteDefinitionIsPresent(HashSet<string> visitedEntities, Dictionary<string, JObject> externalFiles, string sourceFilePath, string currentFilePath = null, string entityType = null, string modelName = null)
         {
@@ -184,18 +193,14 @@
                     }
                     if (!externalFiles.ContainsKey(filePath))
                     {
-                        if (filePath.Contains("Costs_CreateOrUpdate.json"))
-                        {
-
-                        }
                         var externalDefinitionString = Settings.FileSystem.ReadAllText(filePath);
                         var jsonLoadSetting = new JsonLoadSettings();
                         var settings = new JsonSerializerSettings
                         {
                             DateParseHandling = DateParseHandling.None,
-                            Converters ={
-                                            new FloatValueJsonConverter()
-                                        }
+                            //Converters ={
+                            //                new FloatValueJsonConverter()
+                            //            }
                         };
                         externalFiles[filePath] = JsonConvert.DeserializeObject<JObject>(externalDefinitionString, settings);
                     }
