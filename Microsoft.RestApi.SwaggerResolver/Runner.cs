@@ -2,6 +2,8 @@
 {
     using System;
     using System.IO;
+    using System.Text;
+    using System.Threading.Tasks;
 
     public static class Runner
     {
@@ -10,14 +12,28 @@
             Console.WriteLine("Resolving begin at:" + DateTime.UtcNow);
             try
             {
-                foreach (var path in paths)
+                Parallel.ForEach(paths, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (path) =>
                 {
-                    Console.WriteLine($"Resolving swagger file by SwaggerResolver {path}");
-                    var formatPath = Path.GetFullPath(path);
-                    var result = SwaggerParser.Resolver(formatPath);
-                    Settings.FileSystem.WriteAllText(formatPath, result);
-                    Console.WriteLine($"Done resolving swagger file by AutoRest{formatPath}");
-                }
+                    var sb = new StringBuilder();
+                    try
+                    {
+                        sb.AppendLine($"Resolving swagger file by SwaggerResolver {path}");
+                        var formatPath = Path.GetFullPath(path);
+                        var result = SwaggerParser.Resolver(formatPath);
+                        Settings.FileSystem.WriteAllText(formatPath, result);
+                        sb.AppendLine($"Done resolving swagger file by AutoRest{formatPath}");
+                        Console.WriteLine();
+                    }
+                    catch (Exception ex)
+                    {
+                        sb.AppendLine(ex.Message);
+                        throw ex;
+                    }
+                    finally
+                    {
+                        Console.WriteLine(sb.ToString());
+                    }
+                });
 
                 return 0;
             }
