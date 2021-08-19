@@ -46,7 +46,7 @@
             var consumes = jObj.SelectToken("consumes")?.DeepClone();
             var produces = jObj.SelectToken("produces")?.DeepClone();
 
-            if (consumes == null && produces != null)
+            if (consumes == null && produces == null)
             {
                 return;
             }
