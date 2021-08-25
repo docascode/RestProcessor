@@ -110,8 +110,9 @@
                         keyValuePairs.Add(fileName, Tuple.Create(new JObject(RootJObj), TargetDir));
                     }
                     
+                    fileName = $"{fileName}.json";
                     fileNameInfo.FileName = OrgsMappingFile.UseYamlSchema ? Path.ChangeExtension(fileName, "yml") : fileName;
-                    fileNameInfo.FilePath = Path.Combine(TargetDir, $"{fileName}.json");
+                    fileNameInfo.FilePath = Path.Combine(TargetDir, fileName);
                     fileNameInfo.Version = Version;
 
                     // Clear up internal data
